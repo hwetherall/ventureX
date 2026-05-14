@@ -16,7 +16,18 @@
       "Bash(npx vitest *)",
       "Bash(pnpm lint *)",
       "Bash(npx next *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(git --no-pager diff --stat HEAD)",
+      "Bash(git --no-pager show --stat 3d28d2c)",
+      "Skill(investigate)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(Get-ChildItem *)",
+      "Bash(git -C \"C:/Users/hweth/OneDrive/Desktop/Innovera/Rapid Prototyping/VentureX\" status --short)",
+      "Bash(git -C \"C:/Users/hweth/OneDrive/Desktop/Innovera/Rapid Prototyping/VentureX\" branch --show-current)",
+      "Bash(mkdir -p /c/dev)",
+      "Bash(echo \"C:\\\\\\\\dev created\")",
+      "Bash(node *)",
+      "PowerShell(pnpm test:run *)"
     ]
   }
 }

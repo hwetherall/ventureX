@@ -91,7 +91,7 @@ export const GeographyRegulatorySchema = z.object({
   target_geographies: z.array(z.string().min(1)),
   accessible_market_constraints: z.array(z.string().min(1)),
   regulatory_regime: z.enum(["Light", "Medium", "Heavy"]),
-  localization_requirements: z.string().min(1),
+  localization_requirements: z.array(z.string().min(1)),
   confidence: ConfidenceSchema,
   supporting_quotes: z.array(SupportingQuoteSchema).max(5),
   notes: z.string().optional(),
@@ -172,8 +172,8 @@ export const VentureProfileSchema = z.object({
   strategic_risks_and_uncertainties: z
     .array(StrategicRiskSchema)
     .min(1)
-    .max(10),
-  gaps_in_input: z.array(z.string().min(1)).max(10),
+    .max(6),
+  gaps_in_input: z.array(z.string().min(1)).max(5),
 });
 
 export type VentureProfile = z.infer<typeof VentureProfileSchema>;

@@ -39,6 +39,17 @@ The 7 dimensions live under a single `dimensions` object in the output JSON. Eac
 dimension has its content fields, a `confidence` score (0.0–1.0), and 1–3 
 `supporting_quotes` (each with `quote` and `source` filename).
 
+Every dimension object also accepts an **optional `notes`** field (string). Use 
+`notes` for nuance, caveats, or reasoning that does not fit into the atomic 
+enum/number fields. Enum and number fields must contain ONLY the atomic value — 
+never append "— with reasoning" or similar inline commentary; put that in `notes`.
+
+**Anonymization rule for `supporting_quotes`:** quote the source documents 
+verbatim wherever possible. If a quote contains the parent company name (e.g., 
+"ABB"), redact it consistently as `[the parent]` using square brackets to 
+signal the edit. Do not invent paraphrases; if a quote isn't useful verbatim 
+or redacted, leave it out and pick a different one.
+
 ## dimensions.product_solution
 - job_to_be_done: The functional + emotional + social job the customer hires 
   this for (Christensen JTBD framing)
@@ -63,8 +74,11 @@ dimension has its content fields, a `confidence` score (0.0–1.0), and 1–3
 ## dimensions.transaction
 - model: unit_sales | subscription | licensing | commission | fee_for_service 
   | advertising | rental | hybrid
-- typical_deal_size_usd: Estimate range if not stated
-- margin_profile: low | medium | high — with reasoning
+- typical_deal_size_usd: Estimate range if not stated (string is fine, e.g. 
+  "$500–$3,000 per unit; $100K–$2M per deployment")
+- margin_profile: exactly one of `low` | `medium` | `high`. **No commentary 
+  appended to the value.** If you want to explain the choice, put the 
+  reasoning in the dimension's optional `notes` field.
 - revenue_recurrence: one_time | recurring | mixed
 
 ## dimensions.partners
@@ -79,24 +93,62 @@ dimension has its content fields, a `confidence` score (0.0–1.0), and 1–3
 - reach: First-touch mechanism
 - acquire: First-transaction mechanism
 - maintain: Ongoing relationship mechanism
-- access_intensity: low | medium | high — does marketing/access drive success 
-  for THIS venture? (For B2B hardware: usually low. For consumer products: 
-  usually high.)
+- access_intensity: exactly one of `low` | `medium` | `high`. This is a 
+  category-level fact about the *business type*, not about THIS venture's 
+  current channel state. Use this decision tree:
+  - **`high`** ONLY when marketing/awareness/reach is itself the primary 
+    moat — i.e., the product wins because customers can find it and trust 
+    it (consumer brands, demand-gen SaaS, marketplaces fighting for 
+    mindshare).
+  - **`medium`** when access matters meaningfully but isn't the moat (e.g., 
+    prosumer tools, mid-market software).
+  - **`low`** for B2B hardware, infrastructure, specifier-driven sales, RFP 
+    procurement, and OEM spec-in markets. The buyer is sophisticated; they 
+    find vendors through specs and RFPs, not advertising.
+  
+  Critically: if the venture has to BUILD a channel from zero, that does NOT 
+  raise `access_intensity` — channel-build effort is a `strategic_risks` 
+  entry. The fact that channels matter to incumbents does NOT raise 
+  `access_intensity` either — that's just B2B distribution working normally. 
+  `access_intensity` is `high` only when access is the *moat*, not when 
+  access is *required infrastructure*.
 
 ## dimensions.geography_regulatory
-- target_geographies: Ranked list
-- accessible_market_constraints: Where headline TAM ≠ accessible TAM (e.g., 
-  "China $500M headline / $75M accessible due to foreign-vendor restrictions")
+- target_geographies: Array of strings, ranked
+- accessible_market_constraints: **Array of strings.** One constraint per 
+  array element. Where headline TAM ≠ accessible TAM, give each region its 
+  own entry. Example:
+  ```
+  [
+    "China: $500M headline market but only ~$75M accessible to foreign vendors due to restrictions",
+    "India: similar accessibility constraints flagged but not quantified"
+  ]
+  ```
 - regulatory_regime: Light | Medium | Heavy
-- localization_requirements: What needs to be regionalized
+- localization_requirements: **Array of strings.** One requirement per array 
+  element (e.g., regional plug standards, voltage variants, certifications, 
+  local-language UI, in-country manufacturing).
 
 ## dimensions.capital_asset
-- capital_intensity: low | medium | high
-- asset_type: hardware | software | services | hybrid
+- capital_intensity: exactly one of `low` | `medium` | `high`. This reflects 
+  the **total capital commitment required to play credibly** — R&D + 
+  manufacturing tooling + channel build + working capital + inventory. A 
+  hardware venture that uses contract manufacturing but still requires 
+  multi-million-dollar inventory, certifications across regions, and a 
+  multi-year channel build is `high`, not `medium`. Software-only with no 
+  inventory is `low`. If you're unsure between two levels, pick the higher 
+  one and explain in `notes`.
+- asset_type: hardware | software | services | hybrid. Pick the dominant 
+  one; only use `hybrid` when the venture genuinely sells two asset types 
+  as co-equal SKUs.
 - manufacturing_footprint: none | contract_manufacturing | owned_facilities
-- defensibility_model: IP | scale | network_effects | brand | switching_costs 
-  | regulatory_capture | none — pick top 1–2
-- time_to_revenue_years: Estimate
+- defensibility_model: free-form string. Name the top 1–2 from IP, scale, 
+  network_effects, brand, switching_costs, regulatory_capture, none. 
+  Combine with `+` if two (e.g., "scale + brand").
+- time_to_revenue_years: **single number** (e.g., `3`). If the venture has 
+  multiple possible go-to-market paths with different timelines, pick the 
+  most likely one as the number and explain alternatives in `notes`. Do 
+  not return a range or string.
 
 # intended_end_state (top-level)
 - scale: e.g., "top-3 global player by revenue"
@@ -108,9 +160,26 @@ dimension has its content fields, a `confidence` score (0.0–1.0), and 1–3
 pre_concept | concept | early_prototype | pilot | early_revenue | scaling
 
 # strategic_risks_and_uncertainties (top-level)
-This field is CRITICAL for downstream competitor generation. List 3–6 strategic 
-risks or uncertainties that the venture faces, AND for each one, explicitly state 
-what kind of competitor or substitute it implies we should look for.
+This field is CRITICAL for downstream competitor generation. List **exactly 4–6** 
+strategic risks or uncertainties that the venture faces, AND for each one, 
+explicitly state what kind of competitor or substitute it implies we should look 
+for. Hard cap: 6 entries.
+
+**Consolidation rule (read carefully — it's easy to over-consolidate):**
+
+Risks with **distinct underlying mechanisms** stay separate even when their 
+downstream searches overlap. For example, in a rack-power venture:
+- "100–200kW density migration could obsolete AC rack PDUs" and "AC-to-DC 
+  transition could displace AC rack PDUs" are TWO risks, not one. The 
+  mechanisms are different (density vs current type) even though both end 
+  up pointing to busbar and DC architectures in `implies_search_for`.
+
+Only merge two risks when BOTH:
+1. The underlying mechanism is the same (not just the symptom), AND
+2. The `implies_search_for` would be word-for-word identical.
+
+If you have 7+ candidate risks, drop the weakest one rather than merging two 
+mechanistically-distinct ones.
 
 Example for a rack PDU venture:
 ```json
@@ -121,8 +190,10 @@ Example for a rack PDU venture:
 ```
 
 # gaps_in_input (top-level)
-List 3–5 specific things that would make the profile stronger if added. This is 
-for the human-in-the-loop refinement step.
+List **3–5 max** specific things that would make the profile stronger if added. 
+Hard cap: 5 entries. This is for the human-in-the-loop refinement step — be 
+specific and actionable ("competitor share data segmented by hyperscale vs 
+colo") rather than generic ("more market data").
 
 # OUTPUT FORMAT
 

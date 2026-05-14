@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(where gstack *)",
+      "Bash(command -v bun)",
+      "Bash(command -v node)",
+      "Bash(command -v git)"
+    ]
+  }
+}

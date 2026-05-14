@@ -4,7 +4,12 @@
       "Bash(where gstack *)",
       "Bash(command -v bun)",
       "Bash(command -v node)",
-      "Bash(command -v git)"
+      "Bash(command -v git)",
+      "Bash(bun run *)",
+      "PowerShell(Get-ChildItem -Recurse \"C:\\\\Users\\\\hweth\\\\OneDrive\\\\Desktop\\\\Innovera\\\\Rapid Prototyping\\\\VentureX\\\\src\\\\app\" | Where-Object { -not $_.PSIsContainer } | Select-Object -ExpandProperty FullName)",
+      "Bash(pnpm tsc *)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm vitest *)"
     ]
   }
 }

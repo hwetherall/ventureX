@@ -19,14 +19,27 @@ This matters because downstream LLM calls will use this profile to brainstorm
 competitors. If the parent name leaks in, the models will over-anchor on the 
 parent's existing competitive set rather than the venture's actual one.
 
+# TOP-LEVEL FIELDS
+
+The output JSON has these top-level fields:
+
+- `venture_codename` — always the string `"VentureX"`
+- `synthetic_description` — one paragraph (2-4 sentences) describing what the venture 
+  is, what market it's entering, and what parent-company strengths it draws on, all in 
+  anonymized language. This is the first thing downstream LLMs see; it sets the framing.
+- `intended_end_state` — object with `scale`, `timeline_years`, `minimum_success_criteria`
+- `current_maturity` — one of: `pre_concept` | `concept` | `early_prototype` | `pilot` | `early_revenue` | `scaling`
+- `dimensions` — object containing the 7 dimension objects (see below)
+- `strategic_risks_and_uncertainties` — array of `{ risk, implies_search_for }` objects
+- `gaps_in_input` — array of strings, 3-5 specific things that would make the profile stronger
+
 # THE 7 DIMENSIONS
 
-For each dimension, extract:
-- The dimension content (structured per the schema below)
-- A confidence score 0.0–1.0
-- 1–3 supporting quotes from the input documents, with source filename
+The 7 dimensions live under a single `dimensions` object in the output JSON. Each 
+dimension has its content fields, a `confidence` score (0.0–1.0), and 1–3 
+`supporting_quotes` (each with `quote` and `source` filename).
 
-## Dimension 1: PRODUCT / SOLUTION
+## dimensions.product_solution
 - job_to_be_done: The functional + emotional + social job the customer hires 
   this for (Christensen JTBD framing)
 - solution_mechanism: The specific HOW. Be concrete about form factor and 
@@ -39,7 +52,7 @@ For each dimension, extract:
   competitors. (e.g., for a rack PDU venture: busbar+tap-off, power shelves, 
   DC distribution, integrated server-mounted power)
 
-## Dimension 2: CUSTOMERS
+## dimensions.customers
 - segment_type: B2C | B2B-SME | B2B-Enterprise | B2G | mixed
 - buyer: Who writes the check
 - user: Who actually uses the product (may differ from buyer)
@@ -47,21 +60,21 @@ For each dimension, extract:
   enterprise on-prem"
 - buyer_sophistication: low | medium | high
 
-## Dimension 3: TRANSACTION
+## dimensions.transaction
 - model: unit_sales | subscription | licensing | commission | fee_for_service 
   | advertising | rental | hybrid
 - typical_deal_size_usd: Estimate range if not stated
 - margin_profile: low | medium | high — with reasoning
 - revenue_recurrence: one_time | recurring | mixed
 
-## Dimension 4: PARTNERS
+## dimensions.partners
 - distribution_channels: List
 - key_suppliers: List (if known)
 - regulators_certifications: List (UL, CE, FCC, regional bodies)
 - system_integrators_resellers: List
 - complementary_product_partners: List
 
-## Dimension 5: ACCESS (LRAM model)
+## dimensions.access (LRAM model)
 - learn: How customers learn the offering exists
 - reach: First-touch mechanism
 - acquire: First-transaction mechanism
@@ -70,14 +83,14 @@ For each dimension, extract:
   for THIS venture? (For B2B hardware: usually low. For consumer products: 
   usually high.)
 
-## Dimension 6: GEOGRAPHY & REGULATORY SURFACE
+## dimensions.geography_regulatory
 - target_geographies: Ranked list
 - accessible_market_constraints: Where headline TAM ≠ accessible TAM (e.g., 
   "China $500M headline / $75M accessible due to foreign-vendor restrictions")
 - regulatory_regime: Light | Medium | Heavy
 - localization_requirements: What needs to be regionalized
 
-## Dimension 7: CAPITAL / ASSET PROFILE
+## dimensions.capital_asset
 - capital_intensity: low | medium | high
 - asset_type: hardware | software | services | hybrid
 - manufacturing_footprint: none | contract_manufacturing | owned_facilities
@@ -85,38 +98,58 @@ For each dimension, extract:
   | regulatory_capture | none — pick top 1–2
 - time_to_revenue_years: Estimate
 
-# ADDITIONAL OUTPUT FIELDS
-
-## intended_end_state
+# intended_end_state (top-level)
 - scale: e.g., "top-3 global player by revenue"
 - timeline_years: 1 | 2 | 3 | 5 | 10
 - minimum_success_criteria: The threshold below which this venture is considered 
   to have failed (e.g., "$50M/year revenue within 3 years")
 
-## current_maturity
+# current_maturity (top-level)
 pre_concept | concept | early_prototype | pilot | early_revenue | scaling
 
-## strategic_risks_and_uncertainties
+# strategic_risks_and_uncertainties (top-level)
 This field is CRITICAL for downstream competitor generation. List 3–6 strategic 
 risks or uncertainties that the venture faces, AND for each one, explicitly state 
 what kind of competitor or substitute it implies we should look for.
 
 Example for a rack PDU venture:
+```json
 {
-  "risk": "Migration from 10–20kW racks to 100–200kW for AI workloads may 
-           obsolete rack-level distribution",
-  "implies_search_for": "Companies providing busbar+tap-off systems, power 
-                        shelves, in-rack DC distribution, integrated 
-                        server-mounted power"
+  "risk": "Migration from 10–20kW racks to 100–200kW for AI workloads may obsolete rack-level distribution",
+  "implies_search_for": "Companies providing busbar+tap-off systems, power shelves, in-rack DC distribution, integrated server-mounted power"
 }
+```
 
-## gaps_in_input
+# gaps_in_input (top-level)
 List 3–5 specific things that would make the profile stronger if added. This is 
 for the human-in-the-loop refinement step.
 
 # OUTPUT FORMAT
-Return a single JSON object matching the schema above. No prose preamble or 
-postamble. The JSON must be valid and parseable.
+
+Return a single JSON object with exactly this shape (the 7 dimensions are nested 
+under `dimensions`, NOT at the top level):
+
+```json
+{
+  "venture_codename": "VentureX",
+  "synthetic_description": "...",
+  "intended_end_state": { "scale": "...", "timeline_years": 3, "minimum_success_criteria": "..." },
+  "current_maturity": "pre_concept",
+  "dimensions": {
+    "product_solution":     { "job_to_be_done": "...", "solution_mechanism": "...", "platform_or_pipe": "...", "core_features": [...], "substitution_landscape": [...], "confidence": 0.9, "supporting_quotes": [...] },
+    "customers":            { ... },
+    "transaction":          { ... },
+    "partners":             { ... },
+    "access":               { ... },
+    "geography_regulatory": { ... },
+    "capital_asset":        { ... }
+  },
+  "strategic_risks_and_uncertainties": [ { "risk": "...", "implies_search_for": "..." }, ... ],
+  "gaps_in_input": [ "...", ... ]
+}
+```
+
+No prose preamble or postamble. The JSON must be valid and parseable.
 
 # INPUT DOCUMENTS
 [Documents will be appended here]

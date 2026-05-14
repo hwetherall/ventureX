@@ -49,8 +49,8 @@ Read this before anything else. The names and concepts here appear throughout th
             │
             ▼
    ┌────────────────┐
-   │  Stage 0       │   Parse PDFs, DOCX, PPTX → clean markdown.
-   │  Intake        │   Store in Supabase. Generate venture_id.
+   │  Stage 0       │   Parse PDFs, DOCX → clean markdown. PPTX rejected.
+   │  Intake        │   Store in InsForge. Generate venture_id.
    └────────────────┘
             │
             ▼
@@ -88,7 +88,7 @@ Read this before anything else. The names and concepts here appear throughout th
 [Profile ready for Phase 3 — out of scope for this CLAUDE.md]
 ```
 
-Every box above logs its full input and output to Supabase. No black boxes; we need to be able to trace any surprising downstream output back to a specific LLM call.
+Every box above logs its full input and output to InsForge. No black boxes; we need to be able to trace any surprising downstream output back to a specific LLM call.
 
 ---
 
@@ -98,10 +98,10 @@ Every box above logs its full input and output to Supabase. No black boxes; we n
 |---|---|---|
 | Frontend framework | Next.js 16 (App Router) | TypeScript, React Server Components |
 | Hosting | Vercel | Standard Innovera deployment |
-| Database & auth | Supabase | Postgres, RLS enabled, Storage for raw docs |
+| Database & auth | InsForge | Postgres, RLS enabled, Storage for raw docs |
 | LLM routing | OpenRouter | Lets us A/B model choices via config, not code changes |
 | Primary models | Claude Opus 4.7 (extraction, weighting), GPT-5.5 (critic) | Frontier-tier only for Phases 1 & 2 — these are high-leverage |
-| Document parsing | `pdf-parse` (PDF), `mammoth` (DOCX), `pptx2json` or similar (PPTX) | Output normalized to markdown |
+| Document parsing | `pdf-parse` (PDF), `mammoth` (DOCX) | Output normalized to markdown. PPTX rejected in V1 per D2. |
 | UI components | shadcn/ui + Tailwind | Standard |
 | Validation | Zod | Every LLM JSON output validated against a Zod schema before storage |
 | Forms | React Hook Form | For HITL editing |
@@ -112,7 +112,7 @@ Every box above logs its full input and output to Supabase. No black boxes; we n
 
 ## 5. Database schema
 
-Migration files live in `supabase/migrations/`. Below is the canonical schema for Phases 0–2.
+Migration files live in `insforge/migrations/`. Below is the canonical schema for Phases 0–2.
 
 ```sql
 -- Ventures: one row per venture analysis
@@ -131,7 +131,7 @@ create table venture_documents (
   id uuid primary key default gen_random_uuid(),
   venture_id uuid not null references ventures(id) on delete cascade,
   filename text not null,
-  storage_path text not null,         -- Supabase Storage path
+  storage_path text not null,         -- InsForge Storage path
   mime_type text not null,
   parsed_markdown text,                -- populated after Stage 0
   parsed_at timestamptz,
@@ -190,6 +190,8 @@ Versioning note: `profile_versions` is **append-only**. The HITL refinement step
 
 RLS policies should restrict all reads/writes to `created_by = auth.uid()` for now. We'll add team-sharing in Phase 4.
 
+**InsForge auth-helper gotcha (per eng review D8):** `auth.uid()` works for application tables. Storage policies on `storage.objects` must use `auth.jwt() ->> 'sub'` instead — see `insforge/migrations/0002_storage_policies.sql`. Storage also requires per-operation policies (separate `FOR SELECT` / `INSERT` / `UPDATE` / `DELETE` blocks) rather than a single `FOR ALL`, and uses columns `bucket` (not `bucket_id`) + `key` (not `name`).
+
 ---
 
 ## 6. Directory structure
@@ -221,12 +223,12 @@ venturex/
 │   │   ├── weight-slider.tsx          ← 7-bar weight visual
 │   │   └── source-quote.tsx           ← inline quote display
 │   ├── lib/
-│   │   ├── supabase/                  ← clients (server, browser)
+│   │   ├── insforge/                  ← clients (server, browser)
 │   │   ├── openrouter/                ← LLM call wrapper
 │   │   ├── parsers/
 │   │   │   ├── pdf.ts
 │   │   │   ├── docx.ts
-│   │   │   └── pptx.ts
+│   │   │   └── index.ts               ← dispatcher; rejects PPTX per D2
 │   │   └── prompts.ts                 ← loads prompts/*.md into memory
 │   ├── types/
 │   │   └── venture-profile.ts         ← Zod schema for the profile
@@ -235,7 +237,7 @@ venturex/
 │       ├── stage1-extract.ts
 │       ├── stage1-critic.ts
 │       └── stage2-weight.ts
-├── supabase/
+├── insforge/
 │   └── migrations/
 └── test-cases/
     └── abb-rack-pdu/                  ← keystone fixture; see section 13
@@ -251,22 +253,22 @@ venturex/
 
 **Goal:** Take a user's venture description + uploaded supporting documents and produce a clean markdown corpus that downstream stages can reason over.
 
-**Inputs:** A short typed description from the user (plain text, required) and 0–N uploaded files (PDF, DOCX, PPTX).
+**Inputs:** A short typed description from the user (plain text, required) and 0–N uploaded files (PDF, DOCX). PPTX deferred to Phase 4 per eng review D2 — Stage 0 rejects `.pptx` with a "convert to PDF first" message.
 
 **Process:**
 1. Create `ventures` row with `status = 'intake'`.
-2. Upload each file to Supabase Storage; create `venture_documents` row.
+2. Upload each file to InsForge Storage; create `venture_documents` row.
 3. For each document, dispatch to the appropriate parser:
    - PDF → `pdf-parse` → text. For PDFs with significant visual content (slides especially), consider falling back to a vision-model OCR pass; the ABB deck has text-light slides where the meaning lives in diagrams.
    - DOCX → `mammoth` → markdown with structure preserved.
-   - PPTX → extract slide text per slide; format as `## Slide N\n\ncontent\n\n`.
+   - PPTX → reject with HTTP 400 and copy "PPTX not supported in V1 — please export to PDF and re-upload" (D2; vision OCR fallback deferred to Phase 4).
 4. Store parsed output in `venture_documents.parsed_markdown`.
 5. Transition `ventures.status` to `'extracting'` and trigger Stage 1.
 
 **Failure modes to handle:**
 - Encrypted/password-protected PDFs → mark document with error, continue with the rest.
 - DOCX with embedded images → fine to skip the image content for V1; flag in a log.
-- PPTX with text inside images → again, document and move on; HITL will catch material gaps.
+- (PPTX uploads are rejected upfront — see Stage 0 Inputs above.)
 
 **No LLM calls in this stage.** Parsing is mechanical.
 
@@ -301,7 +303,29 @@ If the combined input exceeds the model's effective context (>200k tokens), summ
 
 **Output:** Valid JSON matching the schema in `src/types/venture-profile.ts`. Validate with Zod before storage. If validation fails, retry once with a corrective prompt, then escalate to error state and surface to the user — do not silently drop or guess.
 
-**The 7 dimensions** (the Zod schema must match these exactly):
+**Profile shape (the Zod schema must match this exactly).** The 7 dimensions are nested under a top-level `dimensions` object. Top-level fields are `venture_codename`, `synthetic_description`, `intended_end_state`, `current_maturity`, `dimensions`, `strategic_risks_and_uncertainties[]`, `gaps_in_input[]`. (Per eng review D1, 2026-05-14.)
+
+```
+{
+  venture_codename: "VentureX",
+  synthetic_description: "...",
+  intended_end_state: { scale, timeline_years, minimum_success_criteria },
+  current_maturity: "pre_concept" | "concept" | "early_prototype" | "pilot" | "early_revenue" | "scaling",
+  dimensions: {
+    product_solution: {...},
+    customers: {...},
+    transaction: {...},
+    partners: {...},
+    access: {...},
+    geography_regulatory: {...},
+    capital_asset: {...}
+  },
+  strategic_risks_and_uncertainties: [{ risk, implies_search_for }, ...],
+  gaps_in_input: [...]
+}
+```
+
+**The 7 dimensions** (each lives at `dimensions.<name>`):
 
 1. **product_solution** — `job_to_be_done`, `solution_mechanism`, `platform_or_pipe`, `core_features[]`, **`substitution_landscape[]`** (load-bearing), confidence, supporting_quotes[]
 2. **customers** — `segment_type`, `buyer`, `user`, `target_sub_segments[]`, `buyer_sophistication`, confidence, supporting_quotes[]
@@ -310,8 +334,6 @@ If the combined input exceeds the model's effective context (>200k tokens), summ
 5. **access** — `learn`, `reach`, `acquire`, `maintain`, `access_intensity`, confidence, supporting_quotes[]
 6. **geography_regulatory** — `target_geographies[]`, `accessible_market_constraints[]`, `regulatory_regime`, `localization_requirements`, confidence, supporting_quotes[]
 7. **capital_asset** — `capital_intensity`, `asset_type`, `manufacturing_footprint`, `defensibility_model`, `time_to_revenue_years`, confidence, supporting_quotes[]
-
-Plus top-level fields: `synthetic_description`, `intended_end_state`, `current_maturity`, `strategic_risks_and_uncertainties[]`, `gaps_in_input[]`.
 
 **The `strategic_risks_and_uncertainties` field is the second load-bearing field.** Each risk must include an `implies_search_for` string that explicitly names what kinds of competitors/substitutes the risk implies. Phase 3 candidate generation uses this directly. If the prompt produces strategic risks without `implies_search_for`, the prompt is broken.
 
@@ -439,10 +461,10 @@ A copy of an acceptable expected profile lives at `test-cases/abb-rack-pdu/expec
 
 Suggested sequence. Each step should be commit-sized; gate progression on the criterion in parentheses.
 
-1. **Scaffold** — Next.js app, Supabase project, env vars, basic auth. (App boots, user can log in.)
-2. **DB schema** — migrations for the five tables above. (Supabase studio shows tables, RLS enabled.)
+1. **Scaffold** — Next.js app, InsForge project, env vars, basic auth. (App boots, user can log in.)
+2. **DB schema** — migrations for the five tables above. (InsForge studio shows tables, RLS enabled.)
 3. **Stage 0 parsers** — PDF/DOCX/PPTX parsers, unit tests against fixture files. (Given an ABB doc, returns clean markdown.)
-4. **Upload flow** — `/ventures/new` page with description field and file upload. (User can submit a venture; documents appear in Supabase.)
+4. **Upload flow** — `/ventures/new` page with description field and file upload. (User can submit a venture; documents appear in InsForge.)
 5. **Zod schema** for `VentureProfile`. (Schema exists; round-trip a hand-written example.)
 6. **OpenRouter wrapper** with logging. (Test call to Opus 4.7 returns and logs.)
 7. **Stage 1 extraction** — load prompt, call Opus, validate, persist as `profile_versions` v1. (Running on ABB fixture produces a profile that hits acceptance criteria from section 13. **Do not move on until this passes.**)
@@ -458,12 +480,12 @@ Suggested sequence. Each step should be commit-sized; gate progression on the cr
 
 These are decisions I deliberately did not make because they need Harry's input. Surface them in the first standup; do not silently resolve them.
 
-1. **Authentication scope.** Phase 1 is single-user (only the uploader sees their ventures). Should we add team sharing now, or defer to Phase 4? Default: defer.
-2. **PPTX visual content.** ABB's market exploration deck has critical info inside diagrams (the power-density-over-time chart, the architecture diagrams). Should we add a vision-model OCR pass on slide screenshots in Stage 0, or rely on HITL to catch missing context? Default: build in OCR options (Sonnet is good for this). Also, we will most likely be uploading PDFs rather than PPTXs, just because they're easier to work with. 
+1. **Authentication scope.** ~~Phase 1 is single-user (only the uploader sees their ventures). Should we add team sharing now, or defer to Phase 4? Default: defer.~~ **Resolved 2026-05-14:** deferred per default. Email/password auth with 6-digit OTP verification implemented in M4 (D9). Team sharing deferred to Phase 4. Password reset deferred to Phase 4 (see PLAN.md "NOT in scope").
+2. **PPTX visual content.** ~~ABB's market exploration deck has critical info inside diagrams (the power-density-over-time chart, the architecture diagrams). Should we add a vision-model OCR pass on slide screenshots in Stage 0, or rely on HITL to catch missing context?~~ **Resolved 2026-05-14:** PPTX dropped from V1 entirely per D2 — Stage 0 rejects `.pptx` with "convert to PDF first" message. Vision OCR fallback deferred to Phase 4. Consultants upload PDFs.
 3. **Critic model choice.** GPT-5.5 is the current default for Stage 1 critic. If Pedram or the team has a preference for Gemini 3.1 Pro or Grok 4 here, easy to swap via env var. The constraint is "different family from Stage 1."
 4. **Profile schema review with Pedram.** The 7 dimensions augment Pedram's Big 5 framework. He should eyeball the schema before we lock it, especially the `product_solution` sub-fields. Get this on his calendar in week 1.
 5. **HITL save granularity.** Currently spec'd as save-per-dimension. Some users might prefer a single "save all" at the end. Worth a UX check with one of the DPZ team after the first working version.
 
 ---
 
-*Last updated: May 14, 2026. Authors: Harry (build lead), with Claude as planning collaborator.*
+*Last updated: May 14, 2026 (post-M4 — auth + upload flow working end-to-end). Authors: Harry (build lead), with Claude as planning collaborator. See PLAN.md for milestone status and decision log.*

@@ -9,7 +9,14 @@
       "PowerShell(Get-ChildItem -Recurse \"C:\\\\Users\\\\hweth\\\\OneDrive\\\\Desktop\\\\Innovera\\\\Rapid Prototyping\\\\VentureX\\\\src\\\\app\" | Where-Object { -not $_.PSIsContainer } | Select-Object -ExpandProperty FullName)",
       "Bash(pnpm tsc *)",
       "Bash(pnpm test *)",
-      "Bash(pnpm vitest *)"
+      "Bash(pnpm vitest *)",
+      "Bash(pnpm typecheck *)",
+      "Bash(pnpm test:run)",
+      "Bash(pnpm test:run --reporter=verbose)",
+      "Bash(npx vitest *)",
+      "Bash(pnpm lint *)",
+      "Bash(npx next *)",
+      "Bash(npx eslint *)"
     ]
   }
 }

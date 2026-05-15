@@ -496,4 +496,4 @@ The design system was ratified 2026-05-15 via `/design-consultation`. Memorable 
 
 ---
 
-*Last updated: May 15, 2026 (post-M9 design-consultation — DESIGN.md ratified). Authors: Harry (build lead), with Claude as planning collaborator. See PLAN.md for milestone status, DESIGN.md for visual spec, TODOS.md for open follow-ups.*
+*Last updated: May 15, 2026 (post-M10 chain + DESIGN.md ratified; M11 in flight in a parallel Claude Code terminal). Authors: Harry (build lead), with Claude as planning collaborator. See PLAN.md for milestone status + M12 strategy, DESIGN.md for visual spec, TODOS.md for open follow-ups.*

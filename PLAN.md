@@ -1,8 +1,8 @@
 # VentureX — Implementation Plan (Phases 0-2)
 
-**Status:** M1-M8 + M10 server-side complete. M9 (HITL UI) in flight on a parallel branch. M10 wire-up + M11 (eval framework + weights UI + e2e test) remain.
+**Status:** M1-M10 complete (HITL UI shipped, M10 wire-up live in `confirmRefinement`). M11 (eval framework + weights UI + e2e test) in flight on a parallel Claude Code terminal. M12 (Phase 3 kickoff) under design.
 **Generated:** 2026-05-14 from `/plan-eng-review`
-**Last updated:** 2026-05-15 (post-M10 server — Stage 2 weighting passes all 5 ABB §13 weight criteria first cycle)
+**Last updated:** 2026-05-15 (post-M10 chain — confirmRefinement → runStage2Weighting wired, DESIGN.md ratified)
 
 This is the working execution plan. `claude.md` remains the spec. This plan tracks decisions, milestone status, and what's left.
 
@@ -20,11 +20,12 @@ This is the working execution plan. `claude.md` remains the spec. This plan trac
 | **M6** | OpenRouter wrapper | ✓ Done | `src/lib/openrouter/call.ts` with budget enforcement (D4) and retry-once (D1) |
 | M7 | Stage 1 extraction | ✓ Done | `src/server/stage1-extract.ts`. Section 13 ABB acceptance gate cleared after 4 prompt-iteration cycles (see D10) |
 | M8 | Stage 1 critic | ✓ Done | `src/server/stage1-critic.ts` + `prompts/stage_1_critic.md`. D3 retry-soft-fail in place. End-to-end on ABB returned valid `Stage1CriticOutput` in 1.9s (gpt-5.5). See M8 calibration note below |
-| M9 | HITL refinement UI | In flight (parallel chat) | `src/app/ventures/[id]/refine/` — page, client wrapper, primitives, product-solution panel scaffolded |
-| M10 | Stage 2 weighting (server-side) | ✓ Done | `src/server/stage2-weight.ts` + `prompts/stage_2_dimension_weighting.md`. End-to-end on ABB passed all 5 §13 weight criteria first cycle (product/capital/geography ≥0.15, access ≤0.05, sum=1.000). Wire-up from HITL "Confirm to continue" deferred until M9 settles |
-| **M11** | **Eval framework + Weights UI + E2E test** | **NEXT** | Section 13 criteria already codified in `scripts/check-abb.ts` (Stage 1) and `scripts/check-stage2.ts` (Stage 2) — fold into `evals/criteria.ts` + `evals/runner.ts` |
+| M9 | HITL refinement UI | ✓ Done | `src/app/ventures/[id]/refine/` — full 7-dimension + top-level panels. Load-bearing emphasis on `substitution_landscape` and `strategic_risks_and_uncertainties`. Always-active save with "Mark reviewed" / "Save dimension" duality. Inline critic flags per field |
+| M10 | Stage 2 weighting | ✓ Done | `src/server/stage2-weight.ts` + `prompts/stage_2_dimension_weighting.md` + `confirmRefinement` chain. End-to-end on ABB passed all 5 §13 weight criteria first cycle. Sum-renormalize [0.95, 1.05] → 1.0; outside throws |
+| **M11** | **Eval framework + Weights UI + E2E test** | **Eval framework ✓ Done; Weights UI + e2e remain** | `evals/criteria.ts` + `evals/runner.ts` + `evals/run.ts` shipped. `pnpm tsx --env-file=.env.local evals/run.ts` runs Stage 1 + Stage 2 live against the ABB case in ~3-5s for $0.20-0.30 and prints structured PASS/FAIL per Section 13 criterion. Weights UI at `/ventures/[id]/weights` still TODO |
+| M12 | Phase 3 kickoff (TBD) | Pending design | Candidate generation. See "M12 strategy" section below |
 
-**25 tests passing.** `pnpm test:run` is green (16 prior + 9 new Stage2WeightingOutputSchema tests in M10).
+**25 tests passing.** `pnpm test:run` is green. `tsc --noEmit` is clean. Test files: `venture-profile` (7) + `venture-profile-critic` (6) + `venture-profile-weighting` (9) + `parsers` (3).
 
 ### M8 calibration follow-up
 
@@ -51,6 +52,7 @@ Open question parked for M9 dogfood: tune the prompt to soften `unsupported` fla
 | **D8** | **Switch backend from Supabase to InsForge** (2026-05-14, user-driven). | All DB code, RLS policies, env vars, auth flow |
 | **D9** | **Email verification via 6-digit OTP code** (not magic link). 3-mode `/login` state machine: signin / signup / verify. Auto-jump from signup on `requireEmailVerification`, from signin on 403 unverified. | `src/app/login/*` |
 | **D10** | **Prompt-tighten before schema-loosen** when Stage N output drifts. Schema is the downstream contract; prompt is the model interface. Loosen schema only on genuine shape miscast (e.g., field naturally a list, schema says string). Apply same triage in M8/M10. | Stage 1/2 iteration, future-stage drift |
+| **D11** | **Design system ratified via `/design-consultation` (2026-05-15).** Memorable thing: "Serious software for serious work." IBM Plex Sans + Plex Mono, zinc neutrals, single indigo accent, load-bearing field emphasis (2px indigo left rule + elevated surface) on `substitution_landscape` and `strategic_risks.implies_search_for`. Always-active save with "Mark reviewed" vs "Save dimension" duality. Strict light/dark pairing on every color token (semantic CSS vars cover this). See `DESIGN.md`. | All UI, current + future |
 
 ### D10 (M7 iteration log — 4 cycles, 2026-05-14)
 
@@ -189,14 +191,17 @@ This chat does not own this milestone. State on disk: `page.tsx`, `actions.ts`, 
 
 ---
 
-## Parallelization map (M2-M8 done; M9 + M10 running in parallel)
+## Parallelization map (M1-M10 done; M11 running in a parallel terminal)
 
-- **This chat** owns M10 (Stage 2 weighting) — prompt + server code. Doesn't touch `src/app/ventures/[id]/refine/**` or any HITL UI surface.
-- **Parallel chat** owns M9 (HITL refinement UI). Touches `src/app/ventures/[id]/refine/**`.
+- **This terminal** owns design + bookkeeping + M12 strategy. Touched M9 panels, M10 chain wire-up, DESIGN.md, CLAUDE.md §17, this file.
+- **Parallel terminal** owns M11: eval framework (`evals/criteria.ts`, `evals/runner.ts`, `evals/run.ts`), weights UI at `/ventures/[id]/weights`, and the end-to-end ABB pipeline run.
 
-Shared surface to avoid double-editing: `src/app/ventures/[id]/page.tsx` and `src/app/ventures/[id]/actions.ts`. If M10 needs an extra server action (likely: a `triggerStage2Weighting` chained from the HITL "Confirm to continue" button), add it as a new export rather than modifying existing ones, and coordinate with the M9 chat before touching the file.
+Shared surface to avoid double-editing:
+- `src/app/ventures/[id]/page.tsx` — already has the "Open HITL refinement →" link; M11 likely adds an "Open weights →" link when status is `weighting` or `ready`. Coordinate before editing.
+- `src/types/venture-profile.ts` — already locked. M11 reads `Stage2WeightingOutputSchema` + `DimensionWeightEntrySchema` but should not need to modify.
+- `dimension_weights` table — M10 writes `llm_proposed` rows. M11 weights UI inserts `human_adjusted` rows on slider commits.
 
-After both land: M11 (eval framework + weights UI + e2e test) becomes the sequential cap.
+After M11 lands: M12 begins. See "M12 strategy" below for the proposal-stage thinking.
 
 ---
 
@@ -219,6 +224,43 @@ No critical gaps flagged (every new codepath has at least one of: test / error h
 
 ---
 
+## M12 strategy — Phase 3 kickoff (working draft, awaiting alignment)
+
+**Premise:** CLAUDE.md scopes the current document at Phases 0-2. Phase 3 (candidate generation, web search, scoring, ranking) is explicitly deferred and is supposed to get its own CLAUDE.md when we reach it. After M11 lands, we are at that gate.
+
+**The question is not "what comes next" — it's "how big should M12 be."** Four options:
+
+### Option A — Pure-LLM candidate brainstorm (smallest first slice)
+Take the `human_adjusted` profile + dimension_weights, prompt a frontier model to brainstorm 20-40 candidate competitors using `substitution_landscape` and `strategic_risks.implies_search_for` as seeds. No web search. No vector DB. Output is a list of `{name, type (direct/category/SPDM), one-line rationale, dimensions_implicated[]}`. Stored in a new `candidate_companies` table.
+
+**Pros:** zero new external dependencies, lets us test prompt design + the profile→candidates handoff in isolation, gives a thing to look at within a week. **Cons:** candidates are limited to what the model knows from training; misses obscure regional players. Will need follow-on work.
+
+### Option B — Web-search-augmented brainstorm (Exa or Serper integration)
+Same as A but each `implies_search_for` string becomes a web search query. Hits are scraped/summarized, model is given the search results as evidence when proposing candidates.
+
+**Pros:** dramatically wider candidate set, surfaces regional players and recent entrants invisible to the model's training, addresses your "web-based support" wish from earlier today. **Cons:** adds Exa/Serper API key + cost, brings in HTML parsing, rate-limiting concerns, citation/attribution UX.
+
+### Option C — Operational polish on Phases 0-2 first (no Phase 3)
+Sweep open TODOs: login + new-form dark-mode pass, second eval test case (TODO #2), password reset (Phase 4 backlog item), schema cross-walk with Pedram, possibly a `/health` dashboard. Hardens the current product before adding new scope.
+
+**Pros:** turns a "works on ABB" product into a "works on any client venture" product. **Cons:** delays the actual differentiator (candidate generation) by 1-2 weeks. Doesn't address the user's web-research wish.
+
+### Option D — Pre-Phase-3 contract definition (small but high-leverage)
+Write a `Phase3InputBuilder` that packages the venture's canonical state (latest `human_refined` profile + `human_adjusted` weights) into a compact JSON contract suitable for any downstream Phase 3 implementation. Document the contract in a new `phase3-contract.md`. Optionally write a Phase 3 CLAUDE.md skeleton.
+
+**Pros:** clean handoff between Phase 0-2 and Phase 3; lets us A/B different Phase 3 implementations (LLM-only vs web-augmented) against the same input contract. **Cons:** doesn't ship visible value; pure plumbing.
+
+### Recommendation (subject to revision)
+**A → then B as a follow-on**, with C deferred to a Phase 4 polish pass. Rationale:
+- The user has explicitly named web research as a V2 wish, so B is on the line of sight, not Phase 4 distant.
+- A is small enough to land as one milestone and gives a real artifact (a list of candidates per venture) you can show people.
+- C work is real but lower-leverage than progress on the candidate pipeline.
+- D is implicit in A — we'll naturally define the profile→candidate-prompt contract while building A.
+
+This is a working draft. Before locking, surface back to the user for the choice. The Phase 3 CLAUDE.md gets written as part of M12 kickoff regardless of A/B/D path.
+
+---
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
@@ -230,4 +272,4 @@ No critical gaps flagged (every new codepath has at least one of: test / error h
 | DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
 
 **UNRESOLVED:** 0
-**VERDICT:** ENG CLEARED — M1-M8 + M10 server-side shipped. Both LLM-stage acceptance gates cleared on ABB: M8 critic via `scripts/check-critic.ts` (38 valid flags, schema-clean) and M10 weighting via `scripts/check-stage2.ts` (5/5 §13 criteria first cycle). M9 (HITL UI) running in parallel chat. Next: M10 wire-up from HITL once M9 settles, then M11 (eval framework + weights UI + e2e).
+**VERDICT:** ENG CLEARED — M1-M10 shipped. Section 13 ABB acceptance gates cleared at both LLM-stage boundaries: M8 critic (38 flags, schema-clean) and M10 weighting (5/5 §13 weight criteria first cycle, sum normalized to 1.0). M9 HITL UI live with 7 dimension panels + top-level panel + load-bearing emphasis + always-active save. M10 chain wired through `confirmRefinement`. Design system ratified (DESIGN.md, D11). M11 (eval framework + weights UI + e2e) running in a parallel Claude Code terminal. M12 = Phase 3 kickoff, currently in design (see "M12 strategy" section above).

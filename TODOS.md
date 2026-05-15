@@ -14,12 +14,33 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 - ~~Drop ABB source documents into `test-cases/abb-rack-pdu/`~~ — confirmed present; M7 successfully ran extraction against them on 2026-05-14, producing a Section 13–passing profile.
 - ~~Schema cross-walk with Pedram~~ — superseded. M7 acceptance gate passed without his review; schema is locked. If he wants to flag additions for Phase 3, that's a separate ticket.
 - ~~Critic model choice~~ — locked 2026-05-14: `STAGE_1_CRITIC_MODEL=openai/gpt-5.5` (spec default). Env-var swap remains trivial if we later A/B against Gemini 3.1 Pro.
+- ~~M9 HITL UI~~ — shipped 2026-05-15. All 7 dimension panels + top-level panel. Load-bearing emphasis on `substitution_landscape` and `strategic_risks.implies_search_for`. Always-active save with "Mark reviewed" / "Save dimension" duality. Inline critic flags per field.
+- ~~Design system ratification~~ — 2026-05-15 via `/design-consultation`. DESIGN.md is now the source of truth. CLAUDE.md §17 points at it. Dark mode tokens fixed.
+- ~~M10 chain wire-up~~ — `confirmRefinement` now chains into `runStage2Weighting` synchronously and returns a discriminated result with `weightingError` / `weightRowIds`.
 
 ---
 
 ## Open
 
-### 1. Stage 1 critic calibration on real extracted profiles
+### 1. Eval-run non-determinism — Section 13 edge-of-band drift
+
+**What:** Track ABB eval pass rate across consecutive runs. On 2026-05-15 the first run scored 10/13 (Stage 1 missed `in-rack DC` as a distinct substitution mechanism; Stage 2 weights summed to 0.86 which dragged `geography_regulatory` to 0.13 below the 0.15 floor). The second run, same prompt, same model, scored 13/13. LLM non-determinism is real — but the consistent failure surface (in-rack DC distinction; sum < 1.0) suggests we're sitting at the edge of clearing the gate rather than solidly above it.
+
+**Why:** A run-1 failure that becomes a run-2 pass is a coin flip, not a fix. The eval framework's value depends on stable signal — if we land prompt edits while the baseline is noisy, we won't be able to tell whether a change improved things or just landed on the lucky side of a flip.
+
+**Pros of doing now:** Calibrates the prompts past the edge of the band before we layer in Phase 3 work that consumes their output. Cheaper to fix now than after a 2nd eval case lands.
+**Cons of doing now:** Two runs is a tiny sample. Maybe the right move is to add a `--runs N` flag to `evals/run.ts` and just take the worst-of-N before iterating.
+
+**Context:**
+- Stage 1: prompt likely needs an explicit note that "in-rack DC" (AC → in-rack converter → DC busbar inside the rack) and "facility-level DC distribution" are different substitution mechanisms, both expected to appear.
+- Stage 2: prompt already says "sum within [0.97, 1.03]" but the model occasionally produces under-summed output. Consider adding a "before submitting, sum your 7 weights — if outside [0.97, 1.03], scale up your highest-weighted dimensions to compensate" instruction.
+- Use D10 triage: prompt fixes before schema. Don't relax the `evals/criteria.ts` thresholds — those mirror CLAUDE.md §13.
+
+**Depends on / blocked by:** Nothing. Cheap to do; budget ~3 eval runs ($0.60-1.00) to confirm a fix is stable.
+
+---
+
+### 2. Stage 1 critic calibration on real extracted profiles
 
 **What:** Re-run `scripts/check-critic.ts` against an actual LLM-extracted profile (not `expected_profile.json`) once M9 lands and we have a real venture row in InsForge. If flag count is still well above CLAUDE.md §9's 4-15 band, tune `prompts/stage_1_critic.md` to soften the bar — likely lower the rate of `unsupported` flags on fields the schema explicitly invites inference for (`time_to_revenue_years`, `defensibility_model`, etc.).
 
@@ -34,7 +55,7 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 
 ---
 
-### 2. HITL save granularity feedback (claude.md Section 16 Q5)
+### 3. HITL save granularity feedback (claude.md Section 16 Q5)
 
 **What:** After the first working version of M9 (HITL UI), run a 30-minute feedback session with someone from the DPZ team to validate save-per-dimension vs save-all-at-end UX.
 
@@ -49,7 +70,7 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 
 ---
 
-### 3. Second anonymized eval test case (D7 P1 follow-on)
+### 4. Second anonymized eval test case (D7 P1 follow-on)
 
 **What:** Anonymize a second Innovera consulting venture for the eval framework (`evals/cases/<case-id>/`).
 
@@ -61,6 +82,36 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 **Context:** Pick a venture from a different industry than ABB (electrical equipment) so the eval surfaces breadth issues. Good candidates: any consumer-facing venture, any services-heavy venture, any with `asset_type !== 'hardware'`. Anonymization process: replace company name with "VentureY" (or similar), redact specific financial figures, rewrite "industry context" sentences to be generic.
 
 **Depends on / blocked by:** M11 (eval framework built). Pick the venture and start anonymization in parallel with M9-M11.
+
+---
+
+### 5. Login + new-venture form dark mode pass
+
+**What:** Sweep `src/app/login/page.tsx` and `src/app/ventures/new/form.tsx` for Tailwind color shorthands without `dark:` pairings. Replace with the DESIGN.md semantic CSS vars (or explicit dark variants). Roughly the same fix pattern applied to the refine flow on 2026-05-15.
+
+**Why:** The `/design-consultation` refactor on 2026-05-15 only touched the refine flow because that's where the user's complaint surfaced. Login and venture-creation are also dark-mode-broken for the same reason: `text-amber-900 on bg-amber-50`, `text-red-700` without `dark:` pair, etc. CLAUDE.md §17 + DESIGN.md §10 explicitly forbid this pattern.
+
+**Pros of doing now:** Small (~30 min). Cleans up before Pedram or DPZ team see the auth/upload flow on a dark-mode machine. Prevents the "dark mode is broken" perception that the refine refactor was supposed to fix.
+**Cons of doing now:** Cosmetic — doesn't block any milestone work.
+
+**Context:** Pattern: replace `border-red-300 bg-red-50 text-red-900` etc. with `border-[color:var(--color-error-border)] bg-[color:var(--color-error-bg)] text-[color:var(--color-error-fg)]`. Same approach already in `refine/page.tsx` and `[id]/page.tsx`.
+
+**Depends on / blocked by:** Nothing.
+
+---
+
+### 6. Phase 3 CLAUDE.md skeleton
+
+**What:** Draft a Phase 3 CLAUDE.md before M12 work begins. Scope: competitor candidate generation, evidence gathering (web search / RAG), scoring against the `dimension_weights` set, ranking. Use the current CLAUDE.md as a structural template.
+
+**Why:** Phases 0-2's CLAUDE.md explicitly defers Phase 3 to a separate spec file. Without a Phase 3 spec, M12 work risks the same kind of mid-build re-scoping that D8 and D10 represented for Phases 0-2 — better to capture the boundaries before code starts.
+
+**Pros of doing now:** Forces a deliberate scope conversation (LLM-only vs web-augmented, candidate count target, scoring approach, output shape). Cheap if Phase 3 is small; high-value if it's not.
+**Cons of doing now:** Spec without code is theoretical — some decisions will only crystallize once we have a first candidate-list to look at. Don't over-spec.
+
+**Context:** Three obvious entry-point decisions: (a) LLM-only brainstorm vs web-search-augmented (see PLAN.md "M12 strategy" — options A vs B), (b) what does a "candidate" record look like (name, type, rationale, dimensions_implicated[], evidence[]?), (c) where do candidates live (new `candidate_companies` table, FK to ventures, RLS via the existing venture-JOIN pattern).
+
+**Depends on / blocked by:** M11 finishing (so the canonical handoff from Phase 0-2 → Phase 3 is observable in the DB).
 
 ---
 

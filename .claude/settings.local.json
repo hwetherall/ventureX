@@ -27,7 +27,11 @@
       "Bash(mkdir -p /c/dev)",
       "Bash(echo \"C:\\\\\\\\dev created\")",
       "Bash(node *)",
-      "PowerShell(pnpm test:run *)"
+      "PowerShell(pnpm test:run *)",
+      "Bash(npx tsc *)",
+      "Bash(git stash *)",
+      "Bash(pnpm exec *)",
+      "Bash(pnpm tsx *)"
     ]
   }
 }

@@ -192,3 +192,55 @@ export const DIMENSION_KEYS = [
   "geography_regulatory",
   "capital_asset",
 ] as const satisfies readonly Dimension[];
+
+// ────────────────────────────────────────────────────────────────────────
+// Stage 1 Critic output (CLAUDE.md §9, M8)
+// Stored in profile_versions.profile_json when source='llm_critic'.
+// HITL UI (M9) reads this alongside the llm_extracted profile.
+// ────────────────────────────────────────────────────────────────────────
+
+export const CriticSeveritySchema = z.enum([
+  "weak",
+  "unsupported",
+  "over_confident",
+  "missing_context",
+]);
+
+export const CriticFlagSchema = z.object({
+  severity: CriticSeveritySchema,
+  field: z.string().min(1),
+  comment: z.string().min(1),
+});
+
+const CriticDimensionSchema = z.object({
+  flags: z.array(CriticFlagSchema).max(8),
+  suggested_edits: z.string().optional(),
+});
+
+/**
+ * @public
+ * Output of the Stage 1 Critic pass. Per-dimension flags + top-level flags
+ * for fields that live outside the `dimensions` object (synthetic_description,
+ * intended_end_state, strategic_risks_and_uncertainties, etc.).
+ *
+ * Per CLAUDE.md §9 the critic output is NOT auto-applied; it surfaces in the
+ * HITL UI as collapsible "Reviewer notes" alongside each dimension panel.
+ */
+export const Stage1CriticOutputSchema = z.object({
+  per_dimension: z.object({
+    product_solution: CriticDimensionSchema,
+    customers: CriticDimensionSchema,
+    transaction: CriticDimensionSchema,
+    partners: CriticDimensionSchema,
+    access: CriticDimensionSchema,
+    geography_regulatory: CriticDimensionSchema,
+    capital_asset: CriticDimensionSchema,
+  }),
+  top_level_flags: z.array(CriticFlagSchema).max(10),
+  overall_notes: z.string().optional(),
+});
+
+export type CriticSeverity = z.infer<typeof CriticSeveritySchema>;
+export type CriticFlag = z.infer<typeof CriticFlagSchema>;
+export type CriticDimension = z.infer<typeof CriticDimensionSchema>;
+export type Stage1CriticOutput = z.infer<typeof Stage1CriticOutputSchema>;

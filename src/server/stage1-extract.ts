@@ -76,12 +76,13 @@ interface VentureWithDocs {
  *
  * Lifecycle:
  *   - On entry: assigns a fresh `current_run_id` (D4 budget tracking),
- *     clears `error_message`, sets `status='extracting'`. Re-runs from
- *     `error` / `awaiting_refinement` start with a fresh $5 budget because
- *     no prior `llm_call_logs.run_id` matches the new UUID.
- *   - On success: transitions `status='awaiting_refinement'`. claude.md §8
- *     locates this transition after the critic; for M7-only shipping we
- *     move it here. M8 will relocate it back to post-critic.
+ *     clears `error_message`, sets `status='extracting'`, resets
+ *     `critic_status='pending'`. Re-runs from `error` / `awaiting_refinement`
+ *     start with a fresh $5 budget because no prior `llm_call_logs.run_id`
+ *     matches the new UUID.
+ *   - On success: leaves `status='extracting'` so the caller can chain into
+ *     `runStage1Critic`. The critic is the one that transitions to
+ *     `awaiting_refinement` (success OR D3 soft-fail).
  *   - On failure: transitions `status='error'`, stamps `error_message`.
  *     The user-facing message comes from {@link formatErrorForUser} so the
  *     UI can render it directly.
@@ -101,6 +102,7 @@ export async function runStage1Extraction(
       current_run_id: runId,
       status: "extracting",
       error_message: null,
+      critic_status: "pending",
     })
     .eq("id", ventureId);
 
@@ -143,10 +145,8 @@ export async function runStage1Extraction(
       llmCallId: result.llmCallId,
     });
 
-    await insforge.database
-      .from("ventures")
-      .update({ status: "awaiting_refinement" })
-      .eq("id", ventureId);
+    // Status stays 'extracting' — the critic is responsible for transitioning
+    // to 'awaiting_refinement' (claude.md §8 / D3). Caller chains immediately.
 
     return {
       ok: true,

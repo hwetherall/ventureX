@@ -1,8 +1,8 @@
 # VentureX — Implementation Plan (Phases 0-2)
 
-**Status:** M1-M6 + auth complete. M7 (Stage 1 extraction orchestrator) is next.
+**Status:** M1-M8 complete. M9 (HITL UI) in flight on a parallel branch; M10 (Stage 2 weighting) is next on this branch.
 **Generated:** 2026-05-14 from `/plan-eng-review`
-**Last updated:** 2026-05-14 (post-M4 end-to-end working)
+**Last updated:** 2026-05-15 (post-M8 — critic e2e verified on ABB)
 
 This is the working execution plan. `claude.md` remains the spec. This plan tracks decisions, milestone status, and what's left.
 
@@ -18,13 +18,22 @@ This is the working execution plan. `claude.md` remains the spec. This plan trac
 | **M4** | Upload flow + auth | ✓ Done | `/ventures/new` + `/ventures/[id]` + login pages. OTP email verification per D9 |
 | **M5** | Zod schema | ✓ Done | `src/types/venture-profile.ts` + 7 round-trip tests against ABB fixture |
 | **M6** | OpenRouter wrapper | ✓ Done | `src/lib/openrouter/call.ts` with budget enforcement (D4) and retry-once (D1) |
-| **M7** | **Stage 1 extraction** | **NEXT** | The load-bearing call. Acceptance gate = Section 13 criteria on ABB |
-| M8 | Stage 1 critic | Pending | Needs M7 |
-| M9 | HITL refinement UI | Pending | Needs M8 |
-| M10 | Stage 2 weighting | Pending | Needs M9 |
-| M11 | Eval framework + Weights UI + E2E test | Pending | Needs M10 |
+| M7 | Stage 1 extraction | ✓ Done | `src/server/stage1-extract.ts`. Section 13 ABB acceptance gate cleared after 4 prompt-iteration cycles (see D10) |
+| M8 | Stage 1 critic | ✓ Done | `src/server/stage1-critic.ts` + `prompts/stage_1_critic.md`. D3 retry-soft-fail in place. End-to-end on ABB returned valid `Stage1CriticOutput` in 1.9s (gpt-5.5). See M8 calibration note below |
+| M9 | HITL refinement UI | In flight (parallel chat) | `src/app/ventures/[id]/refine/` — page, client wrapper, primitives, product-solution panel scaffolded |
+| **M10** | **Stage 2 weighting** | **NEXT (this chat)** | Draft prompt + `stage2-weight.ts`. Runs after M9 lands but the prompt + server code are independent of refine UI |
+| M11 | Eval framework + Weights UI + E2E test | Pending | Needs M10. Section 13 criteria already codified in `scripts/check-abb.ts` — fold into `evals/criteria.ts` |
 
-**10 tests passing.** `pnpm test:run` is green.
+**16 tests passing.** `pnpm test:run` is green (10 prior + 6 new Stage1CriticOutputSchema tests in M8).
+
+### M8 calibration follow-up
+
+Running the critic against `expected_profile.json` produced **38 flags** (30 per-dim + 8 top-level) — well above the CLAUDE.md §9 calibrated band of 4-15. Two reads:
+
+1. The expected profile is the hand-curated gold standard with extrapolation beyond literal doc evidence (e.g., enumerated distribution channels, key suppliers, `time_to_revenue_years`). The critic correctly flags these as "unsupported" because the cited quotes don't establish them.
+2. In production the critic reads an LLM-extracted profile that grounds claims in `supporting_quotes[]`. Flag count there should be substantially lower.
+
+Open question parked for M9 dogfood: tune the prompt to soften `unsupported` flags on fields the schema explicitly invites extrapolation for, or accept the higher count and trust HITL to filter. Don't iterate the prompt until we have a real extracted profile to point it at (M11 eval framework gives us that loop).
 
 ---
 
@@ -41,6 +50,17 @@ This is the working execution plan. `claude.md` remains the spec. This plan trac
 | D7 | LLM eval framework in scope for Phases 0-2. `evals/` directory with runner, Section 13 criteria as assertions. 2nd test case = P1 follow-on. | New scope addition; build step M11 |
 | **D8** | **Switch backend from Supabase to InsForge** (2026-05-14, user-driven). | All DB code, RLS policies, env vars, auth flow |
 | **D9** | **Email verification via 6-digit OTP code** (not magic link). 3-mode `/login` state machine: signin / signup / verify. Auto-jump from signup on `requireEmailVerification`, from signin on 403 unverified. | `src/app/login/*` |
+| **D10** | **Prompt-tighten before schema-loosen** when Stage N output drifts. Schema is the downstream contract; prompt is the model interface. Loosen schema only on genuine shape miscast (e.g., field naturally a list, schema says string). Apply same triage in M8/M10. | Stage 1/2 iteration, future-stage drift |
+
+### D10 (M7 iteration log — 4 cycles, 2026-05-14)
+
+| Cycle | Issue | Fix type | Outcome |
+|---|---|---|---|
+| 1 | 4 Zod errors (margin_profile enum bleed, accessible_market_constraints shape, localization_requirements shape, time_to_revenue_years type) + content gap (capital_intensity=medium vs Section 13 needs high) | 3× prompt fix + 1× schema fix (`localization_requirements` string → array) | Validation green, Section 13 cleared 6/8 |
+| 2 | Risks count 7 vs cap. Anonymization inconsistent. `access_intensity=medium` would push Stage 2 access weight above the ≤0.05 gate | 4× prompt fix + 2× schema cap (risks max 6, gaps max 5) | Risks=6, gaps=5, anonymization consistent. But over-consolidated AC-to-DC into 100–200kW risk; access_intensity flipped to "high" with channel-mattering rationalization |
+| 3 | AC-to-DC risk merged with density risk (Section 13 hard fail). access_intensity=high (Section 13 weight-criterion soft fail) | 2× targeted prompt fix: (a) consolidation rule — distinct mechanisms stay distinct; (b) access_intensity decision tree — high only when access IS the moat | All 8 Section 13 criteria green. 6 distinct risks. access_intensity=low. M7 done |
+
+Net: schema shape changed in 2 small places (localization_requirements; risks/gaps max caps tightened). All other fixes were prompt-only. Schema contract for downstream consumers preserved.
 
 ### D8 gotchas (captured in code; relevant for any future InsForge work)
 
@@ -116,53 +136,35 @@ VentureX/
 
 ---
 
-## What's pending — M7-M11
+## What's pending — M10-M11
 
-### M7 — Stage 1 extraction (the load-bearing call)
+### M7 — Stage 1 extraction (the load-bearing call) — ✓ DONE 2026-05-14
 
-**Deliverables:**
-- `src/server/stage1-extract.ts` that:
-  1. Loads venture + all `venture_documents.parsed_markdown` from DB
-  2. Reads `prompts/stage_1_profile_extraction.md` at runtime (per claude.md Section 8 — no hardcoded prompts)
-  3. Assembles input per Section 8's "Input assembly" block (description + each doc as `## Document: filename` blocks)
-  4. Generates a `run_id` UUID for budget tracking (D4)
-  5. Calls `callLLM` with `schema: VentureProfileSchema`, `expectJson: true`, `stage: "stage_1_extract"`, the new `run_id`, and 180s timeout
-  6. On success: inserts a `profile_versions` row with `source: 'llm_extracted'` via `insertProfileVersion` (D6 wrapper) — `version_number = 1`
-  7. On error: transitions venture `status='error'` with `error_message` populated; does not silently retry
-- Either a server action triggered after M4's upload completes, or a route handler invoked by a small "Run Stage 1" button on `/ventures/[id]` (pick the simpler one — server action chained off the upload is probably cleanest)
+Cleared Section 13 ABB acceptance in 4 iteration cycles (see D10 log). All 8 hard criteria green plus the `access_intensity = low` bonus that sets Stage 2 up to satisfy the access-weight ≤ 0.05 criterion. Server code at `src/server/stage1-extract.ts`, prompt at `prompts/stage_1_profile_extraction.md`, schema at `src/types/venture-profile.ts`.
 
-**Acceptance — primary gate:** Running on the ABB fixture produces a profile that hits Section 13 criteria:
-- `dimensions.product_solution.substitution_landscape` includes busbar/tap-off, power shelves, DC distribution, in-rack DC, integrated server-mounted power
-- `strategic_risks_and_uncertainties` includes the 100-200kW migration risk and the AC-to-DC transition risk, each with non-empty `implies_search_for`
-- `dimensions.geography_regulatory.accessible_market_constraints` mentions the China $500M / $75M gap
-- `dimensions.capital_asset.capital_intensity === 'high'` and `asset_type === 'hardware'`
-- `dimensions.customers.segment_type` is `B2B-Enterprise` or `mixed`
-- `synthetic_description` does not contain "ABB"
+### M8 — Stage 1 critic with D3 retry-soft-fail — ✓ DONE 2026-05-15
 
-**Do not move on to M8 until this passes.** Expect 2-4 cycles of prompt iteration.
+- `prompts/stage_1_critic.md` — drafted (per-dimension flags, 4 severities, hard caps)
+- `src/server/stage1-critic.ts` — orchestrator with D3 retry: try once → 30s wait → retry → soft-fail to `critic_status='unavailable'`
+- `src/types/venture-profile.ts` — `Stage1CriticOutputSchema` (4 severity enum, 7-dimension shape, ≤8 flags/dim, ≤10 top-level)
+- `src/types/venture-profile-critic.test.ts` — 6 tests for the critic schema
+- `src/app/ventures/[id]/actions.ts` — chains extraction → critic in one server action
+- `src/server/stage1-extract.ts` — extraction now leaves `status='extracting'`; critic owns the transition to `awaiting_refinement`
+- `scripts/check-critic.ts` — M8 acceptance helper that runs the critic against ABB without touching the DB
+- E2E verification: critic returned valid output in 1.9s with 38 flags. Schema parsed clean. Calibration question parked (see M8 follow-up above)
 
-**Est:** CC ~4 hours of code + prompt iteration time
+### M9 — HITL refinement UI at `/ventures/[id]/refine` — in flight (parallel chat)
 
-### M8 — Stage 1 critic with D3 retry-soft-fail
-- Draft `prompts/stage_1_critic.md` (~1 hour, separate task)
-- `src/server/stage1-critic.ts` — different model family per env (`STAGE_1_CRITIC_MODEL` default `openai/gpt-5.5`)
-- D3 retry logic: try once → 30s wait → retry → on second failure set `venture.critic_status='unavailable'` and continue
-- Insert `profile_versions` row with `source='llm_critic'` on success
-- Transition to `awaiting_refinement` regardless of critic outcome
+This chat does not own this milestone. State on disk: `page.tsx`, `actions.ts`, `refine-client.tsx`, `panel-primitives.tsx`, `panels/product-solution.tsx`. The parallel chat is iterating on UI/UX.
 
-### M9 — HITL refinement UI at `/ventures/[id]/refine`
-- Client Component (claude.md Section 10 explicit: not Server Components)
-- Per-dimension panel with inline edit + supporting quotes + critic flag display
-- Array editors for `substitution_landscape` and `strategic_risks_and_uncertainties` (load-bearing fields, ergonomics matter)
-- "Save dimension" creates a new `profile_versions` row via `insertProfileVersion`
-- D3 banner when `critic_status === 'unavailable'`
-- "Confirm to continue" → status `weighting`, triggers M10
+### M10 — Stage 2 weighting — NEXT (this chat)
 
-### M10 — Stage 2 weighting
 - Draft `prompts/stage_2_dimension_weighting.md`
-- `src/server/stage2-weight.ts` — Opus 4.7 on latest `human_refined` profile
+- `src/server/stage2-weight.ts` — Opus 4.7 on latest `human_refined` profile (fallback: latest `llm_extracted` if no human_refined exists)
 - Renormalize if sum ∈ [0.95, 1.05]; throw outside
 - Insert 7 `dimension_weights` rows with `source='llm_proposed'`
+- Add a `triggerStage2Weighting` server action chained from the HITL "Confirm to continue" button
+- Acceptance gate: on ABB, product_solution/capital_asset/geography_regulatory each weight ≥0.15 and access ≤0.05 (CLAUDE.md §13)
 
 ### M11 — Eval framework + Weights UI + end-to-end test
 - `evals/criteria.ts` — Section 13 criteria as assertion functions
@@ -186,11 +188,11 @@ VentureX/
 
 ---
 
-## Parallelization map (mostly historical now — M2-M6 are done)
+## Parallelization map (mostly historical now — M2-M7 are done)
 
-The remaining work M7→M8→M9→M10→M11 is largely sequential because each depends on the prior step's output. No meaningful parallelization opportunity left.
+The remaining work M8→M9→M10→M11 is largely sequential because each depends on the prior step's output. No meaningful parallelization opportunity left.
 
-The one exception: **drafting `prompts/stage_1_critic.md` and `prompts/stage_2_dimension_weighting.md`** can happen in parallel with M7 implementation — prompts are text, not code, and don't block compilation. Two short Markdown writes; budget ~1 hour each.
+The one exception: **drafting `prompts/stage_2_dimension_weighting.md`** can happen in parallel with M8 implementation — prompts are text, not code, and don't block compilation. Short Markdown write; budget ~1 hour.
 
 ---
 
@@ -224,4 +226,4 @@ No critical gaps flagged (every new codepath has at least one of: test / error h
 | DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
 
 **UNRESOLVED:** 0
-**VERDICT:** ENG CLEARED — M1-M6 + M4 shipped. M7 is the next milestone and the load-bearing acceptance gate.
+**VERDICT:** ENG CLEARED — M1-M7 shipped. M7 acceptance gate cleared 2026-05-14 (4 cycles, D10). M8 (Stage 1 critic) is the next milestone.

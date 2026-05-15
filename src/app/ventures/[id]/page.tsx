@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/insforge/auth";
 import { createAuthedServerClient } from "@/lib/insforge/server";
-import { triggerStage1Extraction } from "./actions";
+import { submitStage1ExtractionForm } from "./actions";
 
 interface VentureDocument {
   id: string;
@@ -197,9 +197,16 @@ export default async function VenturePage({
               {new Date(latestProfile.created_at).toLocaleString()}
             </span>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            HITL refinement UI (M9) will render the full profile here.
-          </p>
+          {(venture.status === "awaiting_refinement" ||
+            venture.status === "weighting" ||
+            venture.status === "ready") && (
+            <Link
+              href={`/ventures/${venture.id}/refine`}
+              className="mt-3 inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+            >
+              Open HITL refinement →
+            </Link>
+          )}
         </section>
       )}
 
@@ -213,7 +220,7 @@ export default async function VenturePage({
               ? "Run the frontier model against your description + parsed documents to produce a v1 profile. Expect 30–120 seconds."
               : "Generates a new profile_versions row at the next version number. Re-runs reset the per-run $5 budget."}
           </p>
-          <form action={triggerStage1Extraction} className="mt-3">
+          <form action={submitStage1ExtractionForm} className="mt-3">
             <input type="hidden" name="ventureId" value={venture.id} />
             <button
               type="submit"

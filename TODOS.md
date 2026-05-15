@@ -11,59 +11,15 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 - ~~Storage RLS policies~~ — migration `0002_storage_policies.sql` applied (owner-only pattern, InsForge-specific syntax).
 - ~~Auth implementation~~ — built in M4 alongside upload flow (email/password + 6-digit OTP verification per D9).
 - ~~OpenRouter key rotation~~ — done after the original key was exposed in a transcript.
+- ~~Drop ABB source documents into `test-cases/abb-rack-pdu/`~~ — confirmed present; M7 successfully ran extraction against them on 2026-05-14, producing a Section 13–passing profile.
+- ~~Schema cross-walk with Pedram~~ — superseded. M7 acceptance gate passed without his review; schema is locked. If he wants to flag additions for Phase 3, that's a separate ticket.
+- ~~Critic model choice~~ — locked 2026-05-14: `STAGE_1_CRITIC_MODEL=openai/gpt-5.5` (spec default). Env-var swap remains trivial if we later A/B against Gemini 3.1 Pro.
 
 ---
 
 ## Open
 
-### 1. Drop ABB source documents into `test-cases/abb-rack-pdu/`
-
-**What:** Place `ABB_Case_Brief.docx`, `ABB_Market_Exploration.pdf`, `20250922_Framing.pdf` (or whatever the actual filenames are — claude.md Section 13 references these specific names) into the directory. Currently the folder has only `expected_profile.json`.
-
-**Why:** Two reasons:
-1. M4 manual testing needs real files to upload through `/ventures/new`.
-2. M11 eval framework will read these files from disk, run Stage 1 on them, and assert against Section 13 criteria.
-
-**Pros of doing now:** Unblocks both M4 dogfooding and M11 eval.
-**Cons of doing now:** None. Could be gitignored if the documents contain anything sensitive — the eval framework reads from disk and doesn't care about git status.
-
-**Context:** Innovera consulting work materials. Confirm with the team whether they should be committed or kept local-only via `.gitignore` entry. If kept local, document in README so future devs know to fetch them from a known location.
-
-**Depends on / blocked by:** Nothing.
-
----
-
-### 2. Critic model choice (claude.md Section 16 Q3)
-
-**What:** Confirm `STAGE_1_CRITIC_MODEL` default before M8. Current spec default is `openai/gpt-5.5`.
-
-**Why:** The critic constraint is "different model family than Stage 1." Stage 1 is Claude Opus 4.7. Options for critic: GPT-5.5 (default), Gemini 3.1 Pro, Grok 4. Different families have different failure modes — Gemini sometimes catches Claude's anchoring in different places than GPT does.
-
-**Pros of deciding now:** M8 wires up against the chosen model. Cost projections in M6's budget logic depend on the model's per-token price.
-**Cons of deciding now:** Hard to know without running the critic on a couple of test cases. Could be a "ship default, swap later" decision.
-
-**Context:** OpenRouter makes the swap trivial (env var change). The harder question is which model has the best critic-style failure-finding behavior on consulting-style profiles. The team has opinions; collect them.
-
-**Depends on / blocked by:** Nothing. Should be locked before M8 implementation starts.
-
----
-
-### 3. Schema cross-walk with Pedram (claude.md Section 16 Q4)
-
-**What:** Get Pedram on calendar to eyeball the 7-dimension schema against his Big 5 framework. Originally meant to happen before M5 — M5 has now landed, so this is now a retrospective check that should happen before M7 prompt iteration starts changing the schema-affecting parts of the spec.
-
-**Why:** Pedram's framework predates this work. The 7 dimensions augment his Big 5 — but he should validate the augmentations don't break what he already knows works. The product_solution sub-fields (especially `substitution_landscape`) are the most likely to need his input. The schema is already locked in code; if Pedram surfaces gaps, we have to plan an explicit migration plus prompt edits.
-
-**Pros of doing now:** Catch any structural concerns before M7's prompt iteration cycle makes them more expensive to address.
-**Cons of doing now:** Adds a calendar dependency to M7's start.
-
-**Context:** Block 30 minutes on his calendar. Have the 7-dimension schema printed (or shared in Notion) with his Big 5 alongside for comparison. Specifically ask him about `substitution_landscape` and `strategic_risks_and_uncertainties.implies_search_for` — those are the load-bearing fields.
-
-**Depends on / blocked by:** Pedram's availability. Should happen before M7 prompt iteration begins.
-
----
-
-### 4. HITL save granularity feedback (claude.md Section 16 Q5)
+### 1. HITL save granularity feedback (claude.md Section 16 Q5)
 
 **What:** After the first working version of M9 (HITL UI), run a 30-minute feedback session with someone from the DPZ team to validate save-per-dimension vs save-all-at-end UX.
 
@@ -78,7 +34,7 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 
 ---
 
-### 5. Second anonymized eval test case (D7 P1 follow-on)
+### 2. Second anonymized eval test case (D7 P1 follow-on)
 
 **What:** Anonymize a second Innovera consulting venture for the eval framework (`evals/cases/<case-id>/`).
 

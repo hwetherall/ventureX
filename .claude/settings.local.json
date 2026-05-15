@@ -35,7 +35,8 @@
       "Bash(git add *)",
       "Bash(git check-ignore *)",
       "Bash(git commit -m ' *)",
-      "Bash(pnpm eval *)"
+      "Bash(pnpm eval *)",
+      "Skill(plan-ceo-review)"
     ]
   }
 }

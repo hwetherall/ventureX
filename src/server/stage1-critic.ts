@@ -1,6 +1,3 @@
-import { promises as fs } from "node:fs";
-import path from "node:path";
-
 import {
   insertProfileVersion,
   ProfileVersionInsertError,
@@ -13,6 +10,7 @@ import {
   OpenRouterError,
   TokenLimitError,
 } from "@/lib/openrouter/errors";
+import { loadPrompt } from "@/lib/prompts";
 import { errorMessage } from "@/lib/utils";
 import {
   Stage1CriticOutputSchema,
@@ -138,7 +136,7 @@ export async function runStage1Critic(
       );
     }
 
-    const promptBody = await loadCriticPrompt();
+    const promptBody = await loadPrompt("stage_1_critic.md");
     const prompt = assembleCriticPrompt(promptBody, latestExtracted, docs);
 
     const model =
@@ -341,17 +339,6 @@ async function loadCriticInputs(
     latestExtracted,
     docs: usableDocs,
   };
-}
-
-async function loadCriticPrompt(): Promise<string> {
-  // Read on every call. Iterating on the critic prompt is high-leverage
-  // during M8 calibration; caching would force a server restart per edit.
-  const promptPath = path.join(
-    process.cwd(),
-    "prompts",
-    "stage_1_critic.md",
-  );
-  return fs.readFile(promptPath, "utf-8");
 }
 
 function assembleCriticPrompt(

@@ -1,6 +1,3 @@
-import { promises as fs } from "node:fs";
-import path from "node:path";
-
 import type { InsForgeClient } from "@/lib/insforge/server";
 import { callLLM } from "@/lib/openrouter/call";
 import {
@@ -9,6 +6,7 @@ import {
   OpenRouterError,
   TokenLimitError,
 } from "@/lib/openrouter/errors";
+import { loadPrompt } from "@/lib/prompts";
 import { errorMessage } from "@/lib/utils";
 import {
   DIMENSION_KEYS,
@@ -130,7 +128,7 @@ export async function runStage2Weighting(
       );
     }
 
-    const promptBody = await loadWeightingPrompt();
+    const promptBody = await loadPrompt("stage_2_dimension_weighting.md");
     const prompt = assembleWeightingPrompt(
       promptBody,
       profileVersion.profile as VentureProfile,
@@ -271,17 +269,6 @@ async function loadLatestProfileVersion(
     }
   }
   return null;
-}
-
-async function loadWeightingPrompt(): Promise<string> {
-  // Read on every call. Iterating the Stage 2 prompt is high-leverage during
-  // M10 calibration; caching would force a server restart per edit.
-  const promptPath = path.join(
-    process.cwd(),
-    "prompts",
-    "stage_2_dimension_weighting.md",
-  );
-  return fs.readFile(promptPath, "utf-8");
 }
 
 function assembleWeightingPrompt(

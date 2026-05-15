@@ -496,4 +496,12 @@ The design system was ratified 2026-05-15 via `/design-consultation`. Memorable 
 
 ---
 
-*Last updated: May 15, 2026 (post-M10 chain + DESIGN.md ratified; M11 in flight in a parallel Claude Code terminal). Authors: Harry (build lead), with Claude as planning collaborator. See PLAN.md for milestone status + M12 strategy, DESIGN.md for visual spec, TODOS.md for open follow-ups.*
+## 18. Phase 3 spec
+
+**This document (CLAUDE.md) covers Phases 0-2 only.** Phase 3 (candidate generation, web-augmented evidence, scoring, ranking) lives in `PHASE3.md`. Future-self / future-agents: read PHASE3.md before doing anything in `src/server/stage3*.ts`, `prompts/stage_3_*.md`, `/ventures/[id]/candidates`, or the `candidate_companies` table.
+
+PHASE3.md was ratified 2026-05-15 via `/plan-ceo-review` in HOLD SCOPE mode. M12 ships LLM-only candidate brainstorm; M13 layers in web search; M14 adds scoring; M15 builds the sortable table.
+
+---
+
+*Last updated: May 15, 2026 (post-M10 chain + DESIGN.md ratified + PHASE3.md ratified; M11 in flight in a parallel Claude Code terminal). Authors: Harry (build lead), with Claude as planning collaborator. See PLAN.md for milestone status + M12 strategy, DESIGN.md for visual spec, PHASE3.md for Phase 3 spec, TODOS.md for open follow-ups.*

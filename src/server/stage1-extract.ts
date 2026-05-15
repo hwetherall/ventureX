@@ -1,6 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 
 import { insertProfileVersion, ProfileVersionInsertError } from "@/lib/db/profile-versions";
 import type { InsForgeClient } from "@/lib/insforge/server";
@@ -11,6 +9,7 @@ import {
   OpenRouterError,
   TokenLimitError,
 } from "@/lib/openrouter/errors";
+import { loadPrompt } from "@/lib/prompts";
 import { errorMessage } from "@/lib/utils";
 import {
   VentureProfileSchema,
@@ -122,7 +121,7 @@ export async function runStage1Extraction(
       );
     }
 
-    const promptBody = await loadStage1Prompt();
+    const promptBody = await loadPrompt("stage_1_profile_extraction.md");
     const prompt = assemblePrompt(promptBody, description, docs);
 
     const model = process.env.STAGE_1_MODEL ?? DEFAULT_STAGE_1_MODEL;
@@ -202,17 +201,6 @@ async function loadVentureAndDocs(
   );
 
   return { description: venture.user_provided_description, docs: usableDocs };
-}
-
-async function loadStage1Prompt(): Promise<string> {
-  // Read on every call. Prompt iteration is the highest-leverage activity in
-  // M7 (claude.md §14) — caching here would force a server restart per edit.
-  const promptPath = path.join(
-    process.cwd(),
-    "prompts",
-    "stage_1_profile_extraction.md",
-  );
-  return fs.readFile(promptPath, "utf-8");
 }
 
 function assemblePrompt(

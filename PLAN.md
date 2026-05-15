@@ -22,10 +22,11 @@ This is the working execution plan. `claude.md` remains the spec. This plan trac
 | M8 | Stage 1 critic | ✓ Done | `src/server/stage1-critic.ts` + `prompts/stage_1_critic.md`. D3 retry-soft-fail in place. End-to-end on ABB returned valid `Stage1CriticOutput` in 1.9s (gpt-5.5). See M8 calibration note below |
 | M9 | HITL refinement UI | ✓ Done | `src/app/ventures/[id]/refine/` — full 7-dimension + top-level panels. Load-bearing emphasis on `substitution_landscape` and `strategic_risks_and_uncertainties`. Always-active save with "Mark reviewed" / "Save dimension" duality. Inline critic flags per field |
 | M10 | Stage 2 weighting | ✓ Done | `src/server/stage2-weight.ts` + `prompts/stage_2_dimension_weighting.md` + `confirmRefinement` chain. End-to-end on ABB passed all 5 §13 weight criteria first cycle. Sum-renormalize [0.95, 1.05] → 1.0; outside throws |
-| M11 | Eval framework + Weights UI + E2E test | ✓ Done (UI shipped; e2e link wire-up open) | `evals/` framework runs Stage 1 + Stage 2 live against ABB in 3-5s for $0.20-0.30 with structured Section 13 PASS/FAIL. Weights UI at `/ventures/[id]/weights` shipped — 7 horizontal bars (bar IS the slider), per-slider-commit inserts `human_adjusted` rows, running-sum gate on the Confirm button (transitions to `status='ready'`). Only follow-up: add "Open weights →" link to `/ventures/[id]/page.tsx` (shared surface — see TODO #2) |
-| M12 | Phase 3 kickoff (TBD) | Pending design | Candidate generation. See "M12 strategy" section below |
+| M11 | Eval framework + Weights UI + E2E test | ✓ Done | `evals/` framework runs Stage 1 + Stage 2 live against ABB in 3-5s for $0.20-0.30 with structured Section 13 PASS/FAIL. Weights UI at `/ventures/[id]/weights` shipped — 7 horizontal bars (bar IS the slider), per-slider-commit inserts `human_adjusted` rows, running-sum gate on the Confirm button (transitions to `status='ready'`). "Open weights →" link landed alongside M12 work. |
+| **M12** | Phase 3 kickoff — LLM-only candidate brainstorm | ✓ Done 2026-05-15 | `src/server/stage3-candidates.ts` + `prompts/stage_3_candidate_generation.md` + migration 0003 (`candidate_companies` table + status enum extension + RLS) + `/ventures/[id]/candidates` card list + Generate-candidates button. ABB run produced 48 candidates (15 Direct / 16 SPDM / 17 Category), $0.26, 113.6s — all §6 acceptance hits cleared first run. Atomic conditional-UPDATE precondition closes TOCTOU window. Shared `src/lib/prompts.ts` with `PromptFileNotFoundError` retrofit across all 4 orchestrators. See PHASE3.md §6 + §6b. |
+| M13 | Web-augmented candidate brainstorm | NEXT — spec locked in PHASE3.md §6b | Exa neural search per `implies_search_for` (P3-D9) → bundled evidence → single Opus call (P3-D10) → citations jsonb on each candidate (P3-D11, migration 0004). M13 supersedes M12 path (P3-D12). 8 implementation tasks queued. |
 
-**25 tests passing.** `pnpm test:run` is green. `tsc --noEmit` is clean. Test files: `venture-profile` (7) + `venture-profile-critic` (6) + `venture-profile-weighting` (9) + `parsers` (3).
+**37 tests passing.** `pnpm test:run` is green. `tsc --noEmit` is clean. Test files: `venture-profile` (7) + `venture-profile-critic` (6) + `venture-profile-weighting` (9) + `candidate` (12) + `parsers` (3).
 
 ### M8 calibration follow-up
 
@@ -265,11 +266,11 @@ This is a working draft. Before locking, surface back to the user for the choice
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
-| CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | — |
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 1 | CLEAR | M12 (Phase 3 kickoff) in HOLD SCOPE. 10 decisions locked (D1-D10). 0 unresolved, 0 critical gaps. 4 TODOs added. PHASE3.md ratified. 9 implementation tasks queued. |
 | Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
 | Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | CLEAR | 9 issues resolved (D1-D9), scope held with adjustments |
 | Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
 | DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
 
 **UNRESOLVED:** 0
-**VERDICT:** ENG CLEARED — M1-M10 shipped. Section 13 ABB acceptance gates cleared at both LLM-stage boundaries: M8 critic (38 flags, schema-clean) and M10 weighting (5/5 §13 weight criteria first cycle, sum normalized to 1.0). M9 HITL UI live with 7 dimension panels + top-level panel + load-bearing emphasis + always-active save. M10 chain wired through `confirmRefinement`. Design system ratified (DESIGN.md, D11). M11 (eval framework + weights UI + e2e) running in a parallel Claude Code terminal. M12 = Phase 3 kickoff, currently in design (see "M12 strategy" section above).
+**VERDICT:** CEO + ENG CLEARED — M1-M10 shipped, M11 in flight (parallel terminal), M12 (Phase 3 kickoff) plan locked. PHASE3.md is the new source-of-truth for Phase 3 work (M12-M15). Section 13 ABB acceptance gates already cleared at both LLM-stage boundaries (M8 critic 38 flags schema-clean, M10 weighting 5/5 §13 criteria sum=1.0). HITL UI live, M10 chain wired through `confirmRefinement`, DESIGN.md design system ratified (D11). M12 ships LLM-only candidate brainstorm via single Opus call (Approach A, D1); manual trigger on `/ventures/[id]` (D3); weights handoff via Pattern X — fetch-all + reduce-in-JS (D4); belt-and-braces concurrency guard (D5); eval framework hookup deferred to TODO #8 (D6); PHASE3.md written before code per spec-then-code playbook (D7); auto-redirect to `/candidates` on success (D8); outside voice skipped given HOLD SCOPE rigor (D10). 9 implementation tasks ready for M12 build.

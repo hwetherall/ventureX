@@ -17,6 +17,8 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 - ~~M9 HITL UI~~ — shipped 2026-05-15. All 7 dimension panels + top-level panel. Load-bearing emphasis on `substitution_landscape` and `strategic_risks.implies_search_for`. Always-active save with "Mark reviewed" / "Save dimension" duality. Inline critic flags per field.
 - ~~Design system ratification~~ — 2026-05-15 via `/design-consultation`. DESIGN.md is now the source of truth. CLAUDE.md §17 points at it. Dark mode tokens fixed.
 - ~~M10 chain wire-up~~ — `confirmRefinement` now chains into `runStage2Weighting` synchronously and returns a discriminated result with `weightingError` / `weightRowIds`.
+- ~~Weights UI "Open weights →" link from `/ventures/[id]/page.tsx`~~ — shipped 2026-05-15 alongside M12-T6 work (Generate-candidates button). Page.tsx now renders refine + weights + candidates links as a flex row of CTAs under "Latest profile version" when their respective statuses gate.
+- ~~Phase 3 CLAUDE.md skeleton~~ — superseded. PHASE3.md ratified 2026-05-15 via `/plan-ceo-review` in HOLD SCOPE mode; M12 spec (§3-§7) and M13 spec (§6b) both fully written, 12 decisions locked (P3-D1 through P3-D12).
 
 ---
 
@@ -37,21 +39,6 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 - Use D10 triage: prompt fixes before schema. Don't relax the `evals/criteria.ts` thresholds — those mirror CLAUDE.md §13.
 
 **Depends on / blocked by:** Nothing. Cheap to do; budget ~3 eval runs ($0.60-1.00) to confirm a fix is stable.
-
----
-
-### 2. Weights UI: wire "Open weights →" link from `/ventures/[id]/page.tsx`
-
-**What:** Add a conditional `<Link href={`/ventures/${id}/weights`}>` button to `src/app/ventures/[id]/page.tsx`, shown when `venture.status` is `weighting` or `ready`. Mirrors the existing "Open HITL refinement →" link pattern at the same location.
-
-**Why:** The weights UI ships in M11 but is unreachable from the venture detail page — you have to type the URL by hand. Tiny addition; deferred because `page.tsx` is the shared surface between this terminal and the parallel terminal and PLAN.md asks for coordination before edits.
-
-**Pros of doing now:** Two minutes of work, unblocks dogfooding the weights UI properly.
-**Cons of doing now:** Need to time the edit so it doesn't collide with whatever the parallel terminal is doing on `page.tsx`.
-
-**Context:** Pattern is already there for the refine link (commit `2c983b3`). Conditional shows when status ∈ {`awaiting_refinement`, `weighting`, `ready`}; the new link wants status ∈ {`weighting`, `ready`} (status `awaiting_refinement` means refine isn't done yet so weights view will redirect back to /refine anyway).
-
-**Depends on / blocked by:** Coordination with the parallel terminal on `page.tsx`.
 
 ---
 
@@ -115,18 +102,79 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 
 ---
 
-### 6. Phase 3 CLAUDE.md skeleton
+### 7. Stage 3 acceptance criteria (§13-equivalent for candidates)
 
-**What:** Draft a Phase 3 CLAUDE.md before M12 work begins. Scope: competitor candidate generation, evidence gathering (web search / RAG), scoring against the `dimension_weights` set, ranking. Use the current CLAUDE.md as a structural template.
+**What:** Hand-curate a §13-equivalent acceptance set for Stage 3 candidate output against ABB. Required entries: Schneider Electric / Eaton / Vertiv / Server Technology in Direct; busbar+tap-off and power-shelf vendors in SPDM; at least 2 of each type; rationale references profile content, not generic. Lives as `test-cases/abb-rack-pdu/expected_candidates.json` (analogous to `expected_profile.json`).
 
-**Why:** Phases 0-2's CLAUDE.md explicitly defers Phase 3 to a separate spec file. Without a Phase 3 spec, M12 work risks the same kind of mid-build re-scoping that D8 and D10 represented for Phases 0-2 — better to capture the boundaries before code starts.
+**Why:** Without acceptance criteria, M12 has no pass/fail gate. Eyeball checks don't scale, and the eval framework hookup (TODO #8 below) is blocked until criteria exist. Phase 0-2's §13 was the linchpin of the M7 iteration loop — Phase 3 needs the equivalent.
 
-**Pros of doing now:** Forces a deliberate scope conversation (LLM-only vs web-augmented, candidate count target, scoring approach, output shape). Cheap if Phase 3 is small; high-value if it's not.
-**Cons of doing now:** Spec without code is theoretical — some decisions will only crystallize once we have a first candidate-list to look at. Don't over-spec.
+**Pros of doing now:** Defines "good candidates" before M12 ships, so the implementer has a target. Prereq for M13 comparison ("did web evidence add 15 regional candidates? Which ones?").
+**Cons of doing now:** Some criteria may shift after seeing real M12 output. Risk of premature precision.
 
-**Context:** Three obvious entry-point decisions: (a) LLM-only brainstorm vs web-search-augmented (see PLAN.md "M12 strategy" — options A vs B), (b) what does a "candidate" record look like (name, type, rationale, dimensions_implicated[], evidence[]?), (c) where do candidates live (new `candidate_companies` table, FK to ventures, RLS via the existing venture-JOIN pattern).
+**Context:** Use M7's prompt-iteration log (PLAN.md D10) as the template. The criteria should be observable from the candidate list alone — no need to inspect rationales for assertion purposes. Pick 6-10 must-have entries; allow 1-2 misses (LLM non-determinism).
 
-**Depends on / blocked by:** M11 finishing (so the canonical handoff from Phase 0-2 → Phase 3 is observable in the DB).
+**Effort estimate:** S (human: ~2 hours / CC: ~20 min for the structure, ABB-specific content is human-only).
+**Priority:** P2 (blocking M12 acceptance gate but not M12 ship).
+**Depends on / blocked by:** Nothing. Cheap to do before or alongside M12 code.
+
+---
+
+### 8. Stage 3 hookup into eval framework (after acceptance criteria exist)
+
+**What:** Once TODO #7 lands, extend `evals/criteria.ts` + `evals/runner.ts` to run Stage 3 end-to-end on ABB and assert against the expected_candidates.json. `pnpm tsx --env-file=.env.local evals/run.ts` becomes a single-command end-to-end eval covering all 3 stages.
+
+**Why:** Catches Stage 3 prompt regressions immediately. Same pattern that's already working for Stage 1 + Stage 2 in M11. Without this, prompt edits to `stage_3_candidate_generation.md` need manual ABB re-runs to verify.
+
+**Pros of doing now (i.e., after #7 lands):** Closes the loop from "edit prompt" to "see eval result" in seconds. Strong signal for future Stage 3 iteration.
+**Cons of doing now:** Coordination tax with the parallel terminal that owns `evals/`. Wait until M11 work is fully landed.
+
+**Context:** Mirror the Stage 1 + Stage 2 assertion patterns already in evals/. Stage 3 assertions should be the §13-equivalent criteria from TODO #7 expressed as runner checks.
+
+**Effort estimate:** S (human: ~1 hour / CC: ~10 min — pattern is established).
+**Priority:** P2.
+**Depends on / blocked by:** TODO #7 (acceptance criteria), plus M11 eval framework being fully landed.
+
+---
+
+### 9. Pattern Y migration — add `weights_run_id` grouping UUID to `dimension_weights`
+
+**What:** Migration 0004 (or later — non-blocking) adds a `weights_run_id uuid` column to `dimension_weights`. Each Stage 2 call shares one UUID across its 7 rows. Each batch of `human_adjusted` saves shares one UUID. M12 / M14 read `WHERE weights_run_id = (latest)` instead of the current Pattern X DISTINCT-ON approach.
+
+**Why:** Pattern X (PHASE3.md §3, P3-D4) is fine for V1 but mixes sources implicitly — if a user adjusts 6 sliders, the "current set" is 6 `human_adjusted` + 1 `llm_proposed` rows by created_at. Pattern Y makes the canonical-set boundary explicit, which is what every reader (M12, M14, future analytics) actually wants.
+
+**Pros of doing now (i.e., post-M12):** Cleaner data model long-term. Future-proofs Phase 4 if we add weight-set A/B testing or versioning.
+**Cons of doing now:** Requires backfilling existing rows with synthetic UUIDs grouped by `(venture_id, source, profile_version_id, abs(created_at - reference_created_at) < 30s)`. Migration coordination with M11/M12 already shipped.
+
+**Context:** Migration text would be:
+```sql
+alter table dimension_weights add column weights_run_id uuid;
+-- backfill: group rows in same venture+source+profile_version_id with created_at within 30s
+-- of each other into a single run_id
+update dimension_weights set weights_run_id = ... ; -- (group-by query, generate one uuid per group)
+alter table dimension_weights alter column weights_run_id set not null;
+create index dimension_weights_run_idx on dimension_weights(venture_id, weights_run_id, created_at desc);
+```
+
+**Effort estimate:** M (human: ~3 hours / CC: ~30 min, mostly the backfill query).
+**Priority:** P3 (technical debt; non-blocking).
+**Depends on / blocked by:** Coordinate with M11 weights UI ship to avoid concurrent migration churn.
+
+---
+
+### 10. Extract shared `_orchestrator.ts` helper for stage1-2-3 boilerplate
+
+**What:** After M12 lands, refactor the 4 orchestrators (stage1-extract / stage1-critic / stage2-weight / stage3-candidates) to share common helpers: `formatErrorForUser` switch on the error-class hierarchy, `loadVentureRow`, `assemblePromptWithJsonBlock`, the discriminated-result-or-status='error' outer try-catch shape. New file: `src/server/_orchestrator.ts`.
+
+**Why:** Four orchestrators × ~50 LOC of duplicated error-formatting and venture-loading boilerplate = ~200 LOC that should be ~50. Adding M14's scorer or M13's web-augmented variant gets cheaper after the refactor.
+
+**Pros of doing now (post-M12):** Each subsequent stage cheaper. Bugs in one orchestrator's error handling don't silently exist in the others.
+**Cons of doing now:** Premature if Phase 3 ends at M15 with no Stage 5+. The refactor itself is ~2-3 hours of work for ~150 LOC delta — worth it if M14+ are coming, marginal if not.
+
+**Context:** Use the existing stage2-weight.ts as the template (it's the most recent and cleanest). The shared helper should NOT abstract away the stage-specific shape (prompt, schema, status transitions) — only the boilerplate around it. Keep the call-site readable.
+
+**Effort estimate:** M (human: ~3 hours / CC: ~20 min).
+**Priority:** P3 (DRY tax; non-blocking).
+**Depends on / blocked by:** M12 landing so the 4th orchestrator exists.
 
 ---
 

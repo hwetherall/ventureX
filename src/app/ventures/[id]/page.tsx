@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/insforge/auth";
 import { createAuthedServerClient } from "@/lib/insforge/server";
 import { submitStage1ExtractionForm } from "./actions";
+import { GenerateCandidatesButton } from "./generate-candidates-button";
 
 interface VentureDocument {
   id: string;
@@ -37,6 +38,8 @@ const STATUS_LABELS: Record<string, string> = {
   awaiting_refinement: "Awaiting human review",
   weighting: "Weighting dimensions",
   ready: "Ready",
+  candidates_generating: "Generating candidates (Stage 3)",
+  candidates_ready: "Candidates ready",
   error: "Error",
 };
 
@@ -88,10 +91,36 @@ export default async function VenturePage({
 
   const latestProfile = (latestProfileRaw as LatestProfileRow | null) ?? null;
 
+  // Candidate existence check drives the Stage 3 CTA visibility. We don't
+  // need the candidate rows themselves here — the candidates page reads them.
+  // A `select("id").limit(1)` is the cheapest existence probe under RLS.
+  const { data: candidateProbeRaw } = await insforge.database
+    .from("candidate_companies")
+    .select("id")
+    .eq("venture_id", id)
+    .limit(1);
+  const candidatesExist = (candidateProbeRaw ?? []).length > 0;
+
   const canRunStage1 =
     STATUSES_RUNNABLE.has(venture.status) && parsedDocsAvailable;
   const isFirstRun = !latestProfile;
   const buttonLabel = isFirstRun ? "Run Stage 1 extraction" : "Re-run Stage 1";
+
+  // Stage 2 weights view is meaningful once weights exist (status='weighting')
+  // and remains useful as a read-only audit surface afterward.
+  const showWeightsLink =
+    venture.status === "weighting" ||
+    venture.status === "ready" ||
+    venture.status === "candidates_generating" ||
+    venture.status === "candidates_ready";
+
+  // Stage 3 trigger surfaces only when the venture is fully through Stage 2
+  // confirmation AND no candidate set already exists. Re-runs require a
+  // manual reset back to 'ready' (M13 will add an explicit affordance).
+  const showGenerateCandidates =
+    venture.status === "ready" && !candidatesExist;
+
+  const showCandidatesLink = candidatesExist;
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
@@ -197,16 +226,65 @@ export default async function VenturePage({
               {new Date(latestProfile.created_at).toLocaleString()}
             </span>
           </div>
-          {(venture.status === "awaiting_refinement" ||
-            venture.status === "weighting" ||
-            venture.status === "ready") && (
-            <Link
-              href={`/ventures/${venture.id}/refine`}
-              className="mt-3 inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
-            >
-              Open HITL refinement →
-            </Link>
-          )}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {(venture.status === "awaiting_refinement" ||
+              venture.status === "weighting" ||
+              venture.status === "ready" ||
+              venture.status === "candidates_generating" ||
+              venture.status === "candidates_ready") && (
+              <Link
+                href={`/ventures/${venture.id}/refine`}
+                className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+              >
+                Open HITL refinement →
+              </Link>
+            )}
+            {showWeightsLink && (
+              <Link
+                href={`/ventures/${venture.id}/weights`}
+                className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+              >
+                Open weights →
+              </Link>
+            )}
+            {showCandidatesLink && (
+              <Link
+                href={`/ventures/${venture.id}/candidates`}
+                className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+              >
+                Open candidates →
+              </Link>
+            )}
+          </div>
+        </section>
+      )}
+
+      {showGenerateCandidates && (
+        <section className="mt-8 rounded-md border border-dashed border-border p-4 text-sm">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Stage 3 — Candidate generation
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Brainstorm 36–45 competitor candidates across the three categories
+            (Direct / Category / Same-Problem-Different-Mechanism) using the
+            human-refined profile + canonical dimension weights. LLM-only at
+            M12; web-augmented evidence lands in M13.
+          </p>
+          <div className="mt-3">
+            <GenerateCandidatesButton ventureId={venture.id} />
+          </div>
+        </section>
+      )}
+
+      {venture.status === "candidates_generating" && !candidatesExist && (
+        <section className="mt-8 rounded-md border border-dashed border-border p-4 text-sm">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Stage 3 in progress
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Candidate brainstorm running. The page will redirect to the
+            candidates list automatically when complete.
+          </p>
         </section>
       )}
 

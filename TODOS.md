@@ -19,7 +19,22 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 
 ## Open
 
-### 1. HITL save granularity feedback (claude.md Section 16 Q5)
+### 1. Stage 1 critic calibration on real extracted profiles
+
+**What:** Re-run `scripts/check-critic.ts` against an actual LLM-extracted profile (not `expected_profile.json`) once M9 lands and we have a real venture row in InsForge. If flag count is still well above CLAUDE.md §9's 4-15 band, tune `prompts/stage_1_critic.md` to soften the bar — likely lower the rate of `unsupported` flags on fields the schema explicitly invites inference for (`time_to_revenue_years`, `defensibility_model`, etc.).
+
+**Why:** M8 verification ran the critic against the hand-curated gold-standard profile and got 38 flags (30 per-dim + 8 top-level). The critic is technically correct that many gold-standard fields go beyond literal doc evidence — but in production the critic reads an LLM-extracted profile that grounds every claim in `supporting_quotes[]`. Need a real production-shape input to tell whether the calibration is a prompt problem or a fixture artifact.
+
+**Pros of doing now:** Sets the right calibration baseline before any consultant sees critic flags surfaced in the HITL UI. A noisy critic is worse than no critic — reviewers will dismiss it.
+**Cons of doing now:** Wasted iteration if the issue self-resolves against real extracted input. Cheaper to wait for the natural test point.
+
+**Context:** Use D10's "prompt-tighten before schema-loosen" triage. The schema (`Stage1CriticOutputSchema`) is the downstream contract for the HITL UI — leave it alone unless the model genuinely needs a new field. Adjust the prompt's calibration paragraph + the severity definitions.
+
+**Depends on / blocked by:** M9 (so we have a refine UI flow that produces a real extracted profile; OR M11 eval framework that gives us a structured loop).
+
+---
+
+### 2. HITL save granularity feedback (claude.md Section 16 Q5)
 
 **What:** After the first working version of M9 (HITL UI), run a 30-minute feedback session with someone from the DPZ team to validate save-per-dimension vs save-all-at-end UX.
 
@@ -34,7 +49,7 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 
 ---
 
-### 2. Second anonymized eval test case (D7 P1 follow-on)
+### 3. Second anonymized eval test case (D7 P1 follow-on)
 
 **What:** Anonymize a second Innovera consulting venture for the eval framework (`evals/cases/<case-id>/`).
 

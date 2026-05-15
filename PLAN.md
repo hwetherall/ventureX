@@ -188,11 +188,14 @@ This chat does not own this milestone. State on disk: `page.tsx`, `actions.ts`, 
 
 ---
 
-## Parallelization map (mostly historical now — M2-M7 are done)
+## Parallelization map (M2-M8 done; M9 + M10 running in parallel)
 
-The remaining work M8→M9→M10→M11 is largely sequential because each depends on the prior step's output. No meaningful parallelization opportunity left.
+- **This chat** owns M10 (Stage 2 weighting) — prompt + server code. Doesn't touch `src/app/ventures/[id]/refine/**` or any HITL UI surface.
+- **Parallel chat** owns M9 (HITL refinement UI). Touches `src/app/ventures/[id]/refine/**`.
 
-The one exception: **drafting `prompts/stage_2_dimension_weighting.md`** can happen in parallel with M8 implementation — prompts are text, not code, and don't block compilation. Short Markdown write; budget ~1 hour.
+Shared surface to avoid double-editing: `src/app/ventures/[id]/page.tsx` and `src/app/ventures/[id]/actions.ts`. If M10 needs an extra server action (likely: a `triggerStage2Weighting` chained from the HITL "Confirm to continue" button), add it as a new export rather than modifying existing ones, and coordinate with the M9 chat before touching the file.
+
+After both land: M11 (eval framework + weights UI + e2e test) becomes the sequential cap.
 
 ---
 
@@ -206,7 +209,7 @@ The one exception: **drafting `prompts/stage_2_dimension_weighting.md`** can hap
 | Stage 1 extract | Zod validation fails (missing field) | Yes (M6) | Same retry path | Error if both fail |
 | Stage 1 extract | Token limit exceeded | Yes (M6) | `TokenLimitError` with copy | Helpful message |
 | Stage 1 extract | Cost budget exceeded | Yes (M6) | `BudgetExceededError` | status='error', "Reset budget" CTA |
-| Stage 1 critic | Both attempts fail (D3) | Pending M8 | Soft-fail, set `critic_status='unavailable'` | Yellow banner in HITL |
+| Stage 1 critic | Both attempts fail (D3) | Covered by orchestrator structure; not exercised end-to-end yet (would need a flaky model) | Soft-fail, set `critic_status='unavailable'` | Yellow banner in HITL (M9) |
 | HITL save | Concurrent inserts (D6) | Pending M9 | Retry-on-conflict up to 3x | Invisible to user |
 | Stage 2 weight | Sum outside [0.95, 1.05] | Pending M10 | Throw with clear error | Error page |
 | Storage upload | File too large or storage error | Yes (M4) | Per-file error, continue with others | Per-file UI feedback |
@@ -226,4 +229,4 @@ No critical gaps flagged (every new codepath has at least one of: test / error h
 | DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
 
 **UNRESOLVED:** 0
-**VERDICT:** ENG CLEARED — M1-M7 shipped. M7 acceptance gate cleared 2026-05-14 (4 cycles, D10). M8 (Stage 1 critic) is the next milestone.
+**VERDICT:** ENG CLEARED — M1-M8 shipped. M8 acceptance verified 2026-05-15 via `scripts/check-critic.ts` (ABB profile, 38 flags, schema-valid). M9 (HITL UI) running in parallel chat; M10 (Stage 2 weighting) is the next milestone on this branch.

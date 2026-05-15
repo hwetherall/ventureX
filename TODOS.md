@@ -40,7 +40,22 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 
 ---
 
-### 2. Stage 1 critic calibration on real extracted profiles
+### 2. Weights UI: wire "Open weights →" link from `/ventures/[id]/page.tsx`
+
+**What:** Add a conditional `<Link href={`/ventures/${id}/weights`}>` button to `src/app/ventures/[id]/page.tsx`, shown when `venture.status` is `weighting` or `ready`. Mirrors the existing "Open HITL refinement →" link pattern at the same location.
+
+**Why:** The weights UI ships in M11 but is unreachable from the venture detail page — you have to type the URL by hand. Tiny addition; deferred because `page.tsx` is the shared surface between this terminal and the parallel terminal and PLAN.md asks for coordination before edits.
+
+**Pros of doing now:** Two minutes of work, unblocks dogfooding the weights UI properly.
+**Cons of doing now:** Need to time the edit so it doesn't collide with whatever the parallel terminal is doing on `page.tsx`.
+
+**Context:** Pattern is already there for the refine link (commit `2c983b3`). Conditional shows when status ∈ {`awaiting_refinement`, `weighting`, `ready`}; the new link wants status ∈ {`weighting`, `ready`} (status `awaiting_refinement` means refine isn't done yet so weights view will redirect back to /refine anyway).
+
+**Depends on / blocked by:** Coordination with the parallel terminal on `page.tsx`.
+
+---
+
+### 3. Stage 1 critic calibration on real extracted profiles
 
 **What:** Re-run `scripts/check-critic.ts` against an actual LLM-extracted profile (not `expected_profile.json`) once M9 lands and we have a real venture row in InsForge. If flag count is still well above CLAUDE.md §9's 4-15 band, tune `prompts/stage_1_critic.md` to soften the bar — likely lower the rate of `unsupported` flags on fields the schema explicitly invites inference for (`time_to_revenue_years`, `defensibility_model`, etc.).
 
@@ -55,7 +70,7 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 
 ---
 
-### 3. HITL save granularity feedback (claude.md Section 16 Q5)
+### 4. HITL save granularity feedback (claude.md Section 16 Q5)
 
 **What:** After the first working version of M9 (HITL UI), run a 30-minute feedback session with someone from the DPZ team to validate save-per-dimension vs save-all-at-end UX.
 
@@ -70,7 +85,7 @@ Living list of open follow-ups. Originally captured during the 2026-05-14 eng re
 
 ---
 
-### 4. Second anonymized eval test case (D7 P1 follow-on)
+### 5. Second anonymized eval test case (D7 P1 follow-on)
 
 **What:** Anonymize a second Innovera consulting venture for the eval framework (`evals/cases/<case-id>/`).
 

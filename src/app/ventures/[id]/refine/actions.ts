@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { insertProfileVersion } from "@/lib/db/profile-versions";
 import { requireUser } from "@/lib/insforge/auth";
 import { createAuthedServerClient } from "@/lib/insforge/server";
+import { runStage2Weighting } from "@/server/stage2-weight";
 import {
   AccessSchema,
   CapitalAssetSchema,
@@ -32,8 +33,31 @@ export type SaveDimensionResult =
 
 export type SaveTopLevelResult = SaveDimensionResult;
 
+/**
+ * @public
+ * Result of {@link confirmRefinement}. Discriminated by `ok`. The success
+ * path further discriminates on `status` because the chained Stage 2 call
+ * can hard-fail and transition the venture to `error` even though the
+ * confirm action itself ran end-to-end.
+ *
+ *   - `ok: true, status: "weighting"` — confirm + Stage 2 both succeeded.
+ *     7 `dimension_weights` rows now exist; venture is in `weighting`,
+ *     ready for the M11 weights UI.
+ *   - `ok: true, status: "error"` — confirm transitioned to weighting,
+ *     Stage 2 hard-failed. Venture is now in `error` with `error_message`
+ *     populated by the orchestrator. `weightingError` holds the same
+ *     message for the UI to surface inline.
+ *   - `ok: false` — confirm itself failed (e.g., no `human_refined` row).
+ *     Venture status was not changed.
+ */
 export type ConfirmRefinementResult =
-  | { ok: true; status: "weighting" }
+  | {
+      ok: true;
+      status: "weighting" | "error";
+      weightingError?: string;
+      weightRowIds?: string[];
+      stage2CostUsd?: number;
+    }
   | { ok: false; error: string };
 
 // ────────────────────────────────────────────────────────────────────────
@@ -199,15 +223,27 @@ export async function saveTopLevel(args: {
 
 /**
  * @public
- * Confirm the refined profile and transition the venture into Stage 2
- * weighting. Called from the bottom-of-page "Confirm and continue" button.
+ * Confirm the refined profile, transition the venture into Stage 2
+ * weighting, and synchronously run Stage 2.
  *
  * Guard: requires at least one `human_refined` profile_versions row, so a
  * user can't accidentally skip refinement entirely. If they want to ship
  * the LLM's first draft without edits they should save at least one
  * dimension as-is to signal explicit human acknowledgement.
  *
- * TODO M10: after the status transition, trigger runStage2Weighting here.
+ * Flow:
+ *   1. Verify at least one `human_refined` row exists.
+ *   2. Transition `status='weighting'`.
+ *   3. Call `runStage2Weighting`. The orchestrator persists 7
+ *      `dimension_weights` rows on success or transitions to `status='error'`
+ *      on hard failure.
+ *   4. Revalidate refine + venture detail pages and return a discriminated
+ *      result indicating whether Stage 2 succeeded.
+ *
+ * The action blocks for the full Stage 2 duration (~30-60s on a small
+ * profile). Same trade-off as `triggerStage1Extraction` — synchronous keeps
+ * the state machine simple and matches the user mental model of "I clicked
+ * a button, I see the result."
  */
 export async function confirmRefinement(args: {
   ventureId: string;
@@ -231,18 +267,43 @@ export async function confirmRefinement(args: {
     };
   }
 
-  const { error } = await insforge.database
+  const { error: transitionError } = await insforge.database
     .from("ventures")
-    .update({ status: "weighting" })
+    .update({ status: "weighting", error_message: null })
     .eq("id", args.ventureId);
 
-  if (error) {
-    return { ok: false, error: `Failed to transition to weighting: ${error.message}` };
+  if (transitionError) {
+    return {
+      ok: false,
+      error: `Failed to transition to weighting: ${transitionError.message}`,
+    };
   }
+
+  // Chain Stage 2. The orchestrator handles its own failure-mode status
+  // transitions (status='error' with error_message stamped), so we just
+  // forward the outcome into the discriminated result.
+  const stage2Result = await runStage2Weighting({
+    ventureId: args.ventureId,
+    insforge,
+  });
 
   revalidatePath(`/ventures/${args.ventureId}`);
   revalidatePath(`/ventures/${args.ventureId}/refine`);
-  return { ok: true, status: "weighting" };
+
+  if (!stage2Result.ok) {
+    return {
+      ok: true,
+      status: "error",
+      weightingError: stage2Result.error,
+    };
+  }
+
+  return {
+    ok: true,
+    status: "weighting",
+    weightRowIds: stage2Result.weightsRowIds,
+    stage2CostUsd: stage2Result.costUsd,
+  };
 }
 
 // ────────────────────────────────────────────────────────────────────────

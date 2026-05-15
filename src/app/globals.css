@@ -1,23 +1,88 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens — single source of truth lives in /DESIGN.md (§4 Color, §3 Typography).
+ * Light mode is the default; dark mode tokens override via prefers-color-scheme.
+ *
+ * Naming: tokens follow the role they serve (background, surface, foreground)
+ * not the underlying hex value. UI code references these via Tailwind utilities
+ * (e.g. `bg-background`, `text-muted-foreground`, `border-border`).
+ */
+
 @theme {
-  --color-background: oklch(1 0 0);
-  --color-foreground: oklch(0.145 0 0);
-  --color-muted: oklch(0.97 0 0);
-  --color-muted-foreground: oklch(0.556 0 0);
-  --color-border: oklch(0.922 0 0);
-  --color-ring: oklch(0.708 0 0);
+  /* Typography — IBM Plex Sans + IBM Plex Mono per DESIGN.md §3 */
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Neutral spine — zinc scale per DESIGN.md §4 */
+  --color-background: #fafafa;        /* zinc-50 */
+  --color-surface: #ffffff;            /* white */
+  --color-surface-elevated: #f4f4f5;   /* zinc-100 — load-bearing emphasis surface (light) */
+  --color-foreground: #18181b;         /* zinc-900 */
+  --color-muted: #f4f4f5;              /* zinc-100 — used by `bg-muted` utility */
+  --color-muted-foreground: #71717a;   /* zinc-500 */
+  --color-border: #e4e4e7;             /* zinc-200 */
+  --color-ring: #818cf8;               /* indigo-400 — focus ring at 30% opacity */
+
+  /* Accent — single indigo used rarely + meaningfully */
+  --color-accent: #4f46e5;             /* indigo-600 */
+  --color-accent-foreground: #ffffff;
+  --color-accent-hover: #4338ca;       /* indigo-700 */
+
+  /* Semantic — warning (critic flags, low confidence) */
+  --color-warning-fg: #b45309;         /* amber-700 */
+  --color-warning-bg: #fffbeb;         /* amber-50 */
+  --color-warning-border: #fde68a;     /* amber-200 */
+
+  /* Semantic — success (save confirmations) */
+  --color-success-fg: #047857;         /* emerald-700 */
+  --color-success-bg: #ecfdf5;         /* emerald-50 */
+
+  /* Semantic — error */
+  --color-error-fg: #b91c1c;           /* red-700 */
+  --color-error-bg: #fef2f2;           /* red-50 */
+  --color-error-border: #fecaca;       /* red-200 */
 }
 
 @media (prefers-color-scheme: dark) {
   @theme {
-    --color-background: oklch(0.145 0 0);
-    --color-foreground: oklch(0.985 0 0);
-    --color-muted: oklch(0.269 0 0);
-    --color-muted-foreground: oklch(0.708 0 0);
-    --color-border: oklch(0.269 0 0);
-    --color-ring: oklch(0.439 0 0);
+    /* Dark mode — the priority fix from 2026-05-15 feedback. */
+    --color-background: #09090b;         /* zinc-950 */
+    --color-surface: #18181b;            /* zinc-900 */
+    --color-surface-elevated: #27272a;   /* zinc-800 — load-bearing emphasis */
+    --color-foreground: #fafafa;         /* zinc-50 */
+    --color-muted: #27272a;              /* zinc-800 — for badges/pills */
+    --color-muted-foreground: #a1a1aa;   /* zinc-400 — meets WCAG AA on bg */
+    --color-border: #27272a;             /* zinc-800 */
+    --color-ring: #a5b4fc;               /* indigo-300 */
+
+    --color-accent: #818cf8;             /* indigo-400 — lighter for dark contrast */
+    --color-accent-foreground: #09090b;
+    --color-accent-hover: #a5b4fc;       /* indigo-300 */
+
+    /* Warning in dark mode — amber palette inverts; use lighter fg on tinted bg */
+    --color-warning-fg: #fcd34d;         /* amber-300 */
+    --color-warning-bg: rgba(69, 26, 3, 0.4);   /* amber-950 at 40% */
+    --color-warning-border: rgba(146, 64, 14, 0.5); /* amber-800 at 50% */
+
+    --color-success-fg: #34d399;         /* emerald-400 */
+    --color-success-bg: rgba(6, 78, 59, 0.3);    /* emerald-900 at 30% */
+
+    --color-error-fg: #f87171;           /* red-400 */
+    --color-error-bg: rgba(69, 10, 10, 0.4);     /* red-950 at 40% */
+    --color-error-border: rgba(153, 27, 27, 0.5); /* red-800 at 50% */
   }
+}
+
+/* Apply IBM Plex Sans as the default body font, IBM Plex Mono on code/mono surfaces. */
+body {
+  font-family: var(--font-sans);
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--font-mono);
 }
 
 * {

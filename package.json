@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "eval": "tsx evals/run.ts"
+    "eval": "tsx --env-file=.env.local evals/run.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

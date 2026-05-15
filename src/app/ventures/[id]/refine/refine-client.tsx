@@ -16,7 +16,14 @@ import {
   type SaveTopLevelResult,
   type TopLevelEdit,
 } from "./actions";
+import { AccessPanel } from "./panels/access";
+import { CapitalAssetPanel } from "./panels/capital-asset";
+import { CustomersPanel } from "./panels/customers";
+import { GeographyRegulatoryPanel } from "./panels/geography-regulatory";
+import { PartnersPanel } from "./panels/partners";
 import { ProductSolutionPanel } from "./panels/product-solution";
+import { TopLevelPanel } from "./panels/top-level";
+import { TransactionPanel } from "./panels/transaction";
 
 interface RefineClientProps {
   ventureId: string;
@@ -36,15 +43,15 @@ export function RefineClient(props: RefineClientProps) {
   const [confirmState, setConfirmState] = useState<
     | { status: "idle" }
     | { status: "pending" }
+    | { status: "success"; weightsCount: number }
+    | { status: "weighting_failed"; error: string }
     | { status: "error"; error: string }
   >({ status: "idle" });
   const [isConfirming, startConfirmTransition] = useTransition();
 
-  // Per-dimension save handler. Optimistically updates local state on success
-  // and marks the dimension as saved-this-session for UI affordance.
-  const handleSaveDimension = async (
-    dimensionKey: Dimension,
-    dimensionData: VentureProfile["dimensions"][Dimension],
+  const handleSaveDimension = async <K extends Dimension>(
+    dimensionKey: K,
+    dimensionData: VentureProfile["dimensions"][K],
   ): Promise<SaveDimensionResult> => {
     const result = await saveDimension({
       ventureId,
@@ -82,8 +89,17 @@ export function RefineClient(props: RefineClientProps) {
         setConfirmState({ status: "error", error: result.error });
         return;
       }
-      // Page revalidation in the action redirects naturally; nothing else to do.
-      setConfirmState({ status: "idle" });
+      if (result.status === "error") {
+        setConfirmState({
+          status: "weighting_failed",
+          error: result.weightingError ?? "Stage 2 failed for an unknown reason.",
+        });
+        return;
+      }
+      setConfirmState({
+        status: "success",
+        weightsCount: result.weightRowIds?.length ?? 7,
+      });
     });
   };
 
@@ -99,23 +115,63 @@ export function RefineClient(props: RefineClientProps) {
         wasSavedThisSession={savedDimensions.has("product_solution")}
       />
 
-      {/* M9.4 will plug the other 6 dimension panels here, in CLAUDE.md §10 order. */}
-      <section className="rounded-md border border-dashed border-border p-4 text-xs text-muted-foreground">
-        Remaining dimension panels (customers, transaction, partners, access,
-        geography_regulatory, capital_asset) plus the top-level panel
-        (synthetic_description, intended_end_state, current_maturity,
-        strategic_risks, gaps_in_input) will land in M9.4. Editing is
-        functional for product_solution today; this section is a placeholder.
-      </section>
+      <CustomersPanel
+        value={profile.dimensions.customers}
+        criticFlags={criticFlagsFor(critic, "customers")}
+        onSave={(data) => handleSaveDimension("customers", data)}
+        wasSavedThisSession={savedDimensions.has("customers")}
+      />
 
-      <section className="rounded-md border border-border p-4 text-sm">
+      <TransactionPanel
+        value={profile.dimensions.transaction}
+        criticFlags={criticFlagsFor(critic, "transaction")}
+        onSave={(data) => handleSaveDimension("transaction", data)}
+        wasSavedThisSession={savedDimensions.has("transaction")}
+      />
+
+      <PartnersPanel
+        value={profile.dimensions.partners}
+        criticFlags={criticFlagsFor(critic, "partners")}
+        onSave={(data) => handleSaveDimension("partners", data)}
+        wasSavedThisSession={savedDimensions.has("partners")}
+      />
+
+      <AccessPanel
+        value={profile.dimensions.access}
+        criticFlags={criticFlagsFor(critic, "access")}
+        onSave={(data) => handleSaveDimension("access", data)}
+        wasSavedThisSession={savedDimensions.has("access")}
+      />
+
+      <GeographyRegulatoryPanel
+        value={profile.dimensions.geography_regulatory}
+        criticFlags={criticFlagsFor(critic, "geography_regulatory")}
+        onSave={(data) => handleSaveDimension("geography_regulatory", data)}
+        wasSavedThisSession={savedDimensions.has("geography_regulatory")}
+      />
+
+      <CapitalAssetPanel
+        value={profile.dimensions.capital_asset}
+        criticFlags={criticFlagsFor(critic, "capital_asset")}
+        onSave={(data) => handleSaveDimension("capital_asset", data)}
+        wasSavedThisSession={savedDimensions.has("capital_asset")}
+      />
+
+      <TopLevelPanel
+        profile={profile}
+        onSave={handleSaveTopLevel}
+        wasSavedThisSession={savedTopLevel}
+      />
+
+      <section className="rounded-md border border-border bg-surface p-4 text-sm">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Confirm refinement
         </h2>
         <p className="mt-2 text-muted-foreground">
           When you&apos;re done editing dimensions, click below to transition
           the venture to Stage 2 weighting. At least one dimension must have
-          been saved as <code>human_refined</code> first.
+          been saved as <code>human_refined</code> first. Stage 2 runs
+          synchronously after the transition — expect ~30-60 seconds.
         </p>
         {alreadyPastRefine && (
           <p className="mt-2 rounded bg-muted p-2 text-xs">
@@ -124,21 +180,35 @@ export function RefineClient(props: RefineClientProps) {
           </p>
         )}
         {confirmState.status === "error" && (
-          <p className="mt-2 rounded border border-red-300 bg-red-50 p-2 text-xs text-red-900">
-            {confirmState.error}
+          <p className="mt-2 rounded border border-[color:var(--color-error-border)] bg-[color:var(--color-error-bg)] p-2 text-xs text-[color:var(--color-error-fg)]">
+            Confirm failed: {confirmState.error}
+          </p>
+        )}
+        {confirmState.status === "weighting_failed" && (
+          <p className="mt-2 rounded border border-[color:var(--color-error-border)] bg-[color:var(--color-error-bg)] p-2 text-xs text-[color:var(--color-error-fg)]">
+            Stage 2 weighting failed: {confirmState.error} You can click
+            below again to retry; refinement saves are still intact.
+          </p>
+        )}
+        {confirmState.status === "success" && (
+          <p className="mt-2 rounded border border-border bg-muted/40 p-2 text-xs text-[color:var(--color-success-fg)]">
+            Stage 2 complete — {confirmState.weightsCount} dimension weights
+            persisted. The weights UI (M11) will surface them next.
           </p>
         )}
         <button
           type="button"
           onClick={onConfirm}
           disabled={isConfirming || alreadyPastRefine}
-          className="mt-3 rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90 disabled:opacity-40"
+          className="mt-3 rounded bg-accent px-3 py-1.5 text-xs font-medium text-accent-foreground hover:bg-[var(--color-accent-hover)] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isConfirming
-            ? "Confirming…"
+            ? "Confirming + running Stage 2…"
             : alreadyPastRefine
               ? "Already confirmed"
-              : "Confirm and continue to weighting"}
+              : confirmState.status === "weighting_failed"
+                ? "Retry Stage 2"
+                : "Confirm and continue to weighting"}
         </button>
         {savedTopLevel === false &&
           savedDimensions.size === 0 &&
@@ -152,14 +222,6 @@ export function RefineClient(props: RefineClientProps) {
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────
-// Helpers
-// ────────────────────────────────────────────────────────────────────────
-
-/**
- * Pull the critic flags for a single dimension, or an empty array if the
- * critic didn't run or didn't flag this dimension. Used by every panel.
- */
 function criticFlagsFor(
   critic: Stage1CriticOutput | null,
   dimensionKey: Dimension,

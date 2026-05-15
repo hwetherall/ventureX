@@ -67,12 +67,12 @@ export default async function RefinePage({
     return (
       <main className="mx-auto max-w-3xl px-6 py-12">
         <PageHeader ventureId={id} />
-        <section className="mt-8 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+        <section className="mt-8 rounded-md border border-[color:var(--color-warning-border)] bg-[color:var(--color-warning-bg)] p-4 text-sm text-[color:var(--color-warning-fg)]">
           No extracted profile exists for this venture yet. Run Stage 1 first.
           <div className="mt-3">
             <Link
               href={`/ventures/${id}`}
-              className="rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+              className="rounded bg-accent px-3 py-1.5 text-xs font-medium text-accent-foreground hover:bg-[var(--color-accent-hover)]"
             >
               ← Back to venture
             </Link>
@@ -87,7 +87,7 @@ export default async function RefinePage({
     return (
       <main className="mx-auto max-w-3xl px-6 py-12">
         <PageHeader ventureId={id} />
-        <section className="mt-8 rounded-md border border-red-300 bg-red-50 p-4 text-sm text-red-900">
+        <section className="mt-8 rounded-md border border-[color:var(--color-error-border)] bg-[color:var(--color-error-bg)] p-4 text-sm text-[color:var(--color-error-fg)]">
           Latest profile row (v{refinableRow.version_number}, source={" "}
           <code>{refinableRow.source}</code>) does not validate against the
           current schema:
@@ -133,14 +133,14 @@ export default async function RefinePage({
           </span>
         )}
         {venture.critic_status === "unavailable" && (
-          <span className="rounded bg-amber-100 px-2 py-1 font-medium text-amber-900">
+          <span className="rounded bg-[color:var(--color-warning-bg)] px-2 py-1 font-medium text-[color:var(--color-warning-fg)]">
             Critic unavailable
           </span>
         )}
       </div>
 
       {venture.critic_status === "unavailable" && (
-        <section className="mt-6 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+        <section className="mt-6 rounded-md border border-[color:var(--color-warning-border)] bg-[color:var(--color-warning-bg)] p-4 text-sm text-[color:var(--color-warning-fg)]">
           <h2 className="text-xs font-semibold uppercase tracking-wide">
             Critic soft-failed (D3)
           </h2>

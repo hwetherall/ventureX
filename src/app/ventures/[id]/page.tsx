@@ -129,12 +129,12 @@ export default async function VenturePage({
         <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Documents ({docs.length})
           {errorCount > 0 && (
-            <span className="ml-2 text-red-700 normal-case">
+            <span className="ml-2 normal-case text-[color:var(--color-error-fg)]">
               {errorCount} failed
             </span>
           )}
           {parsedCount > 0 && errorCount === 0 && (
-            <span className="ml-2 text-green-700 normal-case">
+            <span className="ml-2 normal-case text-[color:var(--color-success-fg)]">
               all parsed
             </span>
           )}
@@ -158,9 +158,9 @@ export default async function VenturePage({
               </div>
               <div className="mt-1 text-xs">
                 {doc.parse_error ? (
-                  <span className="text-red-700">Error: {doc.parse_error}</span>
+                  <span className="text-[color:var(--color-error-fg)]">Error: {doc.parse_error}</span>
                 ) : doc.parsed_at ? (
-                  <span className="text-green-700">
+                  <span className="text-[color:var(--color-success-fg)]">
                     Parsed at {new Date(doc.parsed_at).toLocaleTimeString()}
                   </span>
                 ) : (
@@ -173,11 +173,11 @@ export default async function VenturePage({
       </section>
 
       {venture.status === "error" && venture.error_message && (
-        <section className="mt-8 rounded-md border border-red-300 bg-red-50 p-4 text-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-red-800">
+        <section className="mt-8 rounded-md border border-[color:var(--color-error-border)] bg-[color:var(--color-error-bg)] p-4 text-sm">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-error-fg)]">
             Stage 1 error
           </h2>
-          <p className="mt-2 whitespace-pre-wrap text-red-900">
+          <p className="mt-2 whitespace-pre-wrap text-[color:var(--color-error-fg)]">
             {venture.error_message}
           </p>
         </section>
@@ -233,7 +233,7 @@ export default async function VenturePage({
       )}
 
       {!parsedDocsAvailable && docs.length > 0 && (
-        <section className="mt-8 rounded-md border border-amber-300 bg-amber-50 p-4 text-xs text-amber-900">
+        <section className="mt-8 rounded-md border border-[color:var(--color-warning-border)] bg-[color:var(--color-warning-bg)] p-4 text-xs text-[color:var(--color-warning-fg)]">
           Stage 1 cannot run: no documents parsed successfully. Re-upload or
           fix the failing files before extracting.
         </section>

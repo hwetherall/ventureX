@@ -488,4 +488,12 @@ These are decisions I deliberately did not make because they need Harry's input.
 
 ---
 
-*Last updated: May 14, 2026 (post-M4 — auth + upload flow working end-to-end). Authors: Harry (build lead), with Claude as planning collaborator. See PLAN.md for milestone status and decision log.*
+## 17. Design system
+
+**Always read `DESIGN.md` before making any visual or UI decisions.** All font choices, colors, spacing, dark-mode pairings, save-button UX, and load-bearing field treatments are defined there. Do not deviate without explicit user approval. In QA/review, flag any code that uses Tailwind color shorthand without a `dark:` pairing — that's the #1 mistake DESIGN.md exists to prevent.
+
+The design system was ratified 2026-05-15 via `/design-consultation`. Memorable thing: "Serious software for serious work." Aesthetic: industrial-utilitarian, Linear/IBM-shaped. Typography: IBM Plex Sans + IBM Plex Mono. Color: zinc neutrals + single indigo accent. Two load-bearing fields (`substitution_landscape`, `strategic_risks_and_uncertainties.implies_search_for`) get a 2px indigo left rule emphasis treatment.
+
+---
+
+*Last updated: May 15, 2026 (post-M9 design-consultation — DESIGN.md ratified). Authors: Harry (build lead), with Claude as planning collaborator. See PLAN.md for milestone status, DESIGN.md for visual spec, TODOS.md for open follow-ups.*

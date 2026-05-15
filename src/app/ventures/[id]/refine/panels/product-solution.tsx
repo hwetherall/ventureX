@@ -6,14 +6,13 @@ import type {
   VentureProfile,
 } from "@/types/venture-profile";
 import {
-  CriticFlagList,
+  ConfidenceField,
+  EnumField,
   PanelHeader,
   PanelSaveButton,
+  StringArrayEditor,
   SupportingQuotesDisplay,
   TextField,
-  StringArrayEditor,
-  EnumField,
-  ConfidenceField,
 } from "../panel-primitives";
 import type { SaveDimensionResult } from "../actions";
 
@@ -48,14 +47,12 @@ export function ProductSolutionPanel({
   const isDirty = JSON.stringify(draft) !== JSON.stringify(value);
 
   return (
-    <section className="rounded-md border border-border p-4">
+    <section className="rounded-md border border-border bg-surface p-4">
       <PanelHeader
         title="1. Product / Solution"
         confidence={draft.confidence}
         criticFlagCount={criticFlags.length}
       />
-
-      <CriticFlagList flags={criticFlags} />
 
       <div className="mt-6 space-y-5">
         <TextField
@@ -87,12 +84,12 @@ export function ProductSolutionPanel({
           flags={flagsForField(criticFlags, "core_features")}
         />
         <StringArrayEditor
-          label="substitution_landscape (load-bearing — Phase 3 reads this directly)"
+          label="substitution_landscape"
           values={draft.substitution_landscape}
           onChange={(arr) => setDraft({ ...draft, substitution_landscape: arr })}
           minLength={1}
           flags={flagsForField(criticFlags, "substitution_landscape")}
-          emphasis
+          loadBearing
         />
         <ConfidenceField
           value={draft.confidence}

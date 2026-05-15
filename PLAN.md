@@ -1,8 +1,8 @@
 # VentureX — Implementation Plan (Phases 0-2)
 
-**Status:** M1-M8 complete. M9 (HITL UI) in flight on a parallel branch; M10 (Stage 2 weighting) is next on this branch.
+**Status:** M1-M8 + M10 server-side complete. M9 (HITL UI) in flight on a parallel branch. M10 wire-up + M11 (eval framework + weights UI + e2e test) remain.
 **Generated:** 2026-05-14 from `/plan-eng-review`
-**Last updated:** 2026-05-15 (post-M8 — critic e2e verified on ABB)
+**Last updated:** 2026-05-15 (post-M10 server — Stage 2 weighting passes all 5 ABB §13 weight criteria first cycle)
 
 This is the working execution plan. `claude.md` remains the spec. This plan tracks decisions, milestone status, and what's left.
 
@@ -21,10 +21,10 @@ This is the working execution plan. `claude.md` remains the spec. This plan trac
 | M7 | Stage 1 extraction | ✓ Done | `src/server/stage1-extract.ts`. Section 13 ABB acceptance gate cleared after 4 prompt-iteration cycles (see D10) |
 | M8 | Stage 1 critic | ✓ Done | `src/server/stage1-critic.ts` + `prompts/stage_1_critic.md`. D3 retry-soft-fail in place. End-to-end on ABB returned valid `Stage1CriticOutput` in 1.9s (gpt-5.5). See M8 calibration note below |
 | M9 | HITL refinement UI | In flight (parallel chat) | `src/app/ventures/[id]/refine/` — page, client wrapper, primitives, product-solution panel scaffolded |
-| **M10** | **Stage 2 weighting** | **NEXT (this chat)** | Draft prompt + `stage2-weight.ts`. Runs after M9 lands but the prompt + server code are independent of refine UI |
-| M11 | Eval framework + Weights UI + E2E test | Pending | Needs M10. Section 13 criteria already codified in `scripts/check-abb.ts` — fold into `evals/criteria.ts` |
+| M10 | Stage 2 weighting (server-side) | ✓ Done | `src/server/stage2-weight.ts` + `prompts/stage_2_dimension_weighting.md`. End-to-end on ABB passed all 5 §13 weight criteria first cycle (product/capital/geography ≥0.15, access ≤0.05, sum=1.000). Wire-up from HITL "Confirm to continue" deferred until M9 settles |
+| **M11** | **Eval framework + Weights UI + E2E test** | **NEXT** | Section 13 criteria already codified in `scripts/check-abb.ts` (Stage 1) and `scripts/check-stage2.ts` (Stage 2) — fold into `evals/criteria.ts` + `evals/runner.ts` |
 
-**16 tests passing.** `pnpm test:run` is green (10 prior + 6 new Stage1CriticOutputSchema tests in M8).
+**25 tests passing.** `pnpm test:run` is green (16 prior + 9 new Stage2WeightingOutputSchema tests in M10).
 
 ### M8 calibration follow-up
 
@@ -157,14 +157,15 @@ Cleared Section 13 ABB acceptance in 4 iteration cycles (see D10 log). All 8 har
 
 This chat does not own this milestone. State on disk: `page.tsx`, `actions.ts`, `refine-client.tsx`, `panel-primitives.tsx`, `panels/product-solution.tsx`. The parallel chat is iterating on UI/UX.
 
-### M10 — Stage 2 weighting — NEXT (this chat)
+### M10 — Stage 2 weighting — ✓ DONE 2026-05-15 (server-side)
 
-- Draft `prompts/stage_2_dimension_weighting.md`
-- `src/server/stage2-weight.ts` — Opus 4.7 on latest `human_refined` profile (fallback: latest `llm_extracted` if no human_refined exists)
-- Renormalize if sum ∈ [0.95, 1.05]; throw outside
-- Insert 7 `dimension_weights` rows with `source='llm_proposed'`
-- Add a `triggerStage2Weighting` server action chained from the HITL "Confirm to continue" button
-- Acceptance gate: on ABB, product_solution/capital_asset/geography_regulatory each weight ≥0.15 and access ≤0.05 (CLAUDE.md §13)
+- `prompts/stage_2_dimension_weighting.md` — drafted, calibrated against §13 expectations
+- `src/server/stage2-weight.ts` — orchestrator: load latest `human_refined` profile (fallback to `llm_extracted`), Opus 4.7 via `callLLM`, validate sum ∈ [0.95, 1.05] and renormalize to 1.0 (throw outside), insert 7 `dimension_weights` rows with `source='llm_proposed'`, reuse `current_run_id` for D4 budget tracking
+- `src/types/venture-profile.ts` — `Stage2WeightingOutputSchema` (nested-by-dimension shape, weight ∈ [0,1], rationale ≤500 chars, optional synthesis_notes ≤600 chars)
+- `src/types/venture-profile-weighting.test.ts` — 9 tests for the schema + sum-not-enforced-at-zod
+- `scripts/check-stage2.ts` — M10 acceptance helper, runs Opus 4.7 against ABB profile and asserts §13 weight criteria
+- E2E verification: 5/5 criteria pass first cycle (product_solution=0.260, capital_asset=0.220, geography_regulatory=0.180, access=0.040, sum=1.000). $0.055 cost, 2.7s latency.
+- **Deferred:** wire-up from the HITL "Confirm to continue" button — touches `src/app/ventures/[id]/refine/actions.ts` which the M9 chat is iterating on. Plumb in after M9 stabilizes; the server action should call `runStage2Weighting` and route the user to `/ventures/[id]/weights` (M11)
 
 ### M11 — Eval framework + Weights UI + end-to-end test
 - `evals/criteria.ts` — Section 13 criteria as assertion functions
@@ -211,7 +212,7 @@ After both land: M11 (eval framework + weights UI + e2e test) becomes the sequen
 | Stage 1 extract | Cost budget exceeded | Yes (M6) | `BudgetExceededError` | status='error', "Reset budget" CTA |
 | Stage 1 critic | Both attempts fail (D3) | Covered by orchestrator structure; not exercised end-to-end yet (would need a flaky model) | Soft-fail, set `critic_status='unavailable'` | Yellow banner in HITL (M9) |
 | HITL save | Concurrent inserts (D6) | Pending M9 | Retry-on-conflict up to 3x | Invisible to user |
-| Stage 2 weight | Sum outside [0.95, 1.05] | Pending M10 | Throw with clear error | Error page |
+| Stage 2 weight | Sum outside [0.95, 1.05] | Covered by `WeightSumOutOfRangeError` in orchestrator; not unit-tested (Zod doesn't enforce sum at schema layer per design) | Throw with clear error | Error page |
 | Storage upload | File too large or storage error | Yes (M4) | Per-file error, continue with others | Per-file UI feedback |
 
 No critical gaps flagged (every new codepath has at least one of: test / error handling / user signal).
@@ -229,4 +230,4 @@ No critical gaps flagged (every new codepath has at least one of: test / error h
 | DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
 
 **UNRESOLVED:** 0
-**VERDICT:** ENG CLEARED — M1-M8 shipped. M8 acceptance verified 2026-05-15 via `scripts/check-critic.ts` (ABB profile, 38 flags, schema-valid). M9 (HITL UI) running in parallel chat; M10 (Stage 2 weighting) is the next milestone on this branch.
+**VERDICT:** ENG CLEARED — M1-M8 + M10 server-side shipped. Both LLM-stage acceptance gates cleared on ABB: M8 critic via `scripts/check-critic.ts` (38 valid flags, schema-clean) and M10 weighting via `scripts/check-stage2.ts` (5/5 §13 criteria first cycle). M9 (HITL UI) running in parallel chat. Next: M10 wire-up from HITL once M9 settles, then M11 (eval framework + weights UI + e2e).

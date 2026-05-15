@@ -244,3 +244,46 @@ export type CriticSeverity = z.infer<typeof CriticSeveritySchema>;
 export type CriticFlag = z.infer<typeof CriticFlagSchema>;
 export type CriticDimension = z.infer<typeof CriticDimensionSchema>;
 export type Stage1CriticOutput = z.infer<typeof Stage1CriticOutputSchema>;
+
+// ────────────────────────────────────────────────────────────────────────
+// Stage 2 Dimension Weighting output (CLAUDE.md §11, M10)
+//
+// The model returns 7 weights nested under `weights.<dimension>`, each with a
+// rationale string. The orchestrator validates the sum is within [0.95, 1.05]
+// and renormalizes; outside that window we reject and surface to the user.
+// Persisted as 7 rows in `dimension_weights` with `source='llm_proposed'`.
+// ────────────────────────────────────────────────────────────────────────
+
+// Per-dimension entry. Weight ∈ [0, 1]. Sum-to-1 is enforced at the
+// orchestrator boundary, not by Zod (Zod sees one dimension at a time).
+//
+// Rationale cap (500 chars) matches the prompt's hard cap. A model that
+// exceeds it has misunderstood the instructions — better to fail validation
+// and retry than persist a wall of text into the UI.
+const DimensionWeightEntrySchema = z.object({
+  weight: z.number().min(0).max(1),
+  rationale: z.string().min(1).max(500),
+});
+
+/**
+ * @public
+ * Output of Stage 2 dimension weighting. All 7 dimensions are required; the
+ * orchestrator inserts 7 `dimension_weights` rows from this object. The
+ * `synthesis_notes` field is optional cross-dimension reasoning surfaced as
+ * a subtitle in the weights UI when present.
+ */
+export const Stage2WeightingOutputSchema = z.object({
+  weights: z.object({
+    product_solution: DimensionWeightEntrySchema,
+    customers: DimensionWeightEntrySchema,
+    transaction: DimensionWeightEntrySchema,
+    partners: DimensionWeightEntrySchema,
+    access: DimensionWeightEntrySchema,
+    geography_regulatory: DimensionWeightEntrySchema,
+    capital_asset: DimensionWeightEntrySchema,
+  }),
+  synthesis_notes: z.string().max(600).optional(),
+});
+
+export type DimensionWeightEntry = z.infer<typeof DimensionWeightEntrySchema>;
+export type Stage2WeightingOutput = z.infer<typeof Stage2WeightingOutputSchema>;

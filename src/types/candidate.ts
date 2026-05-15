@@ -38,6 +38,30 @@ const DimensionEnumSchema = z.enum(DIMENSION_KEYS);
 
 /**
  * @public
+ * One web-evidence citation attached to a candidate (M13). The model emits
+ * these only when the candidate is grounded in an entry from the Stage 3
+ * "## Web evidence" block; training-data-only candidates omit `citations`
+ * entirely (see CandidateCompanySchema below).
+ *
+ * Bounds rationale:
+ *   - `url`: must be a valid URL. The orchestrator passes Exa-returned URLs
+ *     into the prompt and the model is told never to invent URLs — if a bad
+ *     URL appears, validation fails and callLLM's retry-once fires.
+ *   - `title`: 1-300 chars. Exa titles are typically <100 but news / paper
+ *     titles can run longer. 300 is a generous ceiling.
+ *   - `query`: 1-500 chars. This is the `implies_search_for` string from
+ *     the venture's strategic_risks_and_uncertainties that triggered the
+ *     search returning this hit — used to trace a citation back to the
+ *     risk it grounded.
+ */
+export const CitationSchema = z.object({
+  url: z.string().url(),
+  title: z.string().min(1).max(300),
+  query: z.string().min(1).max(500),
+});
+
+/**
+ * @public
  * One candidate. Bounds rationale (PHASE3.md §4):
  *
  *   - `name`: 1-200 chars. Some real-world company names run long
@@ -56,6 +80,10 @@ export const CandidateCompanySchema = z.object({
     .array(DimensionEnumSchema)
     .min(1)
     .max(7),
+  // Optional per PHASE3.md §6b. Present on M13 candidates grounded in web
+  // evidence; absent on training-data-only candidates. Cap of 3 prevents the
+  // model from over-citing a single candidate — picks the strongest 3 sources.
+  citations: z.array(CitationSchema).max(3).optional(),
 });
 
 /**
@@ -79,6 +107,7 @@ export const Stage3CandidatesOutputSchema = z.object({
 });
 
 export type CandidateType = z.infer<typeof CandidateTypeSchema>;
+export type Citation = z.infer<typeof CitationSchema>;
 export type CandidateCompany = z.infer<typeof CandidateCompanySchema>;
 export type Stage3CandidatesOutput = z.infer<
   typeof Stage3CandidatesOutputSchema

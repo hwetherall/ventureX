@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
 
+import { ExaError } from "@/lib/exa/errors";
+import { exaSearchBatch } from "@/lib/exa/search";
 import type { InsForgeClient } from "@/lib/insforge/server";
 import { callLLM } from "@/lib/openrouter/call";
 import {
@@ -13,6 +15,7 @@ import { errorMessage } from "@/lib/utils";
 import {
   Stage3CandidatesOutputSchema,
   type CandidateCompany,
+  type Citation,
   type Stage3CandidatesOutput,
 } from "@/types/candidate";
 import {
@@ -35,10 +38,10 @@ const STAGE_3_TIMEOUT_MS = 180_000;
 const DEFAULT_STAGE_3_MODEL = "anthropic/claude-opus-4.7";
 
 // Matches the placeholder line at the end of prompts/stage_3_candidate_generation.md.
-// The orchestrator strips it before appending the profile + weights blocks so
-// the prompt file stays self-documenting.
+// The orchestrator strips it before appending the three input blocks (profile,
+// weights, web evidence) so the prompt file stays self-documenting.
 const DOCUMENTS_PLACEHOLDER =
-  /\[The VentureX profile JSON and dimension weights will be appended below\]\s*$/;
+  /\[The VentureX profile JSON, dimension weights, and web evidence will be appended below\]\s*$/;
 
 const PRECONDITION_STATUS = "ready" as const;
 const IN_PROGRESS_STATUS = "candidates_generating" as const;
@@ -106,11 +109,27 @@ type CanonicalWeights = Record<
 >;
 
 /**
+ * One bundled web-search result set passed to the prompt. `query` echoes the
+ * `implies_search_for` string verbatim so the model can attach citations with
+ * the exact query string the schema demands.
+ */
+interface WebEvidenceBlock {
+  query: string;
+  results: { url: string; title: string; text: string }[];
+}
+
+/**
  * @public
- * Stage 3 (M12): LLM-only candidate brainstorm. Reads the latest human-refined
- * profile + canonical dimension_weights set, calls Opus 4.7 with the Stage 3
- * prompt, validates the output against `Stage3CandidatesOutputSchema`, and
- * inserts 10-60 `candidate_companies` rows sharing one `generation_run_id`.
+ * Stage 3 (M13): web-augmented candidate brainstorm. Reads the latest
+ * human-refined profile + canonical dimension_weights set, gathers web
+ * evidence by running one Exa neural search per
+ * `strategic_risks_and_uncertainties[].implies_search_for` (parallel), calls
+ * Opus 4.7 with profile + weights + evidence, validates the output against
+ * `Stage3CandidatesOutputSchema`, deduplicates within-run by case-folded
+ * name (merging citations), and inserts 10-60 `candidate_companies` rows
+ * sharing one `generation_run_id`. Candidates grounded in web evidence
+ * carry up to 3 citations; training-data-only candidates carry no
+ * citations. P3-D12: this path supersedes the M12 LLM-only flow.
  *
  * Concurrency guard (P3-D5, server-side half of belt-and-braces):
  *   - On entry, venture must be in `status='ready'`. The precondition is
@@ -161,11 +180,18 @@ export async function runStage3Candidates(
       ventureId,
     );
 
+    // M13 web evidence step: one Exa neural search per implies_search_for
+    // string, in parallel. ExaError propagates to the outer catch, where
+    // formatErrorForUser surfaces it with the "Stage 3 web search failed"
+    // prefix so the user can distinguish search failures from LLM failures.
+    const webEvidence = await gatherWebEvidence(profileVersion.profile);
+
     const promptBody = await loadPrompt("stage_3_candidate_generation.md");
     const prompt = assembleStage3Prompt(
       promptBody,
       profileVersion.profile,
       weights,
+      webEvidence,
     );
 
     const model = process.env.STAGE_3_MODEL ?? DEFAULT_STAGE_3_MODEL;
@@ -185,12 +211,19 @@ export async function runStage3Candidates(
       estimatedOutputTokens: 7_000,
     });
 
+    // Within-run dedup by case-folded name. The web-search step can surface
+    // the same company under multiple implies_search_for hits, leading the
+    // model to emit it under multiple candidate types. We keep the first
+    // occurrence's type/rationale (model's primary placement) and merge
+    // citation URLs from later duplicates, capping at 3 per candidate.
+    const dedupedCandidates = dedupCandidates(result.data.candidates);
+
     const candidateIds = await insertCandidates(insforge, {
       ventureId,
       profileVersionId: profileVersion.id,
       generationRunId,
       llmCallId: result.llmCallId,
-      candidates: result.data.candidates,
+      candidates: dedupedCandidates,
     });
 
     await markCandidatesReady(insforge, ventureId);
@@ -427,6 +460,7 @@ function assembleStage3Prompt(
   promptBody: string,
   profile: VentureProfile,
   weights: CanonicalWeights,
+  webEvidence: WebEvidenceBlock[],
 ): string {
   const stripped = promptBody.replace(DOCUMENTS_PLACEHOLDER, "").trimEnd();
 
@@ -444,7 +478,7 @@ function assembleStage3Prompt(
     };
   }
 
-  return [
+  const sections = [
     stripped,
     "",
     "## VentureX profile (JSON)",
@@ -462,7 +496,28 @@ function assembleStage3Prompt(
     JSON.stringify(weightsForPrompt, null, 2),
     "```",
     "",
-  ].join("\n");
+  ];
+
+  // The "## Web evidence" block is emitted even when empty so the model sees
+  // a consistent prompt structure — an empty results array per query is more
+  // legible than a missing section, and tells the model "we did search; no
+  // hits came back" rather than "we forgot to search."
+  sections.push(
+    "## Web evidence",
+    "",
+    "Real Exa neural search results, one block per `implies_search_for`",
+    "string from the venture profile. Use these to ground candidates that",
+    "would otherwise be uncertain (regional players especially). When a",
+    "candidate is supported by entries below, attach `citations` per the",
+    "WEB EVIDENCE rules in the prompt body. Never invent URLs.",
+    "",
+    "```json",
+    JSON.stringify(webEvidence, null, 2),
+    "```",
+    "",
+  );
+
+  return sections.join("\n");
 }
 
 /**
@@ -505,6 +560,9 @@ async function insertCandidates(
   // Single insert with the full batch. The candidate_companies CHECK
   // constraints (type enum, dimensions_implicated bounds) provide
   // defense-in-depth around the Zod schema that callLLM already enforced.
+  // Citations land as `null` when omitted (training-data candidates) or a
+  // 1-3 element array when the model attached evidence; the schema enforced
+  // shape upstream so no further validation here.
   const rows = args.candidates.map((c) => ({
     venture_id: args.ventureId,
     profile_version_id: args.profileVersionId,
@@ -513,6 +571,7 @@ async function insertCandidates(
     type: c.type,
     rationale: c.rationale,
     dimensions_implicated: c.dimensions_implicated,
+    citations: c.citations ?? null,
     llm_call_id: args.llmCallId,
   }));
 
@@ -530,6 +589,94 @@ async function insertCandidates(
   return (data as InsertedCandidate[]).map((r) => r.id);
 }
 
+/**
+ * Run one Exa neural search per `strategic_risks_and_uncertainties[]`
+ * .implies_search_for string in parallel. Returns one
+ * {@link WebEvidenceBlock} per risk, in the same order the risks appear in
+ * the profile. Empty-result blocks are kept (the model sees "we searched;
+ * found nothing here") rather than dropped.
+ *
+ * Empty input (a profile with no risks — unusual but possible if an extractor
+ * regression produced a zero-risk profile) returns an empty array; the
+ * prompt's `## Web evidence` block becomes an empty JSON array.
+ *
+ * Throws {@link ExaError} on any search failure. The outer orchestrator
+ * `try/catch` transitions venture to status='error'; the user re-runs.
+ */
+async function gatherWebEvidence(
+  profile: VentureProfile,
+): Promise<WebEvidenceBlock[]> {
+  const queries = profile.strategic_risks_and_uncertainties.map(
+    (r) => r.implies_search_for,
+  );
+
+  if (queries.length === 0) {
+    return [];
+  }
+
+  const responses = await exaSearchBatch(queries);
+
+  return responses.map((r) => ({
+    query: r.query,
+    results: r.results.map((hit) => ({
+      url: hit.url,
+      title: hit.title,
+      text: hit.text,
+    })),
+  }));
+}
+
+/**
+ * Within-run de-duplication by case-folded name. PHASE3.md §8 warned that
+ * M13's multi-search shape would surface the same company under multiple
+ * queries; the model may then emit them as separate candidates (sometimes
+ * under different types). We keep the first occurrence — that's the model's
+ * primary categorization — and merge `citations` URLs from later duplicates,
+ * de-duping by URL and capping at 3.
+ *
+ * Returns a fresh array, preserving the order of first occurrence. Inputs
+ * are not mutated.
+ */
+function dedupCandidates(candidates: CandidateCompany[]): CandidateCompany[] {
+  const seen = new Map<string, CandidateCompany>();
+
+  for (const c of candidates) {
+    const key = c.name.toLowerCase().trim();
+    const existing = seen.get(key);
+
+    if (!existing) {
+      seen.set(key, c);
+      continue;
+    }
+
+    // Merge citations from this duplicate into the kept entry. Only the
+    // citations field is merged; type / rationale / dimensions_implicated
+    // stay as the first-occurrence model placement.
+    if (!c.citations || c.citations.length === 0) {
+      continue;
+    }
+
+    const existingUrls = new Set(
+      (existing.citations ?? []).map((cit) => cit.url),
+    );
+    const newOnes: Citation[] = c.citations.filter(
+      (cit) => !existingUrls.has(cit.url),
+    );
+
+    if (newOnes.length === 0) {
+      continue;
+    }
+
+    const merged = [...(existing.citations ?? []), ...newOnes].slice(0, 3);
+    seen.set(key, {
+      ...existing,
+      citations: merged.length > 0 ? merged : undefined,
+    });
+  }
+
+  return Array.from(seen.values());
+}
+
 function formatErrorForUser(err: unknown): string {
   if (err instanceof PreconditionError) {
     return err.message;
@@ -545,6 +692,10 @@ function formatErrorForUser(err: unknown): string {
   }
   if (err instanceof LLMValidationError) {
     return `Stage 3 model output failed validation after ${err.attempts} attempt(s). The candidate brainstorm did not match the expected schema; try again or inspect llm_call_logs for diagnostics.`;
+  }
+  if (err instanceof ExaError) {
+    const status = err.status ? ` (HTTP ${err.status})` : "";
+    return `Stage 3 web search failed${status}: ${err.message}. The Exa search step ran before the LLM call; no budget was spent on Opus. Verify EXA_API_KEY and retry.`;
   }
   if (err instanceof OpenRouterError) {
     const status = err.status ? ` (HTTP ${err.status})` : "";

@@ -1,0 +1,821 @@
+{
+  "rows": [
+    {
+      "id": "e8b8b360-6db9-4714-8cfd-35aaa48df5ac",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Vertiv",
+      "type": "direct",
+      "rationale": "Pure-play data-center infrastructure vendor with the Geist-branded rack PDU line covering hyperscale, colocation, and enterprise ΓÇö the exact three sub-segments the venture targets. Heavy capital_asset overlap: global manufacturing footprint, multi-region certifications, and embedded IT-distribution channels are precisely what the parent lacks. Strong DCIM integration (Trellis/Environet) addresses the 'low-margin trap' via software attach.",
+      "dimensions_implicated": [
+        "product_solution",
+        "capital_asset",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "861b9726-1bfb-4446-8e11-aa432561f813",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Schneider Electric (APC)",
+      "type": "direct",
+      "rationale": "APC NetShelter rack PDU line is a category leader; Schneider matches the parent profile (electrical heritage + IT-channel reach) the venture aspires to, making it the benchmark direct rival on scale+brand defensibility. EcoStruxure IT DCIM attach directly addresses the commoditization risk flagged in the profile. Global certification footprint covers every target geography including constrained China/India.",
+      "dimensions_implicated": [
+        "product_solution",
+        "capital_asset",
+        "partners",
+        "geography_regulatory"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "2d447d6d-0b44-4998-b1ef-c26a16d18f5b",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Eaton",
+      "type": "direct",
+      "rationale": "Eaton's ePDU line competes head-on at the rack level, with Brightlayer DCIM software offering the intelligence/management overlay the profile identifies as the escape from the low-margin trap. Like the parent, Eaton straddles upstream electrical distribution and IT-room power ΓÇö they are the closest analog to the venture's strategic thesis, and likely the toughest direct comparator.",
+      "dimensions_implicated": [
+        "product_solution",
+        "capital_asset",
+        "customers"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "8f7524af-0a5c-450d-abf3-8a84c18522fa",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Server Technology (Legrand)",
+      "type": "direct",
+      "rationale": "Pure-play intelligent rack PDU specialist (PRO3X, Switched POPS) acquired by Legrand; deeply embedded in hyperscale and colocation specs with outlet-level switching, metering, and DCIM integration matching the venture's exact core_features list. Strong IT-distribution channel and server-OEM relationships ΓÇö the channel the parent must build from zero.",
+      "dimensions_implicated": [
+        "product_solution",
+        "partners",
+        "customers"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "f36a545a-72b8-4872-91a9-42b07d7ebeb8",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Raritan (Legrand)",
+      "type": "direct",
+      "rationale": "Intelligent rack PDU pioneer (PX series) with outlet-level metering and switching, sold heavily into enterprise and colocation through IT distribution. Now Legrand-owned, sharing channel with Server Technology ΓÇö illustrates the consolidation trajectory and channel-mastery profile the venture lacks.",
+      "dimensions_implicated": [
+        "product_solution",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "76817b93-0a60-4f63-a27d-5f50045ff715",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Legrand (Data Center Power & Control Division)",
+      "type": "direct",
+      "rationale": "Parent of Server Technology, Raritan, and Starline ΓÇö Legrand's DCPC division is the consolidated rack-PDU + busway leader and the most plausible acquirer/competitor across both AC rack PDU and SPDM busway categories that the substitution_landscape explicitly names. Embodies the scale+brand defensibility model the venture targets.",
+      "dimensions_implicated": [
+        "product_solution",
+        "capital_asset",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "23d8a244-b72c-4cd5-afa1-7c31411bfc6b",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Panduit",
+      "type": "direct",
+      "rationale": "SmartZone intelligent rack PDU line with branch/outlet metering and DCIM tie-ins; sells through IT distribution and integrators into enterprise/colocation ΓÇö exactly the channel the parent does not own. Cabling/rack ecosystem bundle is a pull-through advantage the venture cannot easily replicate.",
+      "dimensions_implicated": [
+        "product_solution",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "67326537-52cb-47b8-a7dc-8a2feef343e0",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Tripp Lite (Eaton)",
+      "type": "direct",
+      "rationale": "Mid-market rack PDU brand acquired by Eaton, strong in enterprise and edge/smaller server-room deployments (the venture's secondary segment). Demonstrates the consolidation path: a credible Buy-path comparator for the parent's speed-to-market risk.",
+      "dimensions_implicated": [
+        "product_solution",
+        "customers"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "bd196272-28dd-4e3c-8194-aab2efda8983",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "CyberPower",
+      "type": "direct",
+      "rationale": "Value-tier rack PDU vendor with switched/metered lines targeting enterprise and edge data centers via IT distribution. Represents the commoditization pressure underlying the 'low-margin trap' risk ΓÇö a benchmark for the floor of margin compression in the category.",
+      "dimensions_implicated": [
+        "product_solution",
+        "transaction"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "a728183a-d567-4af2-a3db-449e22f6ef71",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Enlogic (nVent)",
+      "type": "direct",
+      "rationale": "Intelligent rack PDU specialist acquired by nVent; high-density, hot-swap controller designs aimed at hyperscale and colocation buyers. A near-perfect acquisition-target archetype matching the 'small/mid-cap rack-PDU specialists' search hint under the speed-to-market risk.",
+      "dimensions_implicated": [
+        "product_solution",
+        "capital_asset"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "82b94450-fc89-4e9f-a343-c42fac659047",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Rittal",
+      "type": "direct",
+      "rationale": "German rack and infrastructure leader offering rack PDUs as part of integrated cabinet/cooling/power bundles; strong in European enterprise and colocation. Bundled-with-rack go-to-market is exactly the server-OEM-style pull-through threat noted in the substitution landscape ('Server-OEM-integrated power distribution built into the chassis or rack').",
+      "dimensions_implicated": [
+        "product_solution",
+        "partners",
+        "geography_regulatory"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "ab399063-affe-4842-ac9c-c03f5ba1deb9",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Chatsworth Products (CPI)",
+      "type": "direct",
+      "rationale": "eConnect intelligent rack PDU line bundled with CPI's rack/cabinet ecosystem; deeply embedded in colocation and enterprise specs in North America. Bundle-with-rack pull-through is a channel pattern the parent must compete against.",
+      "dimensions_implicated": [
+        "product_solution",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "1d3db461-e156-4e16-83be-220ec28be65c",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "HPE (Hewlett Packard Enterprise)",
+      "type": "direct",
+      "rationale": "Server OEM selling branded rack PDUs bundled into HPE rack solutions ΓÇö the OEM-bundled channel explicitly named in the partners and risks fields. Directly threatens the venture's ability to win pull-through unless server-OEM relationships are secured.",
+      "dimensions_implicated": [
+        "product_solution",
+        "partners",
+        "customers"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "3844ed8d-163f-4859-9564-1c6dc6490455",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Dell Technologies",
+      "type": "direct",
+      "rationale": "Server OEM that bundles rack PDUs into PowerEdge rack solutions sold through Dell's IT distribution ΓÇö the exact channel mismatch risk the profile names. Pull-through volume to enterprise and hyperscale buyers makes Dell a defensive comparator on the customers + partners axes.",
+      "dimensions_implicated": [
+        "partners",
+        "customers",
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "a17284fd-5367-4de3-8858-0aa56c2e8832",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Delta Electronics",
+      "type": "direct",
+      "rationale": "Taiwanese power-electronics giant with a growing rack PDU portfolio plus deep ODM relationships with hyperscalers and server OEMs. A plausible white-label/ODM partner ΓÇö directly matching the 'white-label/ODM rack-PDU manufacturers' search hint under the speed-to-market risk.",
+      "dimensions_implicated": [
+        "product_solution",
+        "capital_asset",
+        "geography_regulatory"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "07c608f9-2388-404f-8f7f-1c81a70a5e48",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Starline (Legrand)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Overhead busway + tap-off systems are the dominant SPDM threat named verbatim in substitution_landscape['Busbar + tap-off unit systems running overhead along racks'] and reinforced by the 100ΓÇô200kW AI density risk. Same JTBD (deliver power to IT equipment per cabinet) via decentralized overhead busbar with per-rack tap-offs, displacing the RPP+rack-PDU chain entirely.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "5ff009e6-e82b-4315-a76a-56bde67ed22b",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Universal Electric Corporation (Starline parent legacy / Anord Mardix peer)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Track busway specialist historically synonymous with the Starline brand ΓÇö overhead busbar+tap-off is the named substitute mechanism in the profile. Pure SPDM play on product_solution axis: same JTBD, fundamentally different mechanism.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "513d01f8-5667-4d56-ac99-2e69c8247c5c",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Anord Mardix (Flex)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Critical-power busway and modular RPP/PDU specialist serving hyperscalers; offers overhead busway as a direct substitute for the rack-PDU-centric architecture named in substitution_landscape. Hyperscale customer overlap aligns with the venture's target sub-segments.",
+      "dimensions_implicated": [
+        "product_solution",
+        "customers"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "6fb92f02-afc8-4251-8092-17a4e251c126",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "E+I Engineering (Vertiv)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Busway and modular power-distribution specialist acquired by Vertiv; supplies overhead busbar systems that displace the RPPΓåÆrack-PDU chain in hyperscale builds ΓÇö the exact SPDM mechanism flagged in the substitution landscape.",
+      "dimensions_implicated": [
+        "product_solution",
+        "capital_asset"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "f6cf87a5-f7fe-434a-b400-d9dda7b3bd23",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Methode Electronics (Power Solutions / Power Distribution busway)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Supplies busbar power distribution products into data-center applications; another SPDM player in the overhead busway category named in substitution_landscape. Same JTBD, different mechanism.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "ea92089a-3b0e-479c-a87a-047a5c784312",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Astec / Artesyn Embedded Power (Advanced Energy)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Supplies OCP-style power shelves and rack-level AC-DC conversion modules ΓÇö matching substitution_landscape['Power shelves integrated at the rack or row level for high-density AI compute'] and the AI-density risk's implies_search_for hint about power shelves.",
+      "dimensions_implicated": [
+        "product_solution",
+        "customers"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "23cb76e6-df21-4d73-90f1-107738283968",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Lite-On Technology (Power SBG)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "OCP-aligned power shelf and rack power supplier to hyperscalers; centralizes AC-DC conversion at the rack level, bypassing traditional AC rack PDUs ΓÇö the SPDM mechanism explicitly cited under the AI-density risk.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "63037d20-f0f5-4147-9434-70e51e9991d9",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Delta Power Solutions (ORv3 power shelf line)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Open Rack v3 power shelf supplier to AI/HPC hyperscale customers ΓÇö same JTBD as a rack PDU (rack-level power delivery) executed via integrated power shelves feeding a DC busbar, the substitution_landscape's named alternative.",
+      "dimensions_implicated": [
+        "product_solution",
+        "customers"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "3ab0d74d-502d-44e8-b7f3-6b84867feebf",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Murata Power Solutions",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Rack-level power shelf and DC distribution modules for AI compute; aligns with the OCP DC-rack-power vendor profile called out in the ACΓåÆDC distribution risk's implies_search_for hint.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "fdaa0b6d-6e4e-443f-89c0-b6e654e1164c",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Bel Power Solutions",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Power shelves and OCP-style rack DC power supplies; another vendor matching the substitution_landscape entry on rack/row power shelves for high-density AI compute. Same JTBD via centralized rack-level AC-DC conversion.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "064e5665-f857-4267-9dbf-84194386dbda",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Vicor",
+      "type": "same_problem_different_mechanism",
+      "rationale": "48V/400VDC factorized power architecture delivering DC directly to GPU boards ΓÇö substitution_landscape['In-rack DC distribution architectures (e.g., 400VDC)'] and the ACΓåÆDC risk both point here. Bypasses the AC rack PDU entirely for AI workloads.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "b3d68907-d09d-4255-b9db-b326075247bd",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Infineon (Server Power / 48V solutions)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Drives the silicon and reference designs enabling in-rack 48V/DC distribution architectures that obsolete AC rack PDUs ΓÇö flagged under the ACΓåÆDC distribution risk. Mechanism shift candidate even if not a direct hardware seller.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "9c37a17b-a94a-477d-9c34-f5ad43fb13da",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "ABB Smart Power (Solid-State Protection / TruONE)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Solid-state protection and intelligent switching upstream of the rack ΓÇö matches substitution_landscape['Solid-state protection devices upstream that absorb metering/protection functions currently in the rack PDU']. Same JTBD (protect and meter rack-bound power) via a different topology.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "e7907963-021c-4c42-8401-2efb2b735f9b",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Atom Power",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Solid-state circuit breaker specialist whose upstream digital protection products could absorb the metering/protection functions currently in the rack PDU ΓÇö the SPDM mechanism explicitly named in substitution_landscape.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "9ebd8bde-3a77-48ec-8dc5-1b3bcd220525",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Supermicro",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Server OEM offering rack-integrated chassis power distribution and liquid-cooled AI rack solutions where power is built into the rack/chassis ΓÇö substitution_landscape['Server-OEM-integrated power distribution built into the chassis or rack']. Direct threat to standalone rack-PDU SKU at AI-density racks.",
+      "dimensions_implicated": [
+        "product_solution",
+        "customers"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "29f875e7-4610-4e5d-9162-82ebc556ba0c",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "NVIDIA (GB200 NVL72 rack reference design)",
+      "type": "same_problem_different_mechanism",
+      "rationale": "NVL72 and successor reference designs specify integrated busbar + power shelf rack architectures for 100kW+ AI racks, displacing per-rack AC PDUs ΓÇö the precise scenario in the AI-density risk. Shapes the hyperscale spec the venture must compete against.",
+      "dimensions_implicated": [
+        "product_solution",
+        "customers"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "fe58285f-836c-46ab-ae91-8eb178d2ce7f",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "ABB Electrification (UPS / Critical Power)",
+      "type": "category",
+      "rationale": "Industrial UPS and modular critical-power vendor ΓÇö same mechanism family (low-voltage power equipment with monitoring and protection) but different JTBD (facility-level power continuity vs. per-rack delivery). Operates in the same buyer ecosystem and competes for the same capital_asset moat the venture's parent is leveraging.",
+      "dimensions_implicated": [
+        "product_solution",
+        "capital_asset",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "3b507ba0-628c-4b5a-8d8b-54596fa3e404",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Siemens Smart Infrastructure",
+      "type": "category",
+      "rationale": "Switchgear, sub-distribution, and busway vendor selling into facility-level data-center power ΓÇö same mechanism family as the parent and the venture, different JTBD. A peer industrial conglomerate facing the same Build/Buy/Partner question for rack-level entry.",
+      "dimensions_implicated": [
+        "product_solution",
+        "capital_asset",
+        "geography_regulatory"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "2e9087de-9fe9-4ea0-b0a6-507a34129804",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Mitsubishi Electric (Power Distribution)",
+      "type": "category",
+      "rationale": "Switchgear and UPS vendor active in APAC data-center facility power ΓÇö same low-voltage power-equipment mechanism, different JTBD (facility vs. rack). Strong Japan/APAC footprint matches the venture's target geographies.",
+      "dimensions_implicated": [
+        "product_solution",
+        "geography_regulatory"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "59e30b4b-f06d-4774-b82f-a8ee7af6fde5",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Socomec",
+      "type": "category",
+      "rationale": "Critical-power and low-voltage switching vendor with UPS and modular PDU (floor-level) products ΓÇö same mechanism family as the venture, different JTBD (floor/row PDU vs. rack PDU). European base aligns with Western Europe target geography.",
+      "dimensions_implicated": [
+        "product_solution",
+        "geography_regulatory"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "3ca0c817-e753-4852-96f7-edc3fb08ab27",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Cummins (Power Generation / Critical Power)",
+      "type": "category",
+      "rationale": "Standby power and critical-power systems vendor ΓÇö same mechanism family (industrial-scale electrical equipment with monitoring) but different JTBD (backup power vs. rack distribution). Competes for the same capital_asset and partner-channel real estate.",
+      "dimensions_implicated": [
+        "capital_asset",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "2baab63e-c7f7-47b9-b132-7ae28e410cf8",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Generac (Industrial)",
+      "type": "category",
+      "rationale": "Industrial backup power and critical infrastructure vendor ΓÇö adjacent mechanism family addressing facility-level continuity rather than per-rack delivery. Buyer ecosystem and capital-asset profile overlap with the parent's positioning.",
+      "dimensions_implicated": [
+        "capital_asset",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "f03776b9-cb69-4f9e-b9b1-8e0d873c4964",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "nVent (Hoffman / SCHROFF)",
+      "type": "category",
+      "rationale": "Enclosure, cooling, and electrical-protection vendor (also owns Enlogic on the direct side) ΓÇö same mechanism family across rack/enclosure infrastructure with different JTBD beyond rack PDU. Capital-asset and channel footprint overlap with the venture's required build.",
+      "dimensions_implicated": [
+        "capital_asset",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "ab2a2f49-a88d-4696-88d7-0cc267d84a52",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Hubbell (Wiring Device / Industrial)",
+      "type": "category",
+      "rationale": "Outlet, receptacle, and electrical-protection component manufacturer ΓÇö same upstream mechanism family (the very components a rack PDU is assembled from) but serving industrial/commercial wiring JTBDs rather than IT rack power. A plausible component supplier or vertical-integration entrant.",
+      "dimensions_implicated": [
+        "product_solution",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "6500d511-fe9f-47e8-a741-595973525934",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Leviton (Network Solutions / Commercial)",
+      "type": "category",
+      "rationale": "Wiring device and metered receptacle vendor ΓÇö same mechanism family (outlet/protection devices with metering) serving commercial/industrial JTBDs distinct from data-center rack PDU. Component-adjacent player that could move up-stack.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "5bddfc49-11f6-4bae-95fb-a42bea85f56d",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Phoenix Contact",
+      "type": "category",
+      "rationale": "Industrial connectivity and power-distribution component vendor ΓÇö same mechanism family (DIN-rail protection, metering, network-managed power) different JTBD (industrial automation vs. IT rack power). Capital-asset and certification expertise overlap.",
+      "dimensions_implicated": [
+        "product_solution",
+        "capital_asset"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "29cfeb00-f9fe-4cf4-a214-f0b8f23355e7",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Rockwell Automation",
+      "type": "category",
+      "rationale": "Industrial power distribution and metering for factory automation ΓÇö same mechanism family with networked metering/protection, different JTBD. Demonstrates the cross-over potential for industrial-power conglomerates entering IT.",
+      "dimensions_implicated": [
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "a514e648-68eb-4df1-bf9b-ea6a621bcd27",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Sunbird Software",
+      "type": "category",
+      "rationale": "DCIM software vendor whose monitoring/management value proposition competes for the 'intelligence/management' premium the profile names as the escape from the low-margin trap ΓÇö same JTBD-adjacent value (rack power visibility) via software rather than hardware. Different mechanism family but same buyer wallet.",
+      "dimensions_implicated": [
+        "transaction",
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "1489bd9c-0667-48d9-85db-238e52dd63ce",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Nlyte (Carrier)",
+      "type": "category",
+      "rationale": "DCIM platform competing for the rack-power-management value premium identified in the low-margin-trap risk's implies_search_for ('DCIM-integrated power platforms'). Software-led JTBD overlap with intelligent rack PDU value pitch.",
+      "dimensions_implicated": [
+        "partners",
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "1ebae56b-0efb-4dbf-81b0-e3298776bc47",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Fujitsu Component / Fujitsu (Data Center Power)",
+      "type": "category",
+      "rationale": "Japanese power and IT infrastructure vendor with rack and power product lines for APAC enterprise ΓÇö same mechanism family, broader JTBD. Strong in Japan, a named target geography with developed-APAC accessibility constraints.",
+      "dimensions_implicated": [
+        "geography_regulatory",
+        "product_solution"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "c589092c-b87d-463a-a107-49e794e22c5e",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Inspur Power Systems",
+      "type": "category",
+      "rationale": "Chinese server OEM and ODCC-aligned rack solution provider ΓÇö bundles power into rack solutions in the protected China market where foreign vendors are limited to ~$75M of the $500M TAM. A local-content-compliant alternative directly relevant to the geography_regulatory risk.",
+      "dimensions_implicated": [
+        "geography_regulatory",
+        "customers",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "73e17991-a0c0-48c0-a566-fed0a1e159a5",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Huawei Digital Power",
+      "type": "category",
+      "rationale": "Chinese power infrastructure giant active in data-center power, UPS, and rack-level solutions; local champion in the protected China market and an expanding APAC competitor. Directly addresses the protected-geography risk's call for 'local-market rack-PDU champions in China'.",
+      "dimensions_implicated": [
+        "geography_regulatory",
+        "product_solution",
+        "capital_asset"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    },
+    {
+      "id": "64b76661-c8f9-4d98-88be-e6533c5eab46",
+      "venture_id": "bacba20f-d3d2-4f06-859e-04a5d6541a29",
+      "profile_version_id": "4d54c468-6159-49de-a8b1-fa10365eb75e",
+      "generation_run_id": "5ee1cdba-433b-4e8e-891f-b0de1b48ff14",
+      "name": "Schurter",
+      "type": "category",
+      "rationale": "Swiss components vendor producing IEC inlets, protection, and metered receptacle modules ΓÇö same mechanism family supplying the components inside rack PDUs but with different JTBD (component sales vs. integrated rack power). Vertical-integration risk candidate.",
+      "dimensions_implicated": [
+        "product_solution",
+        "partners"
+      ],
+      "llm_call_id": "ab86eb14-2eb7-4794-a252-bd3864cf32b2",
+      "created_at": "2026-05-15T19:19:06.737Z",
+      "citations": null
+    }
+  ],
+  "rowCount": 48,
+  "fields": [
+    {
+      "name": "id",
+      "dataTypeID": 2950
+    },
+    {
+      "name": "venture_id",
+      "dataTypeID": 2950
+    },
+    {
+      "name": "profile_version_id",
+      "dataTypeID": 2950
+    },
+    {
+      "name": "generation_run_id",
+      "dataTypeID": 2950
+    },
+    {
+      "name": "name",
+      "dataTypeID": 25
+    },
+    {
+      "name": "type",
+      "dataTypeID": 25
+    },
+    {
+      "name": "rationale",
+      "dataTypeID": 25
+    },
+    {
+      "name": "dimensions_implicated",
+      "dataTypeID": 1009
+    },
+    {
+      "name": "llm_call_id",
+      "dataTypeID": 2950
+    },
+    {
+      "name": "created_at",
+      "dataTypeID": 1184
+    },
+    {
+      "name": "citations",
+      "dataTypeID": 3802
+    }
+  ]
+}

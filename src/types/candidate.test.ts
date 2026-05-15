@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   CandidateCompanySchema,
+  CitationSchema,
   Stage3CandidatesOutputSchema,
 } from "./candidate";
 
@@ -197,5 +198,100 @@ describe("CandidateCompanySchema", () => {
         ],
       }),
     ).not.toThrow();
+  });
+});
+
+describe("CitationSchema (M13)", () => {
+  const sampleCitation = {
+    url: "https://www.servertech.com/products/pro3x-rack-pdus",
+    title: "PRO3X Switched POPS Rack PDUs | Server Technology",
+    query:
+      "Companies providing busbar+tap-off systems, power shelves, in-rack high-density power distribution",
+  };
+
+  it("parses a representative citation", () => {
+    expect(() => CitationSchema.parse(sampleCitation)).not.toThrow();
+  });
+
+  it("rejects a non-URL string in url", () => {
+    expect(() =>
+      CitationSchema.parse({ ...sampleCitation, url: "not-a-url" }),
+    ).toThrow();
+  });
+
+  it("rejects an empty title", () => {
+    expect(() =>
+      CitationSchema.parse({ ...sampleCitation, title: "" }),
+    ).toThrow();
+  });
+
+  it("rejects a title over 300 chars", () => {
+    expect(() =>
+      CitationSchema.parse({ ...sampleCitation, title: "x".repeat(301) }),
+    ).toThrow();
+  });
+
+  it("rejects an empty query", () => {
+    expect(() =>
+      CitationSchema.parse({ ...sampleCitation, query: "" }),
+    ).toThrow();
+  });
+
+  it("rejects a query over 500 chars", () => {
+    expect(() =>
+      CitationSchema.parse({ ...sampleCitation, query: "x".repeat(501) }),
+    ).toThrow();
+  });
+});
+
+describe("CandidateCompanySchema with citations (M13)", () => {
+  const baseCandidate = SAMPLE_CANDIDATES_OUTPUT.candidates[0];
+  const sampleCitation = {
+    url: "https://www.servertech.com/products/pro3x-rack-pdus",
+    title: "PRO3X Switched POPS Rack PDUs",
+    query: "Companies providing busbar+tap-off systems, power shelves",
+  };
+
+  it("accepts a candidate without citations (training-data-only path)", () => {
+    expect(() => CandidateCompanySchema.parse(baseCandidate)).not.toThrow();
+  });
+
+  it("accepts a candidate with 0 citations (explicit empty array)", () => {
+    expect(() =>
+      CandidateCompanySchema.parse({ ...baseCandidate, citations: [] }),
+    ).not.toThrow();
+  });
+
+  it("accepts a candidate with 1-3 citations", () => {
+    for (const count of [1, 2, 3]) {
+      const citations = Array.from({ length: count }, () => ({
+        ...sampleCitation,
+      }));
+      expect(() =>
+        CandidateCompanySchema.parse({ ...baseCandidate, citations }),
+      ).not.toThrow();
+    }
+  });
+
+  it("rejects a candidate with 4+ citations (cap is 3)", () => {
+    const citations = Array.from({ length: 4 }, () => ({ ...sampleCitation }));
+    expect(() =>
+      CandidateCompanySchema.parse({ ...baseCandidate, citations }),
+    ).toThrow();
+  });
+
+  it("rejects a candidate whose citation has a bad URL", () => {
+    expect(() =>
+      CandidateCompanySchema.parse({
+        ...baseCandidate,
+        citations: [{ ...sampleCitation, url: "ftp://invalid" }],
+      }),
+    ).not.toThrow(); // ftp is still a valid URL scheme
+    expect(() =>
+      CandidateCompanySchema.parse({
+        ...baseCandidate,
+        citations: [{ ...sampleCitation, url: "definitely not a url" }],
+      }),
+    ).toThrow();
   });
 });

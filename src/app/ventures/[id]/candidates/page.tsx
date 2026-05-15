@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/insforge/auth";
 import { createAuthedServerClient } from "@/lib/insforge/server";
-import type { CandidateType } from "@/types/candidate";
+import type { CandidateType, Citation } from "@/types/candidate";
 import type { Dimension } from "@/types/venture-profile";
 
 interface VentureRow {
@@ -17,6 +17,7 @@ interface CandidateRow {
   type: CandidateType;
   rationale: string;
   dimensions_implicated: Dimension[];
+  citations: Citation[] | null;
   generation_run_id: string;
   created_at: string;
 }
@@ -76,7 +77,7 @@ export default async function CandidatesPage({
   const { data: rowsRaw, error: candidatesError } = await insforge.database
     .from("candidate_companies")
     .select(
-      "id, name, type, rationale, dimensions_implicated, generation_run_id, created_at",
+      "id, name, type, rationale, dimensions_implicated, citations, generation_run_id, created_at",
     )
     .eq("venture_id", id)
     .order("created_at", { ascending: true });
@@ -141,9 +142,11 @@ export default async function CandidatesPage({
       </div>
 
       <p className="mt-6 text-sm text-muted-foreground">
-        LLM-only brainstorm (M12). Web-augmented evidence and per-dimension
-        scoring land in M13 and M14 respectively. Eyeball the list against the
-        venture profile; flag obvious misses for the next prompt iteration.
+        Web-augmented brainstorm (M13). Each <code className="font-mono text-xs">implies_search_for</code>
+        risk-string in the venture profile is run through Exa neural search; the
+        Opus call gets the bundled evidence and grounds candidates in real URLs.
+        Per-candidate citations appear inline below the rationale. Per-dimension
+        scoring lands in M14.
       </p>
 
       {TYPE_ORDER.map((type) => (
@@ -199,6 +202,7 @@ function CandidatesSection({
 }
 
 function CandidateCard({ candidate }: { candidate: CandidateRow }) {
+  const citations = candidate.citations ?? [];
   return (
     <li className="rounded-md border border-border bg-surface p-4 text-sm">
       <div className="flex items-baseline justify-between gap-3">
@@ -218,6 +222,25 @@ function CandidateCard({ candidate }: { candidate: CandidateRow }) {
       <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/90">
         {candidate.rationale}
       </p>
+      {citations.length > 0 && (
+        <ul className="mt-3 space-y-1 border-t border-border pt-2">
+          {citations.map((c, i) => (
+            <li
+              key={`${candidate.id}-${i}`}
+              className="text-xs text-muted-foreground"
+            >
+              <a
+                href={c.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[color:var(--color-accent)] underline underline-offset-2 hover:text-[color:var(--color-accent-hover)]"
+              >
+                {c.title || c.url}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </li>
   );
 }

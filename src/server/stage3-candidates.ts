@@ -618,11 +618,21 @@ async function gatherWebEvidence(
 
   return responses.map((r) => ({
     query: r.query,
-    results: r.results.map((hit) => ({
-      url: hit.url,
-      title: hit.title,
-      text: hit.text,
-    })),
+    results: r.results
+      // Drop hits with empty title (Exa returns these for pages where the
+      // <title> tag is missing or stripped). The prompt instructs the model
+      // to copy `title` byte-exact into citations, but the Citation schema
+      // requires `title.min(1)`. Filtering here makes the bad input
+      // impossible rather than relying on the model to skip on its own.
+      // First observed 2026-05-15: candidate index 32 / citation 1 / empty
+      // title failed Zod validation; retry-once would have hit the same
+      // wall because the prompt is identical.
+      .filter((hit) => hit.title.trim().length > 0)
+      .map((hit) => ({
+        url: hit.url,
+        title: hit.title,
+        text: hit.text,
+      })),
   }));
 }
 

@@ -147,9 +147,12 @@ point of running the search.
 
 2. **Use exact `url`, `title`, and `query` strings from the evidence block.**
    Do not edit, paraphrase, normalize, or invent URLs. Copy them verbatim
-   from the evidence entry. If the title is empty, pass an empty string is
-   not allowed by the schema — pick a different evidence entry or omit
-   citations for that candidate.
+   from the evidence entry. The orchestrator filters out evidence hits with
+   empty titles before assembling this prompt, so every hit you see here
+   has a usable title. If you somehow encounter an evidence hit with an
+   empty `title` string (should not happen), **skip that result entirely**
+   — do not emit a citation with an empty title; the schema requires
+   `title` to be at least 1 character and the run will hard-fail.
 
 3. **Never invent URLs.** If you do not see a URL in the evidence block, you
    do not have grounds to cite. A training-data candidate without citations

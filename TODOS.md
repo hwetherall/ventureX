@@ -161,6 +161,30 @@ create index dimension_weights_run_idx on dimension_weights(venture_id, weights_
 
 ---
 
+### 11. Cost + time predictor for M15 cell-research runs (BLOCKS the 5-candidate demo)
+
+**What:** A small CLI (or script) that takes a candidate count + parameter schema (or just a venture_id) and emits an estimate of `(total_cost_usd, est_wall_clock_min)` for a Stage 5 cell-research run. Breaks the estimate down by tier: T1 universal Opus calls × N candidates, T2 framework Opus calls × N candidates, T3 dynamic Exa + Haiku per-cell pairs × (15 params × N candidates). Surfaces the estimate before any code spends money.
+
+**Why:** Tomorrow's demo to Daniel = 5 candidates × 51 parameters = 255 cells. Without a predictor we discover cost only after the bill arrives. With it we get an explicit "go" gate. Also reusable for the 53-candidate scale-out later — the $30–80 per-venture band in `M15_DESIGN.md` is currently a vibes estimate; the predictor turns it into a number we can quote.
+
+**Pros of doing now:** Hard prerequisite for the demo (per `M15_SPRINT_PLAN.md` Sprint scope, post-Daniel-sync update). Cheap to build (~30–60 min CC) because the math is just unit-cost × call-count.
+**Cons of doing now:** None — this is on the critical path.
+
+**Context:**
+- Unit costs to encode (sourced from current OpenRouter pricing — re-verify before locking):
+  - Opus 4.7: ~$15/M input, ~$75/M output → ~$0.20 per batched call at typical Stage 5 token counts.
+  - Haiku: ~$0.80/M input, ~$4/M output → ~$0.002 per single-cell extraction.
+  - Exa: ~$0.01–0.025 per search (top-3 results).
+- Time estimates: Opus batched ~30s; Haiku ~3s; Exa ~2s; with 3-concurrent T3 cap that's ~5 min for 15 cells.
+- For the 5-candidate demo: expected ~$3.50–4.50 total, ~30–40 min sequential / ~6–8 min with parallelism.
+- Output shape: print a table with `[tier, calls, per_call_usd, subtotal_usd, est_seconds]` rows plus a totals line.
+
+**Effort estimate:** S (human: ~30 min / CC: ~30–60 min).
+**Priority:** **P0 — blocks the 5-candidate demo.**
+**Depends on / blocked by:** Nothing. Build before M15-T5 ships (or as part of M15-T5 — it shares unit-cost knowledge with the orchestrator's budget cap enforcement).
+
+---
+
 ### 10. Extract shared `_orchestrator.ts` helper for stage1-2-3 boilerplate
 
 **What:** After M12 lands, refactor the 4 orchestrators (stage1-extract / stage1-critic / stage2-weight / stage3-candidates) to share common helpers: `formatErrorForUser` switch on the error-class hierarchy, `loadVentureRow`, `assemblePromptWithJsonBlock`, the discriminated-result-or-status='error' outer try-catch shape. New file: `src/server/_orchestrator.ts`.

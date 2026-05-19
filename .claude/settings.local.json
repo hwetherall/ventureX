@@ -38,7 +38,8 @@
       "Bash(pnpm eval *)",
       "Skill(plan-ceo-review)",
       "Bash(git commit *)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Skill(office-hours)"
     ]
   }
 }

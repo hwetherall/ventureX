@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/insforge/auth";
 import { createAuthedServerClient } from "@/lib/insforge/server";
 import { submitStage1ExtractionForm } from "./actions";
 import { GenerateCandidatesButton } from "./generate-candidates-button";
+import { GenerateParametersButton } from "./generate-parameters-button";
 
 interface VentureDocument {
   id: string;
@@ -40,6 +41,8 @@ const STATUS_LABELS: Record<string, string> = {
   ready: "Ready",
   candidates_generating: "Generating candidates (Stage 3)",
   candidates_ready: "Candidates ready",
+  parameters_generating: "Generating parameters",
+  parameters_ready: "Parameters ready",
   error: "Error",
 };
 
@@ -101,6 +104,13 @@ export default async function VenturePage({
     .limit(1);
   const candidatesExist = (candidateProbeRaw ?? []).length > 0;
 
+  const { data: parameterProbeRaw } = await insforge.database
+    .from("parameter_generation_runs")
+    .select("id")
+    .eq("venture_id", id)
+    .limit(1);
+  const parametersExist = (parameterProbeRaw ?? []).length > 0;
+
   const canRunStage1 =
     STATUSES_RUNNABLE.has(venture.status) && parsedDocsAvailable;
   const isFirstRun = !latestProfile;
@@ -112,7 +122,9 @@ export default async function VenturePage({
     venture.status === "weighting" ||
     venture.status === "ready" ||
     venture.status === "candidates_generating" ||
-    venture.status === "candidates_ready";
+    venture.status === "candidates_ready" ||
+    venture.status === "parameters_generating" ||
+    venture.status === "parameters_ready";
 
   // Stage 3 trigger surfaces only when the venture is fully through Stage 2
   // confirmation AND no candidate set already exists. Re-runs require a
@@ -121,6 +133,9 @@ export default async function VenturePage({
     venture.status === "ready" && !candidatesExist;
 
   const showCandidatesLink = candidatesExist;
+  const showGenerateParameters =
+    venture.status === "candidates_ready" && candidatesExist && !parametersExist;
+  const showParametersLink = parametersExist;
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
@@ -231,7 +246,9 @@ export default async function VenturePage({
               venture.status === "weighting" ||
               venture.status === "ready" ||
               venture.status === "candidates_generating" ||
-              venture.status === "candidates_ready") && (
+              venture.status === "candidates_ready" ||
+              venture.status === "parameters_generating" ||
+              venture.status === "parameters_ready") && (
               <Link
                 href={`/ventures/${venture.id}/refine`}
                 className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
@@ -253,6 +270,14 @@ export default async function VenturePage({
                 className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
               >
                 Open candidates →
+              </Link>
+            )}
+            {showParametersLink && (
+              <Link
+                href={`/ventures/${venture.id}/parameters`}
+                className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+              >
+                Open parameters →
               </Link>
             )}
           </div>
@@ -284,6 +309,34 @@ export default async function VenturePage({
           <p className="mt-2 text-muted-foreground">
             Candidate brainstorm running. The page will redirect to the
             candidates list automatically when complete.
+          </p>
+        </section>
+      )}
+
+      {showGenerateParameters && (
+        <section className="mt-8 rounded-md border border-dashed border-border p-4 text-sm">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Parameter Builder — Y-axis schema
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Generate the Tier 3 brief-specific parameters, merge them with the
+            Universal and Framework parameter catalogs, and snapshot the full
+            schema for downstream cell research.
+          </p>
+          <div className="mt-3">
+            <GenerateParametersButton ventureId={venture.id} />
+          </div>
+        </section>
+      )}
+
+      {venture.status === "parameters_generating" && !parametersExist && (
+        <section className="mt-8 rounded-md border border-dashed border-border p-4 text-sm">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Parameter Builder in progress
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Building the parameter schema. The page will redirect to the
+            parameters list automatically when complete.
           </p>
         </section>
       )}

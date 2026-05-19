@@ -216,20 +216,47 @@ Weights are a soft tilt, not a filter:
    training data underrepresents — use it.
 
 4. **Anonymization — parent only.** The venture profile refers to the parent
-   company as `[the parent]` or by abstract descriptor. Maintain that in
-   your `rationale` and `generation_notes`: refer to "the parent's industrial
-   capacity" rather than naming the parent. **Competitor names ARE the real
-   thing** — "Schneider Electric", "Eaton", "Vertiv" verbatim. The
-   anonymization rule applies to the venture's parent, not to its
-   competitors.
+   company as `[the parent]` or by abstract descriptor.
+   - In `rationale` and `generation_notes`: refer to "the parent's
+     industrial capacity" rather than naming the parent.
+   - **The parent itself is not a valid candidate.** Do not include the
+     parent or any of the parent's divisions / product lines as a
+     candidate `name`. The parent IS the venture; competitors are
+     everyone else. If you find yourself writing the parent's name into
+     a candidate, you have misread the profile.
+   - **Competitor names ARE the real thing** — copy them verbatim from
+     training data or the evidence block. The anonymization rule
+     applies to the venture's parent, not to its competitors.
 
 5. **Web evidence is supplemental, not a replacement for training data.**
    The `## Web evidence` block grounds candidates that would otherwise be
-   uncertain — it does NOT mean your training-data knowledge is unwelcome.
-   Continue to surface the obvious incumbents (Schneider, Eaton, Vertiv,
-   etc.) even if they don't appear in the evidence block; the search was
-   shaped by `implies_search_for` strings that target gaps, not coverage.
-   Do not cite training-data candidates with URLs they did not appear under.
+   uncertain — it does NOT replace your training-data knowledge. The
+   search is shaped by `implies_search_for` strings that target *gaps*,
+   not coverage, so the obvious candidates often won't appear in evidence.
+
+   - **Direct incumbents from training data stay in the set.** Surface
+     the obvious direct competitors you know from training data even
+     when they don't appear in evidence. The rule generalizes: for any
+     venture, the top 5–10 incumbents addressing the same JTBD with the
+     same mechanism are required, evidence or no evidence.
+
+   - **SPDM archetypes are load-bearing.** Every entry in
+     `dimensions.product_solution.substitution_landscape[]` MUST be
+     represented by ≥1 candidate, regardless of whether Exa surfaced a
+     vendor for that archetype. Training-data picks that fill a
+     substitution archetype (e.g., a known specialist for an alternative
+     mechanism the search didn't return any results for) stay in the
+     candidate set; evidence-backed alternatives are *additive*, not
+     *substitutional*. **The most common failure mode in this stage is
+     dropping a substitution_landscape archetype because the search
+     returned no hits for it — guard against it explicitly.** If an
+     archetype has no obvious training-data vendor either, surface the
+     architecture itself (reference designs, OCP specs) rather than
+     leaving the archetype unrepresented.
+
+   - Never cite training-data candidates with URLs they did not appear
+     under. A candidate from training data alone carries no `citations`;
+     fabricating one to lend false weight is a hard failure.
 
 6. **Rationale must reference the venture, not the framework.** "Same JTBD,
    different mechanism" is the category definition, not a rationale. A real
@@ -315,6 +342,37 @@ Note: these are *shape* examples for an illustrative rack-PDU venture. Your
 output should reflect the *actual* venture profile attached below, which may
 or may not be in this space. Kehua Tech is illustrative only — do not
 include it unless the actual web evidence block shows it.
+
+# SELF-AUDIT BEFORE RETURNING
+
+Before emitting your JSON, walk through this checklist. If any item fails,
+revise the candidate set before responding. This is the gate your output
+is evaluated against (PHASE3.md §6b):
+
+1. **Direct floor + incumbents.** ≥5 Direct candidates, and the obvious
+   incumbents you'd expect from training data are present even if they
+   don't appear in the evidence block.
+
+2. **SPDM archetype completeness.** Walk through every entry in
+   `dimensions.product_solution.substitution_landscape[]` and confirm
+   ≥1 candidate whose rationale references that entry. If any entry
+   has zero candidates, add training-data names that fill the archetype
+   before finalizing — this is the load-bearing self-check.
+
+3. **Anonymization.** No candidate `name` matches the venture's parent
+   or one of the parent's divisions / product lines. The parent IS the
+   venture; do not list it as its own competitor.
+
+4. **Citation coverage on the targeted categories.** Across your Direct
+   + SPDM candidates combined, ≥50% carry ≥1 citation. Category
+   candidates without citations are fine — the search wasn't shaped to
+   target them — but Direct and SPDM are where the evidence should
+   concentrate.
+
+5. **No invented URLs.** Every citation's `url` and `title` appears
+   byte-exact somewhere in the `## Web evidence` block.
+
+6. **No duplicates.** No two candidates share a case-folded `name`.
 
 # OUTPUT FORMAT
 

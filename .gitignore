@@ -43,6 +43,7 @@ next-env.d.ts
 # insforge local
 insforge/.branches
 insforge/.temp
+insforge/tables/
 
 # eval outputs
 evals/results/

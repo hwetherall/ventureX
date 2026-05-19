@@ -336,14 +336,30 @@ Still well under D4's $5/run budget cap. Bump `STAGE_3_TIMEOUT_MS` only if neede
 
 ### M13 acceptance criteria
 
-Hand-curated against the M12 baseline JSON:
+**Venture-agnostic by design (P3-D13, 2026-05-19).** Each criterion below is evaluable for any venture's Stage 3 output without hardcoding company names; venture-specific operationalization (which names a given run must surface) lives in per-case `test-cases/<case-id>/expected_candidates.json` fixtures (TODO #7). The ABB fixture is the keystone reference, but the framework applies unchanged to any future Innovera venture.
 
-1. **No regression on Direct shelf** — Schneider, Eaton, Vertiv, Server Technology, Raritan still present.
-2. **No regression on SPDM coverage** — busbar+tap-off (Starline / Anord Mardix / Universal Electric) AND power-shelf vendors AND in-rack DC (Vicor) AND solid-state upstream (Atom Power / ABB TruONE) AND server-integrated (Supermicro / NVIDIA) all still surfaced.
-3. **≥3 new regional names** not present in M12's 48-candidate set. Specifically: at least one named Chinese specialist beyond Huawei/Inspur, OR at least one named Indian specialist, OR at least one named Korean/SEA specialist with evidence backing.
-4. **≥50% of candidates carry ≥1 citation.** Training-data-only candidates are fine, but more than half the candidate set should have web evidence backing.
-5. **Within-run de-dup works** — no two candidates share a case-folded `name`.
-6. **Cost cap respected** — total Stage 3 cost (search + LLM) stays under $1.
+1. **Direct shelf — floor + baseline preservation.**
+   - Floor: ≥5 Direct candidates (matches CRITICAL CONSTRAINTS #1 in the prompt).
+   - Baseline preservation: when a prior `generation_run_id` exists for the same `profile_version_id`, every Direct candidate in the baseline reappears in this run by case-folded `name` (regression test). For ABB the baseline is `test-cases/abb-rack-pdu/m12_baseline.json`; future ventures get their own baseline on first ship.
+
+2. **SPDM archetype completeness — the substitute for hardcoded SPDM names.**
+   - Every entry in `dimensions.product_solution.substitution_landscape[]` is represented by ≥1 SPDM candidate whose `rationale` references the entry (substring match on the entry's keyword set is sufficient — e.g., a `substitution_landscape` entry naming "busway / busbar overhead distribution with per-rack tap-off units" is satisfied by any candidate whose rationale contains `busbar`, `busway`, or `tap-off`).
+   - Floor: ≥5 SPDM candidates total.
+   - This generalizes: any venture's `substitution_landscape` becomes its own SPDM checklist. Dropping a substitution archetype because Exa returned no hits for it is the M13 regression mode this criterion guards against (see P3-D13 root-cause).
+
+3. **Web-search lift — new candidates with evidence.**
+   - ≥3 candidates present in this run AND not in the baseline (when a baseline exists) AND carrying ≥1 citation each.
+   - Conditional: where `geography_regulatory.accessible_market_constraints[]` names a constrained market, ≥1 candidate operating in that market appears with evidence backing. For ABB this means a named China-market specialist beyond Huawei/Inspur; for ventures with no geographic constraints this sub-criterion is N/A.
+
+4. **Citation rate on the categories the searches target.**
+   - ≥50% of Direct + SPDM candidates carry ≥1 citation.
+   - Category candidates are excluded from the denominator: the six `implies_search_for` queries target Direct and SPDM archetypes by construction, so requiring citations on Category candidates would push the model toward fabricated URLs.
+
+5. **Within-run de-dup** — no two candidates share a case-folded `name`.
+
+6. **Cost cap respected** — total Stage 3 cost (Exa searches + Opus call) stays under $1.
+
+7. **Anonymization preserved (NEW).** No candidate `name` matches the venture's parent or one of the parent's divisions / product lines. M12 baseline violated this for the ABB run by listing ABB Smart Power / ABB TruONE / ABB Electrification as competitors; M13 correctly dropped two of three. The criterion exists so future ventures don't reintroduce the leak, and so the prompt's Constraint 4 has a corresponding gate.
 
 ---
 
@@ -387,6 +403,7 @@ Estimated cost: ~$0.20-0.40 per Stage 3 call. Total venture lifecycle (1+2+3) st
 | P3-D10 | M13 uses a single Opus call with all 6 search-result sets bundled as web evidence, not per-risk LLM fan-out. ~6x cheaper, lets the model cross-reference evidence across risks. Context budget has ~150k tokens of headroom; not a concern. | M13 orchestrator shape, prompt assembly | 2026-05-15 |
 | P3-D11 | Citations stored as a `jsonb` column on `candidate_companies` (migration 0004), not a separate `candidate_citations` table. Atomic with the candidate row; M14/M15 don't query citations independently. If a future milestone needs citation-source analytics, lift to a table then. | Migration 0004, schema, candidate UI | 2026-05-15 |
 | P3-D12 | M13 supersedes the M12-only code path rather than coexisting. The M12 ABB baseline is preserved as a frozen test fixture (`test-cases/abb-rack-pdu/m12_baseline.json`) for regression comparison; runtime keeps only the M13 (web-augmented) path. | Orchestrator structure, dead code policy | 2026-05-15 |
+| P3-D13 | M13 §6b acceptance criteria reframed as venture-agnostic shelf-coverage tests, not hardcoded ABB names. SPDM coverage moves from a hardcoded must-have list (Vicor / Atom Power / ABB TruONE / NVIDIA) to "every `substitution_landscape[]` entry must be represented by ≥1 candidate by keyword match." Citation-rate denominator narrowed to Direct + SPDM (the categories Exa queries target). New criterion 7 (anonymization preserved) closes the M12 ABB Smart Power / ABB TruONE leak that §6b previously made a must-have. Root cause of the original framing: §6b was drafted from the M12 ABB baseline contents rather than from the profile structure that generalizes across ventures. | §6b acceptance criteria, expected_candidates.json fixture shape (TODO #7), prompt Constraints 4 + 5 | 2026-05-19 |
 
 ---
 
@@ -435,4 +452,4 @@ Estimated effort: ~4-6 hours human / ~45-90 min CC. Smaller than M12 because the
 
 ---
 
-*Last updated: 2026-05-15 (M12 shipped, M13 spec ratified, 12 decisions locked). Authors: Harry (build lead), with Claude as planning collaborator. See PLAN.md for milestone status, root CLAUDE.md for Phase 0-2 spec, DESIGN.md for visual system, TODOS.md for open follow-ups.*
+*Last updated: 2026-05-19 (M13 acceptance criteria reframed as venture-agnostic shelf-coverage tests; P3-D13 logged). Authors: Harry (build lead), with Claude as planning collaborator. See PLAN.md for milestone status, root CLAUDE.md for Phase 0-2 spec, DESIGN.md for visual system, TODOS.md for open follow-ups.*

@@ -104,31 +104,73 @@ export async function runStage4ParameterBuilder(
       await loadParameterInputs(insforge, ventureId);
 
     const promptBody = await loadPrompt("stage_4_parameter_builder.md");
-    const prompt = assembleParameterPrompt(
-      promptBody,
-      profileVersion.profile,
-      weights,
-      priorRuns,
-    );
-
     const model = process.env.STAGE_4_PARAMETERS_MODEL ?? DEFAULT_STAGE_4_MODEL;
 
-    const result = await callLLM<Stage4ParameterBuilderOutput>({
-      insforge,
-      model,
-      stage: STAGE,
-      prompt,
-      ventureId,
-      runId,
-      schema: Stage4ParameterBuilderOutputSchema,
-      timeoutMs: STAGE_4_TIMEOUT_MS,
-      estimatedOutputTokens: 4_000,
-    });
+    // Retry-on-semantic-validation-failure loop. callLLM's internal retry-once
+    // handles JSON shape + Zod failures, but ParameterValidationError fires
+    // AFTER callLLM returns successfully (the shape is valid; the content
+    // violates a semantic rule like "every risk needs literal source_field
+    // coverage"). Without an outer retry, a single LLM miss burns the run
+    // and surfaces a user-visible error. One retry with the specific gap as
+    // corrective feedback eliminates the most common failure mode at the
+    // cost of one extra Opus call ($0.166 on the bad path; $0 on the happy
+    // path). Surfaced from /investigate 2026-05-19.
+    const MAX_SEMANTIC_ATTEMPTS = 2;
+    let result: Awaited<ReturnType<typeof callLLM<Stage4ParameterBuilderOutput>>> | undefined;
+    let dynamicParameters: DynamicParameter[] | undefined;
+    let correctiveFeedback: string | undefined;
+    let lastValidationError: ParameterValidationError | undefined;
 
-    const dynamicParameters = validateParameterBuilderOutput(
-      result.data,
-      profileVersion.profile,
-    );
+    for (let attempt = 1; attempt <= MAX_SEMANTIC_ATTEMPTS; attempt++) {
+      const prompt = assembleParameterPrompt(
+        promptBody,
+        profileVersion.profile,
+        weights,
+        priorRuns,
+        correctiveFeedback,
+      );
+
+      result = await callLLM<Stage4ParameterBuilderOutput>({
+        insforge,
+        model,
+        stage: STAGE,
+        prompt,
+        ventureId,
+        runId,
+        schema: Stage4ParameterBuilderOutputSchema,
+        timeoutMs: STAGE_4_TIMEOUT_MS,
+        estimatedOutputTokens: 4_000,
+      });
+
+      try {
+        dynamicParameters = validateParameterBuilderOutput(
+          result.data,
+          profileVersion.profile,
+        );
+        break; // Semantic validation passed — exit the retry loop.
+      } catch (validationErr) {
+        if (!(validationErr instanceof ParameterValidationError)) {
+          throw validationErr;
+        }
+        lastValidationError = validationErr;
+        if (attempt === MAX_SEMANTIC_ATTEMPTS) {
+          // Out of attempts; let the outer catch turn this into status='error'.
+          throw validationErr;
+        }
+        // Feed the specific gap back into the next attempt's prompt.
+        correctiveFeedback = validationErr.message;
+      }
+    }
+
+    if (!result || !dynamicParameters) {
+      // Defensive: the loop above guarantees one of break|throw on every
+      // iteration, so this branch is unreachable. Throw a diagnostic error
+      // if the invariant ever breaks (e.g., a future refactor reorders the
+      // control flow).
+      throw new OrchestratorError(
+        `Parameter Builder semantic retry loop exited without a validated result (last error: ${lastValidationError?.message ?? "unknown"}).`,
+      );
+    }
     const fullParameterSchema = mergeParameterSchema(dynamicParameters);
     assertUniqueParameterIds(fullParameterSchema);
 
@@ -400,11 +442,68 @@ async function loadPriorParameterRuns(
   }));
 }
 
-function assembleParameterPrompt(
+/**
+ * Build a numbered checklist of literal coverage requirements the validator
+ * will enforce. Injected just below the profile so the model walks it while
+ * building its parameter list. Mirrors the M13 §6b fix pattern: when the
+ * validator enforces a literal index match, the prompt has to enumerate the
+ * indices for the model to map against.
+ *
+ * Surfaced from /investigate root cause 2026-05-19: the model previously
+ * mapped params to risk topics rather than literal source_field indices,
+ * leaving one risk index uncovered.
+ */
+/** @internal Exported for unit tests; not part of the public surface. */
+export function buildCoverageChecklist(profile: VentureProfile): string {
+  const substitutions =
+    profile.dimensions.product_solution.substitution_landscape;
+  const risks = profile.strategic_risks_and_uncertainties;
+
+  const lines: string[] = [];
+  lines.push("## RISK + SUBSTITUTION COVERAGE CHECKLIST");
+  lines.push("");
+  lines.push(
+    "Each item below is enforced LITERALLY by the validator. Walk this list",
+    "while building your parameter list. Topical alignment does NOT count —",
+    "only exact source_field prefix match counts.",
+  );
+  lines.push("");
+  lines.push(
+    "### Substitution landscape (exactly one parameter per entry, literal source_field):",
+  );
+  lines.push("");
+  for (let i = 0; i < substitutions.length; i++) {
+    lines.push(
+      `- [ ] **[${i}]** \`source_field === "dimensions.product_solution.substitution_landscape[${i}]"\``,
+    );
+    lines.push(`      Entry: ${JSON.stringify(substitutions[i])}`);
+  }
+  lines.push("");
+  lines.push(
+    "### Strategic risks (at least one parameter per index, source_field must start with the exact prefix):",
+  );
+  lines.push("");
+  for (let i = 0; i < risks.length; i++) {
+    const risk = risks[i]!;
+    lines.push(
+      `- [ ] **[${i}]** \`source_field.startsWith("strategic_risks_and_uncertainties[${i}]")\``,
+    );
+    lines.push(`      Risk: ${JSON.stringify(risk.risk)}`);
+    lines.push(
+      `      Implies search for: ${JSON.stringify(risk.implies_search_for)}`,
+    );
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
+/** @internal Exported for unit tests; not part of the public surface. */
+export function assembleParameterPrompt(
   promptBody: string,
   profile: VentureProfile,
   weights: CanonicalWeights,
   priorRuns: PriorParameterRun[],
+  correctiveFeedback?: string,
 ): string {
   const stripped = promptBody.replace(DOCUMENTS_PLACEHOLDER, "").trimEnd();
 
@@ -419,7 +518,7 @@ function assembleParameterPrompt(
     };
   }
 
-  return [
+  const sections: string[] = [
     stripped,
     "",
     "## VentureX profile (JSON)",
@@ -428,6 +527,7 @@ function assembleParameterPrompt(
     JSON.stringify(profile, null, 2),
     "```",
     "",
+    buildCoverageChecklist(profile),
     "## Canonical dimension weights",
     "",
     "```json",
@@ -442,7 +542,30 @@ function assembleParameterPrompt(
     JSON.stringify(priorRuns, null, 2),
     "```",
     "",
-  ].join("\n");
+  ];
+
+  // Corrective feedback only present on retry-after-validation-failure.
+  // Lives at the END of the prompt (most recent / most salient position)
+  // so the model gives it explicit attention before regenerating.
+  if (correctiveFeedback) {
+    sections.push(
+      "## RETRY — PREVIOUS ATTEMPT FAILED VALIDATION",
+      "",
+      "Your previous output was JSON-shape-valid but failed the acceptance",
+      "checks below. Read the specific gap, fix it, and resubmit the FULL",
+      "parameter list (not a delta). All other constraints from the prompt",
+      "body still apply.",
+      "",
+      "**Validator feedback:**",
+      "",
+      "```",
+      correctiveFeedback,
+      "```",
+      "",
+    );
+  }
+
+  return sections.join("\n");
 }
 
 async function insertParameterRun(

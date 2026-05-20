@@ -5,6 +5,7 @@ import { createAuthedServerClient } from "@/lib/insforge/server";
 import { submitStage1ExtractionForm } from "./actions";
 import { GenerateCandidatesButton } from "./generate-candidates-button";
 import { GenerateParametersButton } from "./generate-parameters-button";
+import { ResetCellResearchButton } from "./reset-cell-research-button";
 
 interface VentureDocument {
   id: string;
@@ -43,6 +44,8 @@ const STATUS_LABELS: Record<string, string> = {
   candidates_ready: "Candidates ready",
   parameters_generating: "Generating parameters",
   parameters_ready: "Parameters ready",
+  cells_researching: "Researching cells (Stage 5)",
+  cells_ready: "Cells ready",
   error: "Error",
 };
 
@@ -100,9 +103,11 @@ export default async function VenturePage({
   const { data: candidateProbeRaw } = await insforge.database
     .from("candidate_companies")
     .select("id")
-    .eq("venture_id", id)
-    .limit(1);
+    .eq("venture_id", id);
   const candidatesExist = (candidateProbeRaw ?? []).length > 0;
+  const candidateIds = ((candidateProbeRaw ?? []) as { id: string }[]).map(
+    (candidate) => candidate.id,
+  );
 
   const { data: parameterProbeRaw } = await insforge.database
     .from("parameter_generation_runs")
@@ -110,6 +115,16 @@ export default async function VenturePage({
     .eq("venture_id", id)
     .limit(1);
   const parametersExist = (parameterProbeRaw ?? []).length > 0;
+
+  const { data: cellsProbeRaw } =
+    candidateIds.length > 0
+      ? await insforge.database
+          .from("cells")
+          .select("id")
+          .in("candidate_id", candidateIds)
+          .limit(1)
+      : { data: [] };
+  const cellsExist = (cellsProbeRaw ?? []).length > 0;
 
   const canRunStage1 =
     STATUSES_RUNNABLE.has(venture.status) && parsedDocsAvailable;
@@ -124,7 +139,9 @@ export default async function VenturePage({
     venture.status === "candidates_generating" ||
     venture.status === "candidates_ready" ||
     venture.status === "parameters_generating" ||
-    venture.status === "parameters_ready";
+    venture.status === "parameters_ready" ||
+    venture.status === "cells_researching" ||
+    venture.status === "cells_ready";
 
   // Stage 3 trigger surfaces only when the venture is fully through Stage 2
   // confirmation AND no candidate set already exists. Re-runs require a
@@ -136,6 +153,7 @@ export default async function VenturePage({
   const showGenerateParameters =
     venture.status === "candidates_ready" && candidatesExist && !parametersExist;
   const showParametersLink = parametersExist;
+  const showTableLink = cellsExist;
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
@@ -248,7 +266,9 @@ export default async function VenturePage({
               venture.status === "candidates_generating" ||
               venture.status === "candidates_ready" ||
               venture.status === "parameters_generating" ||
-              venture.status === "parameters_ready") && (
+              venture.status === "parameters_ready" ||
+              venture.status === "cells_researching" ||
+              venture.status === "cells_ready") && (
               <Link
                 href={`/ventures/${venture.id}/refine`}
                 className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
@@ -278,6 +298,14 @@ export default async function VenturePage({
                 className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
               >
                 Open parameters →
+              </Link>
+            )}
+            {showTableLink && (
+              <Link
+                href={`/ventures/${venture.id}/table`}
+                className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+              >
+                Open comparison table →
               </Link>
             )}
           </div>
@@ -367,6 +395,25 @@ export default async function VenturePage({
         <section className="mt-8 rounded-md border border-[color:var(--color-warning-border)] bg-[color:var(--color-warning-bg)] p-4 text-xs text-[color:var(--color-warning-fg)]">
           Stage 1 cannot run: no documents parsed successfully. Re-upload or
           fix the failing files before extracting.
+        </section>
+      )}
+
+      {(venture.status === "cells_researching" ||
+        venture.status === "cells_ready" ||
+        (venture.status === "error" && cellsExist)) && (
+        <section className="mt-12 rounded-md border border-dashed border-border p-4 text-sm">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Admin
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Wipe all cells + Exa call logs for this venture and return status
+            to <span className="font-mono">parameters_ready</span>. Useful
+            when re-running cell research after a prompt or schema iteration
+            without round-tripping through InsForge.
+          </p>
+          <div className="mt-3">
+            <ResetCellResearchButton ventureId={venture.id} />
+          </div>
         </section>
       )}
     </main>

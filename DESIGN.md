@@ -206,6 +206,8 @@ Dark mode is a first-class design surface, not an afterthought. The 2026-05-15 f
 | 2026-05-15 | Always-active save button with "Mark reviewed" vs "Save dimension" labels | Fixes "I have to manually edit things to save it" friction. Both states create audit-trail rows; visual distinction is purely UX. |
 | 2026-05-15 | Inline critic flags only (deprecate collapsible "Show reviewer notes") | Flags need to be impossible to miss. Collapsed-by-default hides them; the inline display was already present and is sufficient. |
 | 2026-05-15 | Strict dark-mode pairing rule on all color tokens | The pre-design-consultation code used `text-amber-900 on amber-50` style classes that inverted badly in dark mode. New rule: never use a Tailwind color shorthand without an explicit dark variant or a semantic CSS variable. |
+| 2026-05-19 | M15 cell-confidence tri-state visual treatment | `verified` → semantic accent (indigo, signals trust); `inferred` → muted-foreground / zinc-neutral (no special chrome); `unknown` → warning treatment (amber bg + amber fg) signalling "consultant should review this". The unknown state is honest about gaps; the warning treatment surfaces it to verification without making it feel like a system error. |
+| 2026-05-19 | Tier 3 cells get the 2px indigo left rule | Mirrors the load-bearing field treatment from `substitution_landscape` — Tier 3 is the venture-specific differentiator, the architecture's "wedge" against Competely. Visual hierarchy maps to data hierarchy: the work that justifies M15 vs the upstream pattern lives in Tier 3, so it gets the visual emphasis. |
 
 ---
 

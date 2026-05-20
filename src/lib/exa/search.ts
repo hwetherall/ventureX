@@ -1,4 +1,5 @@
 import { ExaError } from "./errors";
+import { broadenTier3Query } from "./query";
 
 /**
  * Exa neural search wrapper (M13).
@@ -87,6 +88,24 @@ export interface ExaSearchArgs {
    * value when you genuinely need long-form content (rare for our use).
    */
   maxCharactersPerResult?: number;
+  /**
+   * Optional server-side text filter (Exa `includeText` parameter). When
+   * set, Exa only returns results whose page text contains the supplied
+   * phrase.
+   *
+   * Used by Tier 3 cell research (M15-F1) to anchor neural search on the
+   * candidate's name — without it, queries like "Schneider Electric rack
+   * power shelf" return Vertiv/Eaton/Advanced Energy product pages because
+   * neural search matches the topic. With `includeText: 'Schneider
+   * Electric'`, Exa filters to results actually about Schneider.
+   *
+   * Implementation note: Exa's API requires `includeText` to be a
+   * single-element array of strings, not a bare string. The caller passes a
+   * single phrase here for ergonomics; the wrapper wraps it in an array
+   * before sending. Discovered the hard way 2026-05-20 — passing a string
+   * produces HTTP 400 with "expected array, received string".
+   */
+  includeText?: string;
 }
 
 interface ExaApiResult {
@@ -145,6 +164,11 @@ export async function exaSearch(args: ExaSearchArgs): Promise<ExaSearchResponse>
         // the source — avoids transferring 10k-char page dumps when ~1000
         // chars of snippet is all the prompt needs.
         contents: { text: { maxCharacters: maxCharacters } },
+        // M15-F1: server-side anchor on candidate name. Omitted when not set
+        // so non-Stage-5 callers (e.g., M13 brainstorming) keep their current
+        // unfiltered behavior. Exa requires this as a single-element array
+        // of strings — bare string returns HTTP 400.
+        ...(args.includeText ? { includeText: [args.includeText] } : {}),
       }),
       signal: controller.signal,
     });
@@ -212,6 +236,72 @@ export async function exaSearchBatch(
   return Promise.all(
     queries.map((query) => exaSearch({ ...options, query })),
   );
+}
+
+/**
+ * @public
+ * Result of {@link exaSearchWithBroadenRetry}. Reports both attempts so the
+ * orchestrator can log the broadening event and the caller knows whether
+ * the final hit set came from the original or broadened query.
+ */
+export interface ExaBroadenedSearchResponse {
+  /** The successful response, or null when both attempts returned empty. */
+  response: ExaSearchResponse | null;
+  /** First-attempt response (always populated unless the call threw). */
+  initial: ExaSearchResponse;
+  /** Second-attempt response (populated only when the broadened retry fired). */
+  broadened: ExaSearchResponse | null;
+  /** True when the orchestrator should record `confidence='unknown'`. */
+  isEmpty: boolean;
+  /** The broadened query string, if a retry fired. */
+  broadenedQuery: string | null;
+}
+
+/**
+ * @public
+ * M15 Tier 3 fallback chain (design doc §Tier 3 fallback chain). Runs one
+ * Exa search; if `results` is empty, broadens the query (drops the
+ * most-specific trailing token via {@link broadenTier3Query}) and retries
+ * once. Still empty → caller writes the cell as `confidence='unknown'`
+ * with `reason='no_evidence_found'`.
+ *
+ * **Never** falls through to Opus / training data for the cell value —
+ * Tier 3 exists specifically for facts that need fresh evidence, so
+ * bypassing the search defeats the architecture (M15_DESIGN.md line 130).
+ */
+export async function exaSearchWithBroadenRetry(
+  args: ExaSearchArgs,
+): Promise<ExaBroadenedSearchResponse> {
+  const initial = await exaSearch(args);
+  if (initial.results.length > 0) {
+    return {
+      response: initial,
+      initial,
+      broadened: null,
+      isEmpty: false,
+      broadenedQuery: null,
+    };
+  }
+
+  const broadenedQuery = broadenTier3Query(args.query);
+  if (broadenedQuery === null) {
+    return {
+      response: null,
+      initial,
+      broadened: null,
+      isEmpty: true,
+      broadenedQuery: null,
+    };
+  }
+
+  const broadened = await exaSearch({ ...args, query: broadenedQuery });
+  return {
+    response: broadened.results.length > 0 ? broadened : null,
+    initial,
+    broadened,
+    isEmpty: broadened.results.length === 0,
+    broadenedQuery,
+  };
 }
 
 function stringifyError(err: unknown): string {

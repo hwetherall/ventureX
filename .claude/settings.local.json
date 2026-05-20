@@ -39,7 +39,8 @@
       "Skill(plan-ceo-review)",
       "Bash(git commit *)",
       "Bash(git checkout *)",
-      "Skill(office-hours)"
+      "Skill(office-hours)",
+      "Skill(plan-eng-review)"
     ]
   }
 }

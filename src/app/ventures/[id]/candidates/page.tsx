@@ -2,8 +2,12 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/insforge/auth";
 import { createAuthedServerClient } from "@/lib/insforge/server";
+import { predictStage5Cost } from "@/lib/openrouter/predict";
+import { ParameterSchema, type Parameter } from "@/types/parameter";
 import type { CandidateType, Citation } from "@/types/candidate";
 import type { Dimension } from "@/types/venture-profile";
+import { ResearchBatchButton } from "./research-batch-button";
+import { ResearchDossierButton } from "./research-dossier-button";
 
 interface VentureRow {
   id: string;
@@ -107,6 +111,11 @@ export default async function CandidatesPage({
   const latestRunId = pickLatestGenerationRun(rows);
   const latestRows = rows.filter((r) => r.generation_run_id === latestRunId);
 
+  // Stage 5 surface: when parameters exist, surface a per-candidate "Research
+  // dossier" button + predictor estimate. When cells exist, swap for a
+  // "View dossier" link.
+  const dossierContext = await loadDossierContext(insforge, id, latestRows);
+
   // Bucket by type. Each candidate appears in exactly one section; within
   // a section we preserve insertion order from the LLM (the model's natural
   // grouping carries information about its confidence ordering).
@@ -149,23 +158,173 @@ export default async function CandidatesPage({
         scoring lands in M14.
       </p>
 
+      <BatchResearchPanel
+        ventureId={venture.id}
+        ventureStatus={venture.status}
+        candidates={latestRows}
+        dossierContext={dossierContext}
+      />
+
       {TYPE_ORDER.map((type) => (
         <CandidatesSection
           key={type}
           type={type}
           candidates={byType[type]}
+          ventureStatus={venture.status}
+          ventureId={venture.id}
+          dossierContext={dossierContext}
         />
       ))}
     </main>
   );
 }
 
+function BatchResearchPanel({
+  ventureId,
+  ventureStatus,
+  candidates,
+  dossierContext,
+}: {
+  ventureId: string;
+  ventureStatus: string;
+  candidates: CandidateRow[];
+  dossierContext: DossierContext;
+}) {
+  const unresearched = candidates.filter(
+    (c) => !dossierContext.candidatesWithCells.has(c.id),
+  );
+
+  // Batch CTAs are meaningful when parameters exist and there are still
+  // un-researched candidates. After cells_ready with everything researched
+  // there's nothing left to do here — the table page is the next surface.
+  if (
+    ventureStatus !== "parameters_ready" &&
+    ventureStatus !== "cells_ready"
+  ) {
+    return null;
+  }
+  if (unresearched.length === 0) {
+    return null;
+  }
+  if (!dossierContext.prediction) {
+    return null;
+  }
+
+  const tenIds = unresearched.slice(0, 10).map((c) => c.id);
+  const allIds = unresearched.map((c) => c.id);
+
+  return (
+    <section className="mt-8 rounded-md border border-dashed border-border p-4 text-sm">
+      <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Batch research ({unresearched.length} candidates not yet researched)
+      </h2>
+      <p className="mt-2 text-muted-foreground">
+        Run cell research across multiple candidates in one pass. Each
+        candidate's dossier is researched independently (T1 + T2 + T3) with
+        a 3-candidate within-venture concurrency cap. Per-candidate failures
+        are recorded but do not fail the whole batch.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-3">
+        {unresearched.length > 10 && (
+          <ResearchBatchButton
+            ventureId={ventureId}
+            candidateIds={tenIds}
+            perCandidatePrediction={dossierContext.prediction}
+            label={`Research 10 candidates`}
+          />
+        )}
+        <ResearchBatchButton
+          ventureId={ventureId}
+          candidateIds={allIds}
+          perCandidatePrediction={dossierContext.prediction}
+          label={`Research all ${unresearched.length}`}
+        />
+      </div>
+    </section>
+  );
+}
+
+interface DossierContext {
+  prediction: {
+    costMin: number;
+    costMax: number;
+    latencyMinMin: number;
+    latencyMaxMin: number;
+  } | null;
+  candidatesWithCells: Set<string>;
+}
+
+/**
+ * Load the latest parameter schema (so we can predict per-candidate cost +
+ * latency) and the set of candidates that already have cells written. The
+ * candidates page renders a different CTA per candidate depending on
+ * whether its dossier exists.
+ */
+async function loadDossierContext(
+  insforge: Awaited<ReturnType<typeof createAuthedServerClient>>,
+  ventureId: string,
+  candidates: CandidateRow[],
+): Promise<DossierContext> {
+  const { data: paramRunRaw } = await insforge.database
+    .from("parameter_generation_runs")
+    .select("full_parameter_schema")
+    .eq("venture_id", ventureId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  let prediction: DossierContext["prediction"] = null;
+  if (paramRunRaw) {
+    const rawSchema = (paramRunRaw as { full_parameter_schema: unknown })
+      .full_parameter_schema;
+    if (Array.isArray(rawSchema)) {
+      const parsed: Parameter[] = [];
+      for (const entry of rawSchema) {
+        const ok = ParameterSchema.safeParse(entry);
+        if (ok.success) parsed.push(ok.data);
+      }
+      if (parsed.length > 0) {
+        const p = predictStage5Cost({ parameters: parsed, candidateCount: 1 });
+        prediction = {
+          costMin: p.costUsd.min,
+          costMax: p.costUsd.max,
+          latencyMinMin: Math.round(p.latencyMs.min / 60_000),
+          latencyMaxMin: Math.round(p.latencyMs.max / 60_000),
+        };
+      }
+    }
+  }
+
+  // Which candidates already have at least one cell? RLS keeps us scoped
+  // to this user's candidates; one `select id` per candidate is fine at
+  // V1 single-user scale (max ~60 candidates).
+  const candidateIds = candidates.map((c) => c.id);
+  const candidatesWithCells = new Set<string>();
+  if (candidateIds.length > 0) {
+    const { data: cellsProbeRaw } = await insforge.database
+      .from("cells")
+      .select("candidate_id")
+      .in("candidate_id", candidateIds);
+    for (const row of (cellsProbeRaw ?? []) as { candidate_id: string }[]) {
+      candidatesWithCells.add(row.candidate_id);
+    }
+  }
+
+  return { prediction, candidatesWithCells };
+}
+
 function CandidatesSection({
   type,
   candidates,
+  ventureStatus,
+  ventureId,
+  dossierContext,
 }: {
   type: CandidateType;
   candidates: CandidateRow[];
+  ventureStatus: string;
+  ventureId: string;
+  dossierContext: DossierContext;
 }) {
   return (
     <section className="mt-10">
@@ -194,14 +353,30 @@ function CandidatesSection({
           </li>
         )}
         {candidates.map((c) => (
-          <CandidateCard key={c.id} candidate={c} />
+          <CandidateCard
+            key={c.id}
+            candidate={c}
+            ventureStatus={ventureStatus}
+            ventureId={ventureId}
+            dossierContext={dossierContext}
+          />
         ))}
       </ul>
     </section>
   );
 }
 
-function CandidateCard({ candidate }: { candidate: CandidateRow }) {
+function CandidateCard({
+  candidate,
+  ventureStatus,
+  ventureId,
+  dossierContext,
+}: {
+  candidate: CandidateRow;
+  ventureStatus: string;
+  ventureId: string;
+  dossierContext: DossierContext;
+}) {
   const citations = candidate.citations ?? [];
   return (
     <li className="rounded-md border border-border bg-surface p-4 text-sm">
@@ -241,7 +416,63 @@ function CandidateCard({ candidate }: { candidate: CandidateRow }) {
           ))}
         </ul>
       )}
+      <CandidateDossierCta
+        candidate={candidate}
+        ventureStatus={ventureStatus}
+        ventureId={ventureId}
+        dossierContext={dossierContext}
+      />
     </li>
+  );
+}
+
+function CandidateDossierCta({
+  candidate,
+  ventureStatus,
+  ventureId,
+  dossierContext,
+}: {
+  candidate: CandidateRow;
+  ventureStatus: string;
+  ventureId: string;
+  dossierContext: DossierContext;
+}) {
+  const hasCells = dossierContext.candidatesWithCells.has(candidate.id);
+
+  if (hasCells) {
+    return (
+      <div className="mt-3 border-t border-border pt-3">
+        <Link
+          href={`/ventures/${ventureId}/dossier/${candidate.id}`}
+          className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+        >
+          View dossier →
+        </Link>
+      </div>
+    );
+  }
+
+  if (ventureStatus !== "parameters_ready" && ventureStatus !== "cells_ready") {
+    return null;
+  }
+
+  if (!dossierContext.prediction) {
+    return (
+      <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
+        Generate parameters before researching this candidate's dossier.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-3 border-t border-border pt-3">
+      <ResearchDossierButton
+        ventureId={ventureId}
+        candidateId={candidate.id}
+        candidateName={candidate.name}
+        prediction={dossierContext.prediction}
+      />
+    </div>
   );
 }
 

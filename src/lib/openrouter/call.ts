@@ -1,5 +1,5 @@
 import type { InsForgeClient } from "@/lib/insforge/server";
-import type { ZodSchema } from "zod";
+import type { ZodType, ZodTypeDef } from "zod";
 import {
   BudgetExceededError,
   LLMValidationError,
@@ -51,8 +51,13 @@ export interface CallLLMArgs<T> {
   ventureId?: string | null;
   /** D4: groups calls within one Stage 1 + critic + Stage 2 cycle for budget tracking. */
   runId?: string | null;
-  /** Optional Zod schema. When set, response is parsed as JSON and validated. */
-  schema?: ZodSchema<T>;
+  /**
+   * Optional Zod schema. When set, response is parsed as JSON and validated.
+   * Input type defaults to `unknown` so schemas wrapped with `z.preprocess`
+   * (e.g., the M15 cell schemas that coerce empty values to null) remain
+   * assignable here.
+   */
+  schema?: ZodType<T, ZodTypeDef, unknown>;
   /** If true (or schema present), response is parsed as JSON before optional Zod check. */
   expectJson?: boolean;
   maxInputTokens?: number;
@@ -332,7 +337,10 @@ async function executeWithValidationRetry<T>(params: {
   throw new LLMValidationError("Exhausted validation retries", 2, null);
 }
 
-function validateJsonResponse<T>(rawText: string, schema?: ZodSchema<T>): T {
+function validateJsonResponse<T>(
+  rawText: string,
+  schema?: ZodType<T, ZodTypeDef, unknown>,
+): T {
   const parsed = extractAndParseJson(rawText);
   return schema ? schema.parse(parsed) : (parsed as T);
 }

@@ -108,6 +108,13 @@ export function ComparisonTableViewer({
             Venture
           </Link>
           <a
+            href={`/api/ventures/${ventureId}/table/export.csv`}
+            className="vx-secondary-button"
+          >
+            <Download size={14} aria-hidden="true" />
+            Download CSV
+          </a>
+          <a
             href={`/api/ventures/${ventureId}/table/export`}
             className="vx-primary-button"
           >

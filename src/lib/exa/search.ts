@@ -2,6 +2,30 @@ import { ExaError } from "./errors";
 import { broadenTier3Query } from "./query";
 
 /**
+ * Strip UTF-16 lone surrogate code units, replacing each with U+FFFD.
+ *
+ * Why: Exa occasionally returns snippets scraped from PDFs and other lossy
+ * sources containing unpaired surrogate halves (e.g. a leading 0xD8xx with
+ * no trailing 0xDCxx). JavaScript stores these as-is. Downstream,
+ * `JSON.stringify` of such a string emits a literal `\uD8xx` escape which
+ * is technically valid JSON but invalid Unicode — and Postgres's JSONB
+ * parser rejects it with "unsupported Unicode escape sequence". That kills
+ * subsequent INSERTs (most painfully, the `llm_call_logs` placeholder
+ * insert inside `callLLM`, which aborts a tier before the model call runs).
+ *
+ * INBRAIN Neuroelectronics' M16 backfill (2026-05-21) hit this: one T2
+ * pre-search result carried a lone surrogate, the orchestrator's
+ * `logExaCall` silently dropped the row, and the subsequent T2 placeholder
+ * insert blew up. Sanitising at the Exa boundary fixes both call sites.
+ */
+function sanitizeForJson(s: string): string {
+  return s.replace(
+    /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g,
+    "�",
+  );
+}
+
+/**
  * Exa neural search wrapper (M13).
  *
  * Used by the Stage 3 orchestrator to ground candidate brainstorm in real web
@@ -192,8 +216,8 @@ export async function exaSearch(args: ExaSearchArgs): Promise<ExaSearchResponse>
 
     const results: ExaSearchResult[] = payload.results.map((r) => ({
       url: r.url,
-      title: r.title ?? "",
-      text: r.text ?? "",
+      title: sanitizeForJson(r.title ?? ""),
+      text: sanitizeForJson(r.text ?? ""),
       ...(r.score !== undefined && { score: r.score }),
       ...(r.publishedDate !== undefined && { publishedDate: r.publishedDate }),
     }));

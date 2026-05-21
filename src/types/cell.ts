@@ -65,14 +65,28 @@ export function isEmptyValue(v: unknown): boolean {
 }
 
 /**
- * Coerce empty values to `null` when `confidence='unknown'`. Applied via
- * `z.preprocess` on every per-tier cell schema so the model can return
- * `[]` / `{}` / `""` for "I don't know" without burning a retry.
+ * Coerce any value to `null` when `confidence='unknown'`. Applied via
+ * `z.preprocess` on every per-tier cell schema.
+ *
+ * The schema invariant downstream (CellRowSchema.superRefine) requires
+ * `unknown ⇒ value=null AND citation=null`. The model is the broken party
+ * when it returns `unknown` with a non-null value — historically that came
+ * in two flavours:
+ *   1. Empty containers (`[]` / `{}` / `""`) that semantically mean null.
+ *   2. Hedge guesses ("we think it's X but we're not sure").
+ *
+ * Both are harmonised here: if the model signalled `unknown`, we trust the
+ * confidence signal and discard any accompanying value. This is symmetric
+ * with the existing orchestrator post-check in `runTier2Batch`
+ * (stage5-cells.ts:838-851) that downgrades cells to `unknown` + null when
+ * a required citation is missing. NewFlex Technology hit case (2)
+ * deterministically across 4 attempts on 2026-05-20/21 — see commit
+ * message and the discussion under M16.
  */
-function coerceEmptyValueOnUnknown(input: unknown): unknown {
+function coerceValueOnUnknown(input: unknown): unknown {
   if (!input || typeof input !== "object") return input;
   const cell = input as Record<string, unknown>;
-  if (cell.confidence === "unknown" && isEmptyValue(cell.value)) {
+  if (cell.confidence === "unknown" && cell.value !== null) {
     return { ...cell, value: null };
   }
   return input;
@@ -198,7 +212,7 @@ const Tier1CellBaseSchema = z
   });
 
 export const Tier1CellOutputSchema = z.preprocess(
-  coerceEmptyValueOnUnknown,
+  coerceValueOnUnknown,
   Tier1CellBaseSchema,
 );
 
@@ -251,7 +265,7 @@ const Tier2CellBaseSchema = z
   });
 
 export const Tier2CellOutputSchema = z.preprocess(
-  coerceEmptyValueOnUnknown,
+  coerceValueOnUnknown,
   Tier2CellBaseSchema,
 );
 
@@ -306,7 +320,7 @@ const Tier3CellBaseSchema = z
   });
 
 export const Tier3CellOutputSchema = z.preprocess(
-  coerceEmptyValueOnUnknown,
+  coerceValueOnUnknown,
   Tier3CellBaseSchema,
 );
 

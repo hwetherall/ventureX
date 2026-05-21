@@ -196,10 +196,17 @@ const EXPORT_INTERACTIONS = `
     return date.toISOString().slice(0, 10);
   }
 
-  function inlineValue(value) {
+  var plainIntegerParameterKeys = { founded_year: true };
+
+  function formatDisplayNumber(value, parameterKey) {
+    if (parameterKey && plainIntegerParameterKeys[parameterKey]) return String(value);
+    return new Intl.NumberFormat("en-US").format(value);
+  }
+
+  function inlineValue(value, parameterKey) {
     if (value == null) return "None";
     if (typeof value === "boolean") return value ? "Yes" : "No";
-    if (typeof value === "number") return new Intl.NumberFormat("en-US").format(value);
+    if (typeof value === "number") return formatDisplayNumber(value, parameterKey);
     if (Array.isArray(value)) return value.map(inlineValue).join(", ");
     if (typeof value === "object") return JSON.stringify(value);
     return String(value);
@@ -224,7 +231,7 @@ const EXPORT_INTERACTIONS = `
     if (Array.isArray(value)) {
       if (value.length === 0) return '<p class="vx-modal-prose">None</p>';
       return '<ul>' + value.map(function (item) {
-        return '<li>' + escape(inlineValue(item)) + '</li>';
+        return '<li>' + escape(inlineValue(item, parameterKey)) + '</li>';
       }).join("") + '</ul>';
     }
     if (typeof value === "object") {
@@ -263,7 +270,7 @@ const EXPORT_INTERACTIONS = `
     if (!candidate || !parameter) return;
     var cell = cells.get(key(candidate.candidate_id, parameter.parameter_key)) || null;
     opener = button;
-    modalRoot.innerHTML = '<div class="vx-modal-backdrop" role="presentation" data-modal-backdrop><div class="vx-modal" role="dialog" aria-modal="true" aria-labelledby="vx-modal-title"><div class="vx-modal-header"><div><h2 id="vx-modal-title" class="vx-modal-title">' + escape(parameter.parameter_label) + '</h2><div class="vx-modal-meta">T' + parameter.tier + ' - ' + escape(cell ? cell.confidence : 'not researched') + ' - ' + escape(candidate.name) + '</div></div><button type="button" class="vx-icon-button" data-close-modal aria-label="Close modal">x</button></div><div class="vx-modal-body"><section class="vx-modal-section"><h3 class="vx-modal-section-title">Value</h3>' + (cell ? renderValue(cell.value) : '<div class="vx-callout" data-kind="warning">Not researched. This candidate/parameter pair has no row in the cells table.</div>') + '</section><section class="vx-modal-section"><h3 class="vx-modal-section-title">Evidence</h3>' + renderEvidence(cell, parameter) + '</section></div><div class="vx-modal-footer"><button type="button" class="vx-secondary-button" data-copy-key="' + escape(parameter.parameter_key) + '">Copy parameter key</button><button type="button" class="vx-primary-button" data-close-modal>Close</button></div></div></div>';
+    modalRoot.innerHTML = '<div class="vx-modal-backdrop" role="presentation" data-modal-backdrop><div class="vx-modal" role="dialog" aria-modal="true" aria-labelledby="vx-modal-title"><div class="vx-modal-header"><div><h2 id="vx-modal-title" class="vx-modal-title">' + escape(parameter.parameter_label) + '</h2><div class="vx-modal-meta">T' + parameter.tier + ' - ' + escape(cell ? cell.confidence : 'not researched') + ' - ' + escape(candidate.name) + '</div></div><button type="button" class="vx-icon-button" data-close-modal aria-label="Close modal">x</button></div><div class="vx-modal-body"><section class="vx-modal-section"><h3 class="vx-modal-section-title">Value</h3>' + (cell ? renderValue(cell.value, parameter.parameter_key) : '<div class="vx-callout" data-kind="warning">Not researched. This candidate/parameter pair has no row in the cells table.</div>') + '</section><section class="vx-modal-section"><h3 class="vx-modal-section-title">Evidence</h3>' + renderEvidence(cell, parameter) + '</section></div><div class="vx-modal-footer"><button type="button" class="vx-secondary-button" data-copy-key="' + escape(parameter.parameter_key) + '">Copy parameter key</button><button type="button" class="vx-primary-button" data-close-modal>Close</button></div></div></div>';
     var closeButton = modalRoot.querySelector("[data-close-modal]");
     if (closeButton) closeButton.focus();
   }

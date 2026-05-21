@@ -295,18 +295,28 @@ async function loadDossierContext(
     }
   }
 
-  // Which candidates already have at least one cell? RLS keeps us scoped
-  // to this user's candidates; one `select id` per candidate is fine at
-  // V1 single-user scale (max ~60 candidates).
+  // Which candidates already have at least one cell? InsForge/PostgREST caps
+  // responses at 1000 rows server-side, so with 42 candidates × ~55 cells the
+  // unsorted tail gets dropped and candidates that landed last erroneously
+  // present as "no cells" in the candidates page. Page explicitly to defeat
+  // the cap. (Same root cause as the comparison table truncation fix in
+  // src/lib/table-data.ts.)
   const candidateIds = candidates.map((c) => c.id);
   const candidatesWithCells = new Set<string>();
   if (candidateIds.length > 0) {
-    const { data: cellsProbeRaw } = await insforge.database
-      .from("cells")
-      .select("candidate_id")
-      .in("candidate_id", candidateIds);
-    for (const row of (cellsProbeRaw ?? []) as { candidate_id: string }[]) {
-      candidatesWithCells.add(row.candidate_id);
+    const PAGE = 1000;
+    let from = 0;
+    while (true) {
+      const { data: cellsProbeRaw } = await insforge.database
+        .from("cells")
+        .select("candidate_id")
+        .in("candidate_id", candidateIds)
+        .order("id", { ascending: true })
+        .range(from, from + PAGE - 1);
+      const rows = (cellsProbeRaw ?? []) as { candidate_id: string }[];
+      for (const row of rows) candidatesWithCells.add(row.candidate_id);
+      if (rows.length < PAGE) break;
+      from += PAGE;
     }
   }
 

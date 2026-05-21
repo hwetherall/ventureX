@@ -86,15 +86,32 @@ export async function loadComparisonTableData(
 
   const cells: ComparisonCell[] = [];
   if (candidateIds.length > 0) {
-    const { data: cellsRaw, error: cellsError } = await insforge.database
-      .from("cells")
-      .select(
-        "candidate_id, parameter_key, tier, value, citation, confidence, reason, created_at",
-      )
-      .in("candidate_id", candidateIds);
-
-    if (cellsError) return { data: null, error: cellsError.message };
-    for (const row of ((cellsRaw as CellRow[] | null) ?? [])) {
+    // InsForge / PostgREST hard-caps responses at 1000 rows server-side
+    // (verified 2026-05-21: Range header ignored, `content-range: 0-999/*`
+    // returned regardless of `Range: 0-9999` request). With 42 candidates ×
+    // ~55 cells = ~2300 rows the unsorted tail gets silently dropped, which
+    // surfaced as "candidates with 0 cells" in the comparison table even
+    // though every candidate had a full row of cells in Postgres. We page
+    // explicitly to defeat this.
+    const PAGE = 1000;
+    let from = 0;
+    const cellsRawAll: CellRow[] = [];
+    while (true) {
+      const { data: cellsRaw, error: cellsError } = await insforge.database
+        .from("cells")
+        .select(
+          "candidate_id, parameter_key, tier, value, citation, confidence, reason, created_at",
+        )
+        .in("candidate_id", candidateIds)
+        .order("id", { ascending: true })
+        .range(from, from + PAGE - 1);
+      if (cellsError) return { data: null, error: cellsError.message };
+      const rows = (cellsRaw as CellRow[] | null) ?? [];
+      cellsRawAll.push(...rows);
+      if (rows.length < PAGE) break;
+      from += PAGE;
+    }
+    for (const row of cellsRawAll) {
       const parsedTier = CellTierSchema.safeParse(row.tier);
       const parsedConfidence = CellConfidenceSchema.safeParse(row.confidence);
       if (!parsedTier.success || !parsedConfidence.success) continue;

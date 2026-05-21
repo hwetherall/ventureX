@@ -613,6 +613,16 @@ export function makeCellKey(candidateId: string, parameterKey: string): string {
   return `${candidateId}::${parameterKey}`;
 }
 
+/** Parameters whose numeric values are identifiers, not quantities (no grouping). */
+const PLAIN_INTEGER_PARAMETER_KEYS = new Set(["founded_year"]);
+
+export function formatDisplayNumber(value: number, parameterKey?: string): string {
+  if (parameterKey && PLAIN_INTEGER_PARAMETER_KEYS.has(parameterKey)) {
+    return String(value);
+  }
+  return new Intl.NumberFormat("en-US").format(value);
+}
+
 export function summarizeCell(
   cell: ComparisonCell | null,
   parameter: ComparisonParameter,
@@ -639,7 +649,7 @@ export function summarizeCell(
     return { text, muted: false, title: value };
   }
   if (typeof value === "number") {
-    const text = new Intl.NumberFormat("en-US").format(value);
+    const text = formatDisplayNumber(value, parameter.parameter_key);
     return { text, muted: false, title: text };
   }
   if (typeof value === "boolean") {
@@ -749,10 +759,10 @@ function pickPrimaryObjectValue(value: Record<string, unknown>): string {
   return first === undefined ? "" : formatInlineValue(first);
 }
 
-export function formatInlineValue(value: unknown): string {
+export function formatInlineValue(value: unknown, parameterKey?: string): string {
   if (value === null || value === undefined) return "None";
   if (typeof value === "string") return value;
-  if (typeof value === "number") return new Intl.NumberFormat("en-US").format(value);
+  if (typeof value === "number") return formatDisplayNumber(value, parameterKey);
   if (typeof value === "boolean") return value ? "Yes" : "No";
   if (Array.isArray(value)) return value.map(formatInlineValue).join(", ");
   if (typeof value === "object") return JSON.stringify(value);

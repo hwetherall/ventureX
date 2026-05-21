@@ -224,6 +224,24 @@ async function checkPrecallBudget(params: {
   }
 }
 
+/**
+ * Strip characters that JSON.stringify encodes in forms PostgreSQL rejects:
+ *   - UTF-16 lone surrogates (encoded as `\uD8xx` literal — invalid Unicode)
+ *   - NUL byte U+0000 (Postgres text columns disallow embedded NULs)
+ * Both have been observed inside Exa snippets scraped from PDFs and from
+ * model output during the M16 backfill. Without this scrub the InsForge
+ * INSERT for `llm_call_logs` aborts with "unsupported Unicode escape
+ * sequence", which kills the whole tier before the model call runs.
+ */
+function scrubForPostgresJsonInsert(s: string): string {
+  return s
+    .replace(/ /g, "")
+    .replace(
+      /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g,
+      "�",
+    );
+}
+
 /** Inserts a placeholder llm_call_logs row and returns its id. */
 async function insertPlaceholderLog<T>(args: CallLLMArgs<T>): Promise<string> {
   const { data, error } = await args.insforge.database
@@ -234,7 +252,7 @@ async function insertPlaceholderLog<T>(args: CallLLMArgs<T>): Promise<string> {
         run_id: args.runId ?? null,
         stage: args.stage,
         model_id: args.model,
-        prompt_text: args.prompt,
+        prompt_text: scrubForPostgresJsonInsert(args.prompt),
         input_documents: args.inputDocuments ?? null,
       },
     ])

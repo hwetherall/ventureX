@@ -419,7 +419,14 @@ function CellModal({
         <div className="vx-modal-body">
           <section className="vx-modal-section">
             <h3 className="vx-modal-section-title">Value</h3>
-            {cell ? <ModalValue value={cell.value} /> : <MissingCell />}
+            {cell ? (
+              <ModalValue
+                value={cell.value}
+                parameterKey={parameter.parameter_key}
+              />
+            ) : (
+              <MissingCell />
+            )}
           </section>
 
           <section className="vx-modal-section">
@@ -441,12 +448,20 @@ function CellModal({
   );
 }
 
-function ModalValue({ value }: { value: unknown }) {
+function ModalValue({
+  value,
+  parameterKey,
+}: {
+  value: unknown;
+  parameterKey: string;
+}) {
   if (value === null || value === undefined) {
     return <p className="vx-modal-prose">None</p>;
   }
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return <p className="vx-modal-prose">{formatInlineValue(value)}</p>;
+    return (
+      <p className="vx-modal-prose">{formatInlineValue(value, parameterKey)}</p>
+    );
   }
   if (Array.isArray(value)) {
     if (value.length === 0) return <p className="vx-modal-prose">None</p>;

@@ -497,7 +497,7 @@ function renderNestedValue(value: unknown): ReactNode {
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
     return formatInlineValue(value);
   }
-  if (Array.isArray(value)) return value.map(formatInlineValue).join(", ");
+  if (Array.isArray(value)) return value.map((item) => formatInlineValue(item)).join(", ");
   if (typeof value === "object") return <pre className="vx-json">{JSON.stringify(value, null, 2)}</pre>;
   return String(value);
 }

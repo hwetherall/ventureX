@@ -764,7 +764,7 @@ export function formatInlineValue(value: unknown, parameterKey?: string): string
   if (typeof value === "string") return value;
   if (typeof value === "number") return formatDisplayNumber(value, parameterKey);
   if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (Array.isArray(value)) return value.map(formatInlineValue).join(", ");
+  if (Array.isArray(value)) return value.map((item) => formatInlineValue(item)).join(", ");
   if (typeof value === "object") return JSON.stringify(value);
   return String(value);
 }

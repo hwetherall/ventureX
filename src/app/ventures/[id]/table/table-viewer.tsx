@@ -15,19 +15,24 @@ import {
 } from "react";
 
 import {
+  CANDIDATE_TYPE_LABELS,
   type ComparisonCandidate,
   type ComparisonCell,
   type ComparisonParameter,
   type ComparisonTableData,
   TABLE_VIEWER_CSS,
   TIER_LABELS,
+  describeDimensionScores,
   formatDate,
   formatInlineValue,
+  formatScore,
   humanizeKey,
   makeCellKey,
   reasonKind,
   summarizeCell,
 } from "@/lib/table-viewer";
+
+import { ScoreCandidatesButton } from "./score-button";
 
 interface SelectedCell {
   candidate: ComparisonCandidate;
@@ -104,6 +109,16 @@ export function ComparisonTableViewer({
       <header className="vx-toolbar">
         <h1>{data.venture.title} comparison table</h1>
         <div className="vx-toolbar-actions">
+          <ScoreCandidatesButton
+            ventureId={ventureId}
+            researchedCount={
+              data.candidates.filter((candidate) => candidate.stats.total > 0)
+                .length
+            }
+            hasScores={data.candidates.some(
+              (candidate) => typeof candidate.aggregate_score === "number",
+            )}
+          />
           <Link href={`/ventures/${ventureId}`} className="vx-link-button">
             Venture
           </Link>
@@ -180,6 +195,9 @@ function CornerCell({
 }
 
 function CandidateHeader({ candidate }: { candidate: ComparisonCandidate }) {
+  const typeLabel = candidate.candidate_type
+    ? CANDIDATE_TYPE_LABELS[candidate.candidate_type] ?? candidate.candidate_type
+    : null;
   return (
     <div className="vx-candidate-header">
       <div className="vx-candidate-inner">
@@ -196,11 +214,26 @@ function CandidateHeader({ candidate }: { candidate: ComparisonCandidate }) {
           {candidate.product_line && (
             <div className="vx-candidate-meta">{candidate.product_line}</div>
           )}
+          {typeof candidate.rank === "number" &&
+          typeof candidate.aggregate_score === "number" ? (
+            <div
+              className="vx-rank-line"
+              title={describeDimensionScores(candidate.dimension_scores)}
+            >
+              <span className="vx-rank-badge">#{candidate.rank}</span>
+              <span className="vx-rank-score">
+                {formatScore(candidate.aggregate_score)}
+              </span>
+              {typeLabel && <span>{typeLabel}</span>}
+            </div>
+          ) : (
+            typeLabel && <div className="vx-rank-line">{typeLabel}</div>
+          )}
           <button
             type="button"
             className="vx-stats-button"
-            title="Candidate summary modal reserved for V2"
-            aria-label={`${candidate.name} summary reserved for V2`}
+            title={`${candidate.stats.verified} verified, ${candidate.stats.inferred} inferred, ${candidate.stats.unknown} unknown`}
+            aria-label={`${candidate.name} research coverage`}
           >
             {candidate.stats.total} - {candidate.stats.verified}v -{" "}
             {candidate.stats.inferred}i - {candidate.stats.unknown}u

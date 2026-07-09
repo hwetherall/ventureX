@@ -1,10 +1,13 @@
 import {
+  CANDIDATE_TYPE_LABELS,
   type ComparisonCell,
   type ComparisonParameter,
   type ComparisonTableData,
   TABLE_VIEWER_CSS,
   TIER_LABELS,
+  describeDimensionScores,
   formatDate,
+  formatScore,
   makeCellKey,
   summarizeCell,
 } from "@/lib/table-viewer";
@@ -85,13 +88,27 @@ function renderCandidateHeader(candidate: ComparisonTableData["candidates"][numb
   const logo = candidate.logo_url
     ? `<img class="vx-logo" src="${escapeAttribute(candidate.logo_url)}" alt="">`
     : `<div class="vx-logo-fallback" aria-hidden="true">${escapeHtml(candidate.name.slice(0, 1).toUpperCase())}</div>`;
+  const typeLabel = candidate.candidate_type
+    ? CANDIDATE_TYPE_LABELS[candidate.candidate_type] ?? candidate.candidate_type
+    : null;
+  const rankLine =
+    typeof candidate.rank === "number" && typeof candidate.aggregate_score === "number"
+      ? `<div class="vx-rank-line" title="${escapeAttribute(describeDimensionScores(candidate.dimension_scores))}">
+      <span class="vx-rank-badge">#${candidate.rank}</span>
+      <span class="vx-rank-score">${escapeHtml(formatScore(candidate.aggregate_score))}</span>
+      ${typeLabel ? `<span>${escapeHtml(typeLabel)}</span>` : ""}
+    </div>`
+      : typeLabel
+        ? `<div class="vx-rank-line">${escapeHtml(typeLabel)}</div>`
+        : "";
   return `<div class="vx-candidate-header">
   <div class="vx-candidate-inner">
     ${logo}
     <div>
       <div class="vx-candidate-name">${escapeHtml(candidate.name)}</div>
       ${candidate.product_line ? `<div class="vx-candidate-meta">${escapeHtml(candidate.product_line)}</div>` : ""}
-      <button type="button" class="vx-stats-button" title="Candidate summary modal reserved for V2">${candidate.stats.total} - ${candidate.stats.verified}v - ${candidate.stats.inferred}i - ${candidate.stats.unknown}u</button>
+      ${rankLine}
+      <button type="button" class="vx-stats-button" title="${candidate.stats.verified} verified, ${candidate.stats.inferred} inferred, ${candidate.stats.unknown} unknown">${candidate.stats.total} - ${candidate.stats.verified}v - ${candidate.stats.inferred}i - ${candidate.stats.unknown}u</button>
     </div>
   </div>
 </div>`;
@@ -223,10 +240,10 @@ const EXPORT_INTERACTIONS = `
     return "neutral";
   }
 
-  function renderValue(value) {
+  function renderValue(value, parameterKey) {
     if (value == null) return '<p class="vx-modal-prose">None</p>';
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-      return '<p class="vx-modal-prose">' + escape(inlineValue(value)) + '</p>';
+      return '<p class="vx-modal-prose">' + escape(inlineValue(value, parameterKey)) + '</p>';
     }
     if (Array.isArray(value)) {
       if (value.length === 0) return '<p class="vx-modal-prose">None</p>';

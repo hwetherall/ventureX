@@ -45,9 +45,17 @@ export function buildComparisonCsv(data: ComparisonTableData): string {
   // tier (T1 / T2 / T3) for visual grouping in Excel, the second names
   // the parameter. The "_confidence" / "_citation" sibling columns are
   // omitted to keep the wide format readable — provenance is appended to
-  // the value cell.
-  const paramHeader: string[] = ["candidate", "candidate_id", "type"];
-  const tierHeader: string[] = ["", "", ""];
+  // the value cell. Rows arrive pre-ranked by Stage 6 aggregate score
+  // (unscored candidates last); rank/overall_score are empty until a
+  // scoring run has covered the candidate.
+  const paramHeader: string[] = [
+    "candidate",
+    "candidate_id",
+    "type",
+    "rank",
+    "overall_score",
+  ];
+  const tierHeader: string[] = ["", "", "", "", ""];
   for (const param of data.parameters) {
     paramHeader.push(csvEscape(param.parameter_key));
     tierHeader.push(`T${param.tier}`);
@@ -59,11 +67,13 @@ export function buildComparisonCsv(data: ComparisonTableData): string {
     const row: string[] = [
       csvEscape(candidate.name),
       csvEscape(candidate.candidate_id),
-      // product_line lives on the comparison shape but the candidate-type
-      // (direct / category / SPDM) is on the source candidate_companies row
-      // and not propagated through table-data.ts today. Leave the column
-      // for future enrichment; emit empty for now to keep schema stable.
-      csvEscape(candidate.product_line ?? ""),
+      csvEscape(candidate.candidate_type ?? ""),
+      csvEscape(typeof candidate.rank === "number" ? String(candidate.rank) : ""),
+      csvEscape(
+        typeof candidate.aggregate_score === "number"
+          ? candidate.aggregate_score.toFixed(3)
+          : "",
+      ),
     ];
 
     for (const param of data.parameters) {

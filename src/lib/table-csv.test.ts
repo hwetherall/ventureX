@@ -85,11 +85,34 @@ describe("buildComparisonCsv", () => {
     // empty blank line after the comment block.
     const blankIdx = lines.findIndex((l) => l === "");
     expect(blankIdx).toBeGreaterThan(0);
-    // First three columns are candidate name/id/type — empty in tier row.
-    expect(lines[blankIdx + 1]).toBe(",,,T1,T2");
+    // First five columns are candidate name/id/type/rank/score — empty in
+    // the tier row.
+    expect(lines[blankIdx + 1]).toBe(",,,,,T1,T2");
     expect(lines[blankIdx + 2]).toBe(
-      "candidate,candidate_id,type,founded_year,core_offering",
+      "candidate,candidate_id,type,rank,overall_score,founded_year,core_offering",
     );
+  });
+
+  it("emits rank, overall_score, and type for scored candidates; blanks otherwise", () => {
+    const scored: ComparisonCandidate = {
+      ...candidate("c1", "Scored Co"),
+      candidate_type: "direct",
+      rank: 1,
+      aggregate_score: 4.234,
+    };
+    const data: ComparisonTableData = {
+      venture: FIXED_VENTURE,
+      candidates: [scored, candidate("c2", "Unscored Co")],
+      parameters: [param("core_offering", 2)],
+      cells: [],
+    };
+
+    const csv = buildComparisonCsv(data);
+    const lines = csv.split("\r\n");
+    const scoredRow = lines.find((l) => l.startsWith("Scored Co"));
+    const unscoredRow = lines.find((l) => l.startsWith("Unscored Co"));
+    expect(scoredRow).toBe("Scored Co,c1,direct,1,4.234,");
+    expect(unscoredRow).toBe("Unscored Co,c2,,,,");
   });
 
   it("escapes commas, quotes, and newlines per RFC 4180", () => {
@@ -190,7 +213,8 @@ describe("buildComparisonCsv", () => {
     const csv = buildComparisonCsv(data);
     const lines = csv.split("\r\n");
     const dataRow = lines.find((l) => l.startsWith("Acme,"));
-    expect(dataRow).toBe("Acme,c1,,1900,");
+    // Columns: candidate, candidate_id, type, rank, overall_score, then params.
+    expect(dataRow).toBe("Acme,c1,,,,1900,");
   });
 
   it("uses CRLF line endings for Excel compatibility", () => {

@@ -1,9 +1,10 @@
-// ⚠ DEFERRED DRAFT (2026-05-19): this schema belongs to a per-candidate
-// scoring milestone that was planned but NOT shipped as M14. M14 shipped
-// as the parameter builder (see parameter_builder.md). Retained because
-// the scoring path is a viable future milestone and tests pass. See the
-// banner in M14_SPRINT_PLAN.md for full context. Do not import this from
-// production paths until a future milestone resumes the scoring work.
+// Stage 6 candidate scoring schemas. Originally drafted 2026-05-19 for a
+// pre-research scoring milestone (deferred M14b, P3-D14 through P3-D21);
+// resumed 2026-07 as Stage 6, which scores AFTER cell research so the
+// ranking reflects researched facts rather than brainstorm-stage guesses.
+// The per-cell shape and the batch schemas below are unchanged from the
+// draft; Stage6CandidateScoringOutputSchema is the production per-candidate
+// call shape.
 
 import { z } from "zod";
 
@@ -170,6 +171,24 @@ export function makeStrictStage4ScoringOutputSchema(
   });
 }
 
+/**
+ * @public
+ * Stage 6 per-candidate scoring output. Stage 6 calls the model once per
+ * researched candidate (the evidence table for one candidate is too large to
+ * batch all candidates into a single call, unlike the deferred pre-research
+ * draft's P3-D14 single-call shape). One candidate per call also means no
+ * name-echo cross-validation is needed — the orchestrator knows which
+ * candidate it asked about.
+ *
+ *   - `dimension_scores`: all 7 dimensions required (P3-D19 coverage rule).
+ *   - `scoring_notes`: optional cross-dimension observations; not persisted
+ *     (metadata-not-data policy, PHASE3.md §8).
+ */
+export const Stage6CandidateScoringOutputSchema = z.object({
+  dimension_scores: CandidateDimensionScoresSchema,
+  scoring_notes: z.string().max(600).optional(),
+});
+
 // ────────────────────────────────────────────────────────────────────────
 // Type exports
 // ────────────────────────────────────────────────────────────────────────
@@ -180,6 +199,9 @@ export type CandidateDimensionScores = z.infer<
 >;
 export type CandidateScore = z.infer<typeof CandidateScoreSchema>;
 export type Stage4ScoringOutput = z.infer<typeof Stage4ScoringOutputSchema>;
+export type Stage6CandidateScoringOutput = z.infer<
+  typeof Stage6CandidateScoringOutputSchema
+>;
 
 /**
  * @public

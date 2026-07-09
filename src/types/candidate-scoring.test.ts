@@ -4,6 +4,7 @@ import {
   CandidateScoreSchema,
   DimensionScoreCellSchema,
   Stage4ScoringOutputSchema,
+  Stage6CandidateScoringOutputSchema,
   makeStrictStage4ScoringOutputSchema,
   type CandidateDimensionScores,
   type Stage4ScoringOutput,
@@ -255,5 +256,42 @@ describe("makeStrictStage4ScoringOutputSchema (P3-D19 partial-scoring rejection)
     // expected used in a subset assertion to satisfy lint; verifies case match.
     expect(tenExpected.length).toBe(10);
     expect(expected[0]).toMatch(/Schneider/);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────
+// Stage 6 per-candidate output (evidence-based scoring)
+// ────────────────────────────────────────────────────────────────────────
+
+describe("Stage6CandidateScoringOutputSchema", () => {
+  it("accepts a well-formed single-candidate output", () => {
+    const parsed = Stage6CandidateScoringOutputSchema.parse({
+      dimension_scores: validDimensionScores,
+      scoring_notes: "Strongest overlap on product; thin geography evidence.",
+    });
+    expect(parsed.dimension_scores.product_solution.score).toBe(3);
+  });
+
+  it("accepts output without the optional scoring_notes", () => {
+    const result = Stage6CandidateScoringOutputSchema.safeParse({
+      dimension_scores: validDimensionScores,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects output missing a dimension", () => {
+    const { capital_asset: _dropped, ...missingOne } = validDimensionScores;
+    const result = Stage6CandidateScoringOutputSchema.safeParse({
+      dimension_scores: missingOne,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects scoring_notes over 600 chars", () => {
+    const result = Stage6CandidateScoringOutputSchema.safeParse({
+      dimension_scores: validDimensionScores,
+      scoring_notes: "x".repeat(601),
+    });
+    expect(result.success).toBe(false);
   });
 });

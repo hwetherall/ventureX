@@ -5,9 +5,11 @@ import {
   type ComparisonCitation,
   type ComparisonTableData,
   parameterToComparison,
+  rankCandidatesByScore,
   slugify,
   tierToNumber,
 } from "@/lib/table-viewer";
+import { CandidateDimensionScoresSchema } from "@/types/candidate-scoring";
 import { CellConfidenceSchema, CellTierSchema } from "@/types/cell";
 import { ParameterSchema, type Parameter } from "@/types/parameter";
 
@@ -21,8 +23,12 @@ interface VentureRow {
 interface CandidateRow {
   id: string;
   name: string;
+  type: string | null;
   generation_run_id: string;
   created_at: string;
+  // numeric arrives as number or string depending on the PostgREST layer.
+  aggregate_score: number | string | null;
+  dimension_scores: unknown;
 }
 
 interface ParameterRunRow {
@@ -71,7 +77,9 @@ export async function loadComparisonTableData(
 
   const { data: candidatesRaw, error: candidatesError } = await insforge.database
     .from("candidate_companies")
-    .select("id, name, generation_run_id, created_at")
+    .select(
+      "id, name, type, generation_run_id, created_at, aggregate_score, dimension_scores",
+    )
     .eq("venture_id", ventureId)
     .order("created_at", { ascending: true });
 
@@ -136,21 +144,26 @@ export async function loadComparisonTableData(
     cellsByCandidate.set(cell.candidate_id, existing);
   }
 
-  const candidates: ComparisonCandidate[] = candidateRows.map((candidate) => {
-    const candidateCells = cellsByCandidate.get(candidate.id) ?? [];
-    return {
-      candidate_id: candidate.id,
-      name: candidate.name,
-      product_line: null,
-      logo_url: null,
-      stats: {
-        total: candidateCells.length,
-        verified: candidateCells.filter((cell) => cell.confidence === "verified").length,
-        inferred: candidateCells.filter((cell) => cell.confidence === "inferred").length,
-        unknown: candidateCells.filter((cell) => cell.confidence === "unknown").length,
-      },
-    };
-  });
+  const candidates: ComparisonCandidate[] = rankCandidatesByScore(
+    candidateRows.map((candidate) => {
+      const candidateCells = cellsByCandidate.get(candidate.id) ?? [];
+      return {
+        candidate_id: candidate.id,
+        name: candidate.name,
+        product_line: null,
+        logo_url: null,
+        candidate_type: candidate.type,
+        aggregate_score: normalizeAggregateScore(candidate.aggregate_score),
+        dimension_scores: normalizeDimensionScores(candidate.dimension_scores),
+        stats: {
+          total: candidateCells.length,
+          verified: candidateCells.filter((cell) => cell.confidence === "verified").length,
+          inferred: candidateCells.filter((cell) => cell.confidence === "inferred").length,
+          unknown: candidateCells.filter((cell) => cell.confidence === "unknown").length,
+        },
+      };
+    }),
+  );
 
   const title = venture.codename || firstLine(venture.user_provided_description) || "Venture";
   return {
@@ -167,6 +180,20 @@ export async function loadComparisonTableData(
     },
     error: null,
   };
+}
+
+function normalizeAggregateScore(input: number | string | null): number | null {
+  if (input === null || input === undefined) return null;
+  const value = typeof input === "number" ? input : Number(input);
+  return Number.isFinite(value) ? value : null;
+}
+
+function normalizeDimensionScores(
+  input: unknown,
+): ComparisonCandidate["dimension_scores"] {
+  if (!input) return null;
+  const parsed = CandidateDimensionScoresSchema.safeParse(input);
+  return parsed.success ? parsed.data : null;
 }
 
 function parseParameterSchema(input: unknown): Parameter[] {

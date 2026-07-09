@@ -18,11 +18,25 @@ export interface ComparisonVenture {
   generated_at: string;
 }
 
+export interface ComparisonDimensionScore {
+  score: number;
+  rationale: string;
+  confidence: number;
+}
+
 export interface ComparisonCandidate {
   candidate_id: string;
   name: string;
   product_line: string | null;
   logo_url: string | null;
+  /** direct / category / same_problem_different_mechanism; null when unknown. */
+  candidate_type?: string | null;
+  /** Stage 6 weighted aggregate (1-5); null until the candidate is scored. */
+  aggregate_score?: number | null;
+  /** Stage 6 per-dimension scores; null until the candidate is scored. */
+  dimension_scores?: Record<string, ComparisonDimensionScore> | null;
+  /** 1-based position after ranking by aggregate_score; null when unscored. */
+  rank?: number | null;
   stats: {
     total: number;
     verified: number;
@@ -74,6 +88,7 @@ export const TABLE_VIEWER_CSS = `
   --vx-warning-bg: var(--color-warning-bg, #fffbeb);
   --vx-warning-fg: var(--color-warning-fg, #b45309);
   --vx-focus: var(--color-ring, #818cf8);
+  --vx-accent: var(--color-accent, #4f46e5);
 }
 
 .vx-page {
@@ -281,6 +296,35 @@ export const TABLE_VIEWER_CSS = `
   line-height: 1.35;
   text-align: left;
   cursor: default;
+}
+
+.vx-score-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vx-rank-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--vx-muted);
+}
+
+.vx-rank-badge {
+  border: 1px solid var(--vx-accent);
+  border-radius: 4px;
+  padding: 0 4px;
+  color: var(--vx-accent);
+  font-weight: 600;
+}
+
+.vx-rank-score {
+  font-weight: 600;
+  color: var(--vx-text);
 }
 
 .vx-tier-left,
@@ -611,6 +655,67 @@ export function parameterToComparison(parameter: Parameter): ComparisonParameter
 
 export function makeCellKey(candidateId: string, parameterKey: string): string {
   return `${candidateId}::${parameterKey}`;
+}
+
+/**
+ * Order candidates by Stage 6 aggregate score (descending) and assign
+ * 1-based ranks. Unscored candidates keep their relative input order and sort
+ * after every scored candidate with `rank: null` — scoring is evidence-based,
+ * so an unscored (unresearched) candidate is never ranked above a scored one.
+ * Ties break alphabetically so re-renders are stable.
+ */
+export function rankCandidatesByScore(
+  candidates: ComparisonCandidate[],
+): ComparisonCandidate[] {
+  const scored = candidates.filter(
+    (candidate) =>
+      typeof candidate.aggregate_score === "number" &&
+      Number.isFinite(candidate.aggregate_score),
+  );
+  const unscored = candidates.filter((candidate) => !scored.includes(candidate));
+
+  scored.sort(
+    (a, b) =>
+      b.aggregate_score! - a.aggregate_score! || a.name.localeCompare(b.name),
+  );
+
+  return [
+    ...scored.map((candidate, index) => ({ ...candidate, rank: index + 1 })),
+    ...unscored.map((candidate) => ({ ...candidate, rank: null })),
+  ];
+}
+
+/** Format a 1-5 aggregate score for display, e.g. 4.21. */
+export function formatScore(value: number): string {
+  return value.toFixed(2);
+}
+
+export const CANDIDATE_TYPE_LABELS: Record<string, string> = {
+  direct: "Direct",
+  category: "Category",
+  same_problem_different_mechanism: "SPDM",
+};
+
+/** Short per-dimension labels for the score-breakdown tooltip. */
+const DIMENSION_SHORT_LABELS: Record<string, string> = {
+  product_solution: "Product",
+  customers: "Customers",
+  transaction: "Transaction",
+  partners: "Partners",
+  access: "Access",
+  geography_regulatory: "Geography",
+  capital_asset: "Capital",
+};
+
+export function describeDimensionScores(
+  scores: Record<string, ComparisonDimensionScore> | null | undefined,
+): string {
+  if (!scores) return "";
+  return Object.entries(scores)
+    .map(
+      ([key, cell]) => `${DIMENSION_SHORT_LABELS[key] ?? key} ${cell.score}/5`,
+    )
+    .join(" · ");
 }
 
 /** Parameters whose numeric values are identifiers, not quantities (no grouping). */

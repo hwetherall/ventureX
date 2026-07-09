@@ -1,9 +1,7 @@
-// ⚠ DEFERRED DRAFT (2026-05-19): this file belongs to a per-candidate
-// scoring milestone that was planned but NOT shipped as M14. M14 shipped
-// as the parameter builder (see parameter_builder.md). Retained because
-// the scoring path is a viable future milestone and tests pass. See the
-// banner in M14_SPRINT_PLAN.md for full context. Do not import this from
-// production paths until a future milestone resumes the scoring work.
+// Weighted-aggregate helper for candidate scoring. Drafted 2026-05-19 for
+// the deferred pre-research scoring milestone (M14b); in production since
+// Stage 6 (2026-07) which scores candidates from researched cells. The
+// formula and contract are unchanged from the reviewed draft (P3-D16).
 
 import {
   DIMENSION_KEYS,

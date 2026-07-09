@@ -54,7 +54,16 @@
       "Bash(curl *)",
       "Bash(grep -oE '\"name\":\"[^\"]+\",\"product_line\":[^,]+,\"logo_url\":[^,]+,\"stats\":\\\\{[^}]+\\\\}' venturex_venturex_20260521.html)",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('rows returned:', len\\(d\\)\\)\")",
-      "Bash(grep -oE '\\\\\\\\\\\\\\\\u[a-zA-Z0-9]{0,4}')"
+      "Bash(grep -oE '\\\\\\\\\\\\\\\\u[a-zA-Z0-9]{0,4}')",
+      "Bash(awk 'NR>=12 && NR<=14' outputs/table.csv)",
+      "Read(//Applications/Google Chrome.app/Contents/MacOS/**)",
+      "Read(//Users/harry/Library/Caches/ms-playwright/**)",
+      "Bash(sed -n '1,60p' src/app/ventures/[id]/parameters/actions.ts)",
+      "Bash(sed -n '1,80p' src/app/ventures/[id]/table/page.tsx)",
+      "Bash(npx tsx *)",
+      "Bash(npx -y pnpm@9.12.0 typecheck)",
+      "Bash(git mv *)",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --screenshot=/private/tmp/claude-501/-Users-harry-code-ventureX/20dfc2c4-84bb-4edc-b818-3ccc20a796ea/scratchpad/table-ranked.png --window-size=1600,1000 --hide-scrollbars file:///private/tmp/claude-501/-Users-harry-code-ventureX/20dfc2c4-84bb-4edc-b818-3ccc20a796ea/scratchpad/table-ranked.html)"
     ]
   }
 }

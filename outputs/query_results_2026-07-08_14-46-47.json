@@ -1,0 +1,1729 @@
+[
+  {
+    "run_id": "b177bc89-68d0-46e6-8572-f1a2748011ac",
+    "created_at": "2026-06-18T23:30:19.290Z",
+    "codename": "VentureX",
+    "venture_description": "Field\r\n\r\n\r\n\r\nDetail\r\n\r\n\r\n\r\n\r\n\r\nProject/Company Name\r\n\r\n\r\n\r\nSumitomo / NTT Joint Venture\r\n\r\n\r\n\r\n\r\n\r\nProject type\r\n\r\n\r\n\r\nMarket Entry\r\n\r\n\r\n\r\n\r\n\r\nLocation\r\n\r\n\r\n\r\nJapan\r\n\r\n\r\n\r\n\r\n\r\nCore Decision\r\n\r\n\r\n\r\nShould Sumitomo commit to building the Predictive Medicine & Preventive Care segment as the consumer-fa",
+    "synthetic_description": "VentureX is a consumer-facing predictive medicine and preventive care business proposed as a pillar of a national medical-data platform in a major East Asian developed market. It offers individuals and employers advanced preventive screening (such as multi-cancer early detection) with the strategic ",
+    "maturity": "concept",
+    "substitution_count": 6,
+    "risk_count": 6,
+    "dynamic_count": 16,
+    "full_count": 52,
+    "params_beyond_floor": 4,
+    "dynamic_by_dimension": {
+      "partners": 2,
+      "customers": 1,
+      "transaction": 1,
+      "capital_asset": 3,
+      "product_solution": 8,
+      "geography_regulatory": 1
+    },
+    "dynamic_param_list": "Diversified-conglomerate / trading-house medical-data platform activity [capital_asset] <- strategic_risks_and_uncertainties[0].risk\nLongitudinal biomarker / genomic dataset scale [capital_asset] <- dimensions.capital_asset.defensibility_model\nOwnership structure: single-owner vs. JV governance [capital_asset] <- strategic_risks_and_uncertainties[4].implies_search_for\nEmployer-sponsored preventive screening / wellness contracts [customers] <- strategic_risks_and_uncertainties[1].implies_search_for\nJapan secondary-use / APPI data compliance posture [geography_regulatory] <- dimensions.geography_regulatory.localization_requirements[0]\nTelecom / network-infrastructure distribution partnership [partners] <- dimensions.partners.distribution_channels[0]\nHospital network / EMR data exclusivity partnerships [partners] <- strategic_risks_and_uncertainties[0].implies_search_for\nPhysical health-checkup clinic / hospital screening network [product_solution] <- dimensions.product_solution.substitution_landscape[0]\nInsurer-led wellness / preventive-care program [product_solution] <- dimensions.product_solution.substitution_landscape[4]\nMulti-cancer early detection / liquid-biopsy product and approval status [product_solution] <- strategic_risks_and_uncertainties[2].implies_search_for\nVertical integration across diagnostic test IP and clinical delivery channel [product_solution] <- strategic_risks_and_uncertainties[3].implies_search_for\nWearables / continuous health-monitoring device offering [product_solution] <- dimensions.product_solution.substitution_landscape[3]\nPHR / health-app / claims-analytics point solution [product_solution] <- dimensions.product_solution.substitution_landscape[5]\nDTC genetic / at-home diagnostic test offering [product_solution] <- dimensions.product_solution.substitution_landscape[2]\nParticipation in government / public-health screening schemes [product_solution] <- dimensions.product_solution.substitution_landscape[1]\nPharma RWD / biomarker data-licensing customers and revenue [transaction] <- strategic_risks_and_uncertainties[5].implies_search_for",
+    "generation_notes": "Six substitution params map 1:1 to substitution_landscape[0-5]. Six risk-coverage params map 1:1 to strategic_risks_and_uncertainties[0-5] via implies_search_for or risk fields. Three secondary params cover defensibility (dataset scale), Japan secondary-use regulatory posture, and telecom distribution partnership — the load-bearing moats of the venture. Total: 16 parameters.",
+    "model_id": "anthropic/claude-opus-4.7",
+    "tokens_in": 10435,
+    "tokens_out": 4312,
+    "cost_usd": "0.159975",
+    "latency_ms": 50382,
+    "dynamic_parameters": [
+      {
+        "id": "physical_checkup_clinic_network",
+        "name": "Physical health-checkup clinic / hospital screening network",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor operates or contracts a physical health-checkup (ningen dock) or hospital-based screening network in Japan, and quantify scale (clinic count, annual screening volume).",
+        "source_field": "dimensions.product_solution.substitution_landscape[0]",
+        "value_schema": {
+          "clinic_count": "number",
+          "operates_clinic_network": "boolean",
+          "screening_programs_offered": "list"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "public_screening_scheme_participation",
+        "name": "Participation in government / public-health screening schemes",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify whether the competitor delivers services under national or municipal public-health screening programs (e.g., MHLW cancer screening, tokutei kenshin) and list named contracts.",
+        "source_field": "dimensions.product_solution.substitution_landscape[1]",
+        "value_schema": {
+          "programs": "list",
+          "participates": "boolean",
+          "contract_geographies": "list"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "dtc_genetic_athome_test_offering",
+        "name": "DTC genetic / at-home diagnostic test offering",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Confirm whether the competitor sells direct-to-consumer genetic or at-home diagnostic kits (mail-in stool, urine, saliva, blood spot, microbiome, genetic) and list product SKUs and channels.",
+        "source_field": "dimensions.product_solution.substitution_landscape[2]",
+        "value_schema": {
+          "test_types": "list",
+          "sales_channels": "list",
+          "offers_dtc_kits": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "wearable_continuous_monitoring_offering",
+        "name": "Wearables / continuous health-monitoring device offering",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Document any wearable or continuous-monitoring device the competitor sells or integrates (smartwatch, CGM, patch) and what physiological biomarkers it captures.",
+        "source_field": "dimensions.product_solution.substitution_landscape[3]",
+        "value_schema": {
+          "device_types": "list",
+          "offers_wearable": "boolean",
+          "biomarkers_captured": "list"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "insurer_wellness_program_offering",
+        "name": "Insurer-led wellness / preventive-care program",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify whether the competitor is an insurer (or operates insurer-bundled programs) running wellness / preventive-care benefits, and quantify covered lives or enrolled members.",
+        "source_field": "dimensions.product_solution.substitution_landscape[4]",
+        "value_schema": {
+          "covered_lives": "number",
+          "program_names": "list",
+          "is_insurer_or_partner": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "phr_claims_analytics_offering",
+        "name": "PHR / health-app / claims-analytics point solution",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor offers a PHR app, consumer health-record platform, or claims-analytics product, and capture product names plus registered-user or covered-claims volume.",
+        "source_field": "dimensions.product_solution.substitution_landscape[5]",
+        "value_schema": {
+          "product_names": "list",
+          "registered_users": "number",
+          "offers_phr_or_claims_analytics": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "hospital_data_exclusivity_partnerships",
+        "name": "Hospital network / EMR data exclusivity partnerships",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "paragraph",
+        "prompt_hint": "List named hospital-network or academic medical center partnerships the competitor has secured for clinical / EMR data access, noting any exclusivity or first-look terms and the scale of records covered. This addresses the race to lock up hospital data partnerships.",
+        "source_field": "strategic_risks_and_uncertainties[0].implies_search_for",
+        "value_schema": {
+          "exclusivity_terms": "short_string",
+          "hospital_partners": "list",
+          "patient_records_count": "number"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "official_third_party"
+        ],
+        "innovera_dimension": "partners"
+      },
+      {
+        "id": "trading_house_medical_data_platform",
+        "name": "Diversified-conglomerate / trading-house medical-data platform activity",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "paragraph",
+        "prompt_hint": "Document whether the competitor is (or is backed by) a diversified trading house / conglomerate building a national medical-data platform, including platform name, disclosed cumulative investment, and announced scale targets.",
+        "source_field": "strategic_risks_and_uncertainties[0].risk",
+        "value_schema": {
+          "platform_name": "short_string",
+          "announced_targets": "list",
+          "parent_conglomerate": "short_string",
+          "cumulative_investment_usd": "number"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "employer_wellness_contracts",
+        "name": "Employer-sponsored preventive screening / wellness contracts",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Capture named employer / corporate health-cost-management contracts the competitor has signed for preventive screening or wellness, with covered-employee counts where disclosed.",
+        "source_field": "strategic_risks_and_uncertainties[1].implies_search_for",
+        "value_schema": {
+          "contract_types": "list",
+          "covered_employees": "number",
+          "employer_clients_named": "list"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "official_third_party"
+        ],
+        "innovera_dimension": "customers"
+      },
+      {
+        "id": "mced_liquid_biopsy_product_status",
+        "name": "Multi-cancer early detection / liquid-biopsy product and approval status",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "paragraph",
+        "prompt_hint": "Identify any multi-cancer early-detection or liquid-biopsy diagnostic the competitor has developed, licensed, or distributes, including regulatory status in Japan (PMDA), US (FDA), and other markets, with clinical trial registry IDs.",
+        "source_field": "strategic_risks_and_uncertainties[2].implies_search_for",
+        "value_schema": {
+          "product_names": "list",
+          "clinical_trial_ids": "list",
+          "regulatory_status_japan": "enum",
+          "regulatory_status_other": "list"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "vertical_integration_test_and_channel",
+        "name": "Vertical integration across diagnostic test IP and clinical delivery channel",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "paragraph",
+        "prompt_hint": "Document whether the competitor owns both proprietary diagnostic test IP AND the clinical delivery channel (owned clinics, phlebotomy network, telehealth flow), evidencing vertical integration vs. third-party dependency.",
+        "source_field": "strategic_risks_and_uncertainties[3].implies_search_for",
+        "value_schema": {
+          "owns_test_ip": "boolean",
+          "owns_delivery_channel": "boolean",
+          "integration_description": "prose"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "ownership_structure_and_jv_status",
+        "name": "Ownership structure: single-owner vs. JV governance",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor is a single-owner standalone entity or a joint venture, naming parent owners and any disclosed governance / control split.",
+        "source_field": "strategic_risks_and_uncertainties[4].implies_search_for",
+        "value_schema": {
+          "structure": "enum",
+          "parent_owners": "list",
+          "jv_governance_notes": "short_string"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "pharma_rwd_data_licensing_revenue",
+        "name": "Pharma RWD / biomarker data-licensing customers and revenue",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "paragraph",
+        "prompt_hint": "Capture evidence the competitor licenses real-world / biomarker / genomic data to pharma, including named pharma clients, disclosed deal values, and the specific data assets sold.",
+        "source_field": "strategic_risks_and_uncertainties[5].implies_search_for",
+        "value_schema": {
+          "data_assets_licensed": "list",
+          "named_pharma_clients": "list",
+          "disclosed_deal_values_usd": "list"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst"
+        ],
+        "innovera_dimension": "transaction"
+      },
+      {
+        "id": "longitudinal_biomarker_dataset_scale",
+        "name": "Longitudinal biomarker / genomic dataset scale",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Quantify the scale of any longitudinal biomarker, genomic, or PHR dataset the competitor owns: number of unique individuals, years of follow-up, and biomarker categories captured.",
+        "source_field": "dimensions.capital_asset.defensibility_model",
+        "value_schema": {
+          "dataset_name": "short_string",
+          "biomarker_types": "list",
+          "longitudinal_years": "number",
+          "unique_individuals": "number"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "japan_data_privacy_secondary_use_compliance",
+        "name": "Japan secondary-use / APPI data compliance posture",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Confirm whether the competitor is registered/authorized under Japan's Next Generation Medical Infrastructure Act (anonymized medical-data authorized business operator) or holds analogous APPI secondary-use approvals.",
+        "source_field": "dimensions.geography_regulatory.localization_requirements[0]",
+        "value_schema": {
+          "appi_certified": "boolean",
+          "authorized_entity_names": "list",
+          "next_gen_medical_infrastructure_act_authorized": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "telecom_or_network_distribution_partnership",
+        "name": "Telecom / network-infrastructure distribution partnership",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify whether the competitor has a distribution or co-marketing partnership with a major telecommunications / network-infrastructure group for healthcare services, naming partner and scope.",
+        "source_field": "dimensions.partners.distribution_channels[0]",
+        "value_schema": {
+          "partner_names": "list",
+          "partnership_scope": "short_string",
+          "telecom_partner_named": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "official_third_party"
+        ],
+        "innovera_dimension": "partners"
+      }
+    ]
+  },
+  {
+    "run_id": "d7914b6a-ba9b-44be-8361-ad95b5c26fa4",
+    "created_at": "2026-06-18T23:27:30.649Z",
+    "codename": "VentureX",
+    "venture_description": "VentureX currently lacks an offering in the Rack PDU (Power Distribution Unit) market, a segment estimated at $2B+ globally. Rack PDUs are socket outlet strips with protection and measurement elements used to power servers in data centers. Competitors already have strong positions, while VentureX is",
+    "synthetic_description": "VentureX is a prospective new business line aimed at entering the rack-level power distribution market for data centers — specifically rack PDUs (intelligent socket-outlet strips with protection and measurement capabilities that power IT equipment inside server cabinets). The venture is backed by a ",
+    "maturity": "pre_concept",
+    "substitution_count": 6,
+    "risk_count": 6,
+    "dynamic_count": 17,
+    "full_count": 53,
+    "params_beyond_floor": 5,
+    "dynamic_by_dimension": {
+      "partners": 1,
+      "customers": 1,
+      "capital_asset": 3,
+      "product_solution": 10,
+      "geography_regulatory": 2
+    },
+    "dynamic_param_list": "Acquisition target / ODM / brand-label status [capital_asset] <- strategic_risks_and_uncertainties[3].implies_search_for\nRack PDU manufacturing footprint locations [capital_asset] <- dimensions.capital_asset.manufacturing_footprint\nRack PDU line revenue scale [capital_asset] <- intended_end_state.minimum_success_criteria\nNamed hyperscale / colocation customer wins [customers] <- dimensions.customers.target_sub_segments\nRegional plug/voltage SKU coverage [geography_regulatory] <- dimensions.geography_regulatory.localization_requirements\nChina and India market access posture [geography_regulatory] <- strategic_risks_and_uncertainties[4].implies_search_for\nIT distribution channel reach [partners] <- strategic_risks_and_uncertainties[2].implies_search_for\nAC-to-DC migration portfolio breadth [product_solution] <- strategic_risks_and_uncertainties[1].implies_search_for\nBusbar + tap-off unit system offering [product_solution] <- dimensions.product_solution.substitution_landscape[0]\nMaximum rack power density supported (kW) [product_solution] <- strategic_risks_and_uncertainties[0].implies_search_for\nSolid-state upstream protection device offering [product_solution] <- dimensions.product_solution.substitution_landscape[5]\nDCIM / software intelligence attach [product_solution] <- strategic_risks_and_uncertainties[5].implies_search_for\nOutlet-level switching and metering depth [product_solution] <- dimensions.product_solution.core_features\nHigh-capacity Remote Power Panel (RPP) offering [product_solution] <- dimensions.product_solution.substitution_landscape[4]\nServer-OEM-integrated rack power offering [product_solution] <- dimensions.product_solution.substitution_landscape[3]\nIn-rack DC distribution (380/400VDC) offering [product_solution] <- dimensions.product_solution.substitution_landscape[2]\nRack/row-level power shelf offering [product_solution] <- dimensions.product_solution.substitution_landscape[1]",
+    "generation_notes": "Six substitution parameters map 1:1 to substitution_landscape[0..5]. Six risk parameters source from strategic_risks_and_uncertainties[0..5].implies_search_for. Remaining parameters cover intelligence ladder, SKU regional coverage, named hyperscale wins, revenue scale, and manufacturing footprint — all factual, citable, non-duplicative of hardcoded tier 1/2 params.",
+    "model_id": "anthropic/claude-opus-4.7",
+    "tokens_in": 10524,
+    "tokens_out": 4258,
+    "cost_usd": "0.15907",
+    "latency_ms": 51406,
+    "dynamic_parameters": [
+      {
+        "id": "busbar_tapoff_offering",
+        "name": "Busbar + tap-off unit system offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Check the competitor's product catalog, datasheets, and DC infrastructure pages for overhead busway + tap-off unit systems that decentralize sub-distribution along racks (displacing RPP+rack-PDU chains).",
+        "source_field": "dimensions.product_solution.substitution_landscape[0]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partner_oem",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "power_shelf_offering",
+        "name": "Rack/row-level power shelf offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify whether the competitor sells rack- or row-level power shelves (centralized rectifiers/PSUs feeding a DC bus) for high-density AI compute. Check OCP/ORV3 compatibility claims.",
+        "source_field": "dimensions.product_solution.substitution_landscape[1]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partner_oem",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "dc_distribution_offering",
+        "name": "In-rack DC distribution (380/400VDC) offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Look for 380V/400VDC in-rack distribution products, DC busways, or OCP-style DC rack power offerings that bypass AC rack PDUs.",
+        "source_field": "dimensions.product_solution.substitution_landscape[2]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partner_oem",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "server_oem_integrated_power",
+        "name": "Server-OEM-integrated rack power offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Check whether the competitor is a server OEM (or partners with one) embedding power distribution directly into the chassis or integrated rack solution, bypassing standalone rack PDUs.",
+        "source_field": "dimensions.product_solution.substitution_landscape[3]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partner_oem",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "high_capacity_rpp_offering",
+        "name": "High-capacity Remote Power Panel (RPP) offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify whether the competitor sells higher-capacity RPPs with direct cable drops that reduce the intelligence/protection requirements of downstream rack PDUs.",
+        "source_field": "dimensions.product_solution.substitution_landscape[4]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partner_oem",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "solid_state_protection_upstream",
+        "name": "Solid-state upstream protection device offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Look for solid-state circuit breakers or upstream protection/metering devices in the competitor's catalog that could absorb functions currently performed by the rack PDU.",
+        "source_field": "dimensions.product_solution.substitution_landscape[5]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partner_oem",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "high_density_rack_support_kw",
+        "name": "Maximum rack power density supported (kW)",
+        "tier": "dynamic",
+        "value_type": "number",
+        "cell_budget": "atom",
+        "prompt_hint": "From product datasheets, identify the highest per-rack kW rating supported by the competitor's rack-level power portfolio (PDU + busway + shelf), especially for AI/HPC builds at 50–200kW.",
+        "source_field": "strategic_risks_and_uncertainties[0].implies_search_for",
+        "value_schema": {
+          "min": 0,
+          "unit": "kW"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "dc_architecture_portfolio_breadth",
+        "name": "AC-to-DC migration portfolio breadth",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List the competitor's DC distribution SKUs/lines (380/400VDC busway, DC power shelves, OCP DC rack power) that position them for an AC→DC shift inside the data center.",
+        "source_field": "strategic_risks_and_uncertainties[1].implies_search_for",
+        "value_schema": {
+          "items": {
+            "type": "string"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "it_channel_reach",
+        "name": "IT distribution channel reach",
+        "tier": "dynamic",
+        "value_type": "prose",
+        "cell_budget": "paragraph",
+        "prompt_hint": "Document the competitor's named server-OEM bundling deals, IT distributor relationships (e.g., TD Synnex, Ingram Micro, Arrow), and DCIM software vendors carrying their hardware.",
+        "source_field": "strategic_risks_and_uncertainties[2].implies_search_for",
+        "value_schema": {},
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "partners"
+      },
+      {
+        "id": "acquisition_and_odm_status",
+        "name": "Acquisition target / ODM / brand-label status",
+        "tier": "dynamic",
+        "value_type": "prose",
+        "cell_budget": "paragraph",
+        "prompt_hint": "Establish whether the competitor is a plausible acquisition target (revenue scale, ownership, recent M&A signals), a white-label/ODM rack-PDU manufacturer, or a brand-label partnership candidate that could compress a 3–5 year build cycle to <2 years.",
+        "source_field": "strategic_risks_and_uncertainties[3].implies_search_for",
+        "value_schema": {},
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "china_india_market_access",
+        "name": "China and India market access posture",
+        "tier": "dynamic",
+        "value_type": "prose",
+        "cell_budget": "paragraph",
+        "prompt_hint": "Determine whether the competitor is a local Chinese/Indian rack-PDU champion, holds CCC/BIS certifications, has in-country manufacturing or JV structures, and what share of revenue comes from those protected geographies.",
+        "source_field": "strategic_risks_and_uncertainties[4].implies_search_for",
+        "value_schema": {},
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "dcim_software_attach",
+        "name": "DCIM / software intelligence attach",
+        "tier": "dynamic",
+        "value_type": "prose",
+        "cell_budget": "paragraph",
+        "prompt_hint": "Document the competitor's proprietary DCIM/management software (name, SKU, licensing model) and any recurring software/subscription revenue attached to rack PDUs as differentiation against commoditization.",
+        "source_field": "strategic_risks_and_uncertainties[5].implies_search_for",
+        "value_schema": {},
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "outlet_level_switching_metering",
+        "name": "Outlet-level switching and metering depth",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "atom",
+        "prompt_hint": "From product datasheets, classify the most advanced rack PDU SKU the competitor offers along the basic → metered → outlet-metered → outlet-switched intelligence ladder.",
+        "source_field": "dimensions.product_solution.core_features",
+        "value_schema": {
+          "enum": [
+            "outlet_switched_and_metered",
+            "outlet_metered_only",
+            "inlet_metered_only",
+            "basic_no_metering"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "plug_standard_sku_coverage",
+        "name": "Regional plug/voltage SKU coverage",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List the regional outlet standards (NEMA, IEC C13/C19/C39, BS, Schuko, GB) and voltage ranges (120V/208V/230V/400V) the competitor supports across their rack PDU SKUs.",
+        "source_field": "dimensions.geography_regulatory.localization_requirements",
+        "value_schema": {
+          "items": {
+            "type": "string"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "hyperscale_named_wins",
+        "name": "Named hyperscale / colocation customer wins",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List any publicly disclosed hyperscale (AWS, Azure, Google, Meta, Oracle) or top-tier colocation (Equinix, Digital Realty, NTT) customer wins or framework agreements for the competitor's rack PDU line.",
+        "source_field": "dimensions.customers.target_sub_segments",
+        "value_schema": {
+          "items": {
+            "type": "string"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "customers"
+      },
+      {
+        "id": "rack_pdu_revenue_scale",
+        "name": "Rack PDU line revenue scale",
+        "tier": "dynamic",
+        "value_type": "short_string",
+        "cell_budget": "atom",
+        "prompt_hint": "Estimate the competitor's annual rack-PDU revenue (USD) from filings, analyst reports, or segment disclosures. Note if the figure is a segment estimate vs reported.",
+        "source_field": "intended_end_state.minimum_success_criteria",
+        "value_schema": {},
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "manufacturing_footprint_locations",
+        "name": "Rack PDU manufacturing footprint locations",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List the countries/sites where the competitor manufactures rack PDUs (in-house plants, contract manufacturers, JV facilities), noting any in-country production in China or India.",
+        "source_field": "dimensions.capital_asset.manufacturing_footprint",
+        "value_schema": {
+          "items": {
+            "type": "string"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "capital_asset"
+      }
+    ]
+  },
+  {
+    "run_id": "887f0c97-123a-4eee-872f-743e3698fe27",
+    "created_at": "2026-05-20T21:01:53.493Z",
+    "codename": "VentureX",
+    "venture_description": "This project aims to determine the optimal market entry strategy for LG into the medical-device thin-film substrate sector, evaluating which applications, customers, and value-chain roles (from substrate supply to modules or CDMO) best align with LG's existing capabilities and strategic goals. The a",
+    "synthetic_description": "VentureX is a market-entry initiative by a large electronics components conglomerate to leverage its advanced flexible substrate, fine-pattern circuit (sub-10μm), and chip-bonding capabilities to supply thin-film substrates and modules to the medical device industry — initially targeting continuous ",
+    "maturity": "early_prototype",
+    "substitution_count": 6,
+    "risk_count": 6,
+    "dynamic_count": 19,
+    "full_count": 55,
+    "params_beyond_floor": 7,
+    "dynamic_by_dimension": {
+      "partners": 2,
+      "customers": 2,
+      "transaction": 2,
+      "capital_asset": 1,
+      "product_solution": 10,
+      "geography_regulatory": 2
+    },
+    "dynamic_param_list": "Roll-to-roll flexible substrate manufacturing capability [capital_asset] <- dimensions.capital_asset.manufacturing_footprint\nTrack record supplying merchant substrates/electrodes to vertically-integrated CGM/neurostim OEMs [customers] <- strategic_risks_and_uncertainties[0].implies_search_for\nNamed CGM / neurostim / BCI OEM customers [customers] <- dimensions.customers.target_sub_segments\nCurrent ISO 13485 / ISO 10993 / FDA medical certifications held [geography_regulatory] <- strategic_risks_and_uncertainties[3].implies_search_for\nMedical-component manufacturing geography [geography_regulatory] <- dimensions.geography_regulatory.target_geographies\nMedical CDMO/contract manufacturing capability [partners] <- strategic_risks_and_uncertainties[3].risk\nBig Tech investments / exclusive BCI partnerships [partners] <- strategic_risks_and_uncertainties[5].implies_search_for\nAnnounced medical-device substrate or stretchable-electronics program [product_solution] <- strategic_risks_and_uncertainties[1].implies_search_for\nNeural-probe foundry / high-channel-count BCI electrode services [product_solution] <- strategic_risks_and_uncertainties[2].implies_search_for\nScreen-printed electrode offering on polymer films [product_solution] <- dimensions.product_solution.substitution_landscape[0]\nVertically integrated OEM in-house substrate fabrication [product_solution] <- dimensions.product_solution.substitution_landscape[5]\nPolyimide-based flexible electrode array offering [product_solution] <- dimensions.product_solution.substitution_landscape[3]\nMEMS/silicon-based neural electrode array offering [product_solution] <- dimensions.product_solution.substitution_landscape[1]\nConventional FPCB supplier retooling for medical applications [product_solution] <- dimensions.product_solution.substitution_landscape[4]\nMinimum fine-pattern line/space capability (μm) [product_solution] <- dimensions.product_solution.core_features\nStretchable/printed electronics on elastomer substrates [product_solution] <- dimensions.product_solution.substitution_landscape[2]\nBiocompatible material stack supported (LCP/PET/Au/Ag-AgCl/Carbon) [product_solution] <- dimensions.product_solution.core_features\nDisclosed gross margin profile for medical components/modules [transaction] <- strategic_risks_and_uncertainties[4].risk\nMigration from component supply into modules/CDMO [transaction] <- strategic_risks_and_uncertainties[4].implies_search_for",
+    "generation_notes": "Covered substitution_landscape[0..5] with one parameter each at the literal source_field. Covered strategic_risks_and_uncertainties[0..5] with at least one parameter per index using either .risk or .implies_search_for as prefix. Added complementary parameters on feature size, R2R capability, material stack, footprint, and named OEM customers to support the heavy product_solution/capital_asset/geography weights.",
+    "model_id": "anthropic/claude-opus-4.7",
+    "tokens_in": 11588,
+    "tokens_out": 6105,
+    "cost_usd": "0.210565",
+    "latency_ms": 64690,
+    "dynamic_parameters": [
+      {
+        "id": "screen_printed_electrode_offering",
+        "name": "Screen-printed electrode offering on polymer films",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor manufactures or sells screen-printed electrodes on polymer films (the incumbent CGM electrode approach). Cite product pages, datasheets, or press releases.",
+        "source_field": "dimensions.product_solution.substitution_landscape[0]",
+        "value_schema": {
+          "offers": "boolean",
+          "evidence_url": "url",
+          "target_applications": "list"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "mems_silicon_neural_array_offering",
+        "name": "MEMS/silicon-based neural electrode array offering",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify whether the competitor produces thin-film MEMS or silicon-based neural electrode arrays (e.g., Utah-array style, microfabricated probes). Capture channel count and target use cases.",
+        "source_field": "dimensions.product_solution.substitution_landscape[1]",
+        "value_schema": {
+          "offers": "boolean",
+          "array_type": "short_string",
+          "evidence_url": "url",
+          "channel_count": "number"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "stretchable_printed_electronics_offering",
+        "name": "Stretchable/printed electronics on elastomer substrates",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor offers stretchable or printed electronics on elastomeric substrates (e.g., silicone, TPU) for medical sensing/stimulation. Cite product or research disclosures.",
+        "source_field": "dimensions.product_solution.substitution_landscape[2]",
+        "value_schema": {
+          "offers": "boolean",
+          "evidence_url": "url",
+          "substrate_material": "short_string"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "polyimide_flexible_electrode_offering",
+        "name": "Polyimide-based flexible electrode array offering",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify whether the competitor produces polyimide-based flexible microelectrode arrays, particularly as a neural-interface foundry. Capture minimum feature size and customer roster if disclosed.",
+        "source_field": "dimensions.product_solution.substitution_landscape[3]",
+        "value_schema": {
+          "offers": "boolean",
+          "evidence_url": "url",
+          "feature_size_um": "number",
+          "is_neural_interface_foundry": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "fpcb_medical_retooling",
+        "name": "Conventional FPCB supplier retooling for medical applications",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor is a conventional FPCB supplier that has announced or initiated retooling for medical device applications. Cite filings, press releases, or industry coverage.",
+        "source_field": "dimensions.product_solution.substitution_landscape[4]",
+        "value_schema": {
+          "evidence_url": "url",
+          "is_fpcb_supplier": "boolean",
+          "announcement_date": "short_string",
+          "medical_program_announced": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "vertically_integrated_oem_substrate_fab",
+        "name": "Vertically integrated OEM in-house substrate fabrication",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor is a medical device OEM with in-house substrate/electrode fabrication (e.g., Abbott, Dexcom, Medtronic). List which sensing/electrode components are fabricated internally.",
+        "source_field": "dimensions.product_solution.substitution_landscape[5]",
+        "value_schema": {
+          "evidence_url": "url",
+          "is_device_oem": "boolean",
+          "in_house_components": "list",
+          "has_in_house_substrate_fab": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "merchant_supply_into_vertically_integrated_oems",
+        "name": "Track record supplying merchant substrates/electrodes to vertically-integrated CGM/neurostim OEMs",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify any publicly disclosed cases where the competitor supplies sensing/electrode substrates as a merchant vendor to vertically-integrated CGM or neurostim OEMs (Abbott, Medtronic, Dexcom). Cite contract or press disclosures.",
+        "source_field": "strategic_risks_and_uncertainties[0].implies_search_for",
+        "value_schema": {
+          "named_oem_customers": "list",
+          "component_type_supplied": "short_string",
+          "contract_disclosure_url": "url"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "customers"
+      },
+      {
+        "id": "announced_medical_substrate_program",
+        "name": "Announced medical-device substrate or stretchable-electronics program",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor (e.g., Murata, Linxens, Japanese/European materials specialists, large FPCB makers) has publicly announced expansion into medical-device flexible substrates or stretchable electronics. Capture scope and date.",
+        "source_field": "strategic_risks_and_uncertainties[1].implies_search_for",
+        "value_schema": {
+          "evidence_url": "url",
+          "program_scope": "short_string",
+          "announcement_date": "short_string",
+          "has_announced_program": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "neural_probe_foundry_services",
+        "name": "Neural-probe foundry / high-channel-count BCI electrode services",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify whether the competitor operates as a neural-probe foundry or MEMS/polyimide microelectrode array supplier serving BCI/neurostim, including max channel count and named BCI customers.",
+        "source_field": "strategic_risks_and_uncertainties[2].implies_search_for",
+        "value_schema": {
+          "evidence_url": "url",
+          "max_channel_count": "number",
+          "process_technology": "short_string",
+          "named_bci_customers": "list",
+          "offers_foundry_service": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "industry_analyst",
+          "news",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "current_medical_certifications_held",
+        "name": "Current ISO 13485 / ISO 10993 / FDA medical certifications held",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Capture the competitor's currently active medical certifications (ISO 13485, ISO 10993 series items, FDA registration, MDSAP). Cite certification numbers or registry entries.",
+        "source_field": "strategic_risks_and_uncertainties[3].implies_search_for",
+        "value_schema": {
+          "mdsap": "boolean",
+          "evidence_url": "url",
+          "fda_registration": "boolean",
+          "iso_13485_current": "boolean",
+          "iso_10993_items_completed": "list"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "medical_cdmo_capability",
+        "name": "Medical CDMO/contract manufacturing capability",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor operates as a medical CDMO (like Integer, Jabil, Flex, Phillips-Medisize) with full medical certifications, including services offered and named OEM customers.",
+        "source_field": "strategic_risks_and_uncertainties[3].risk",
+        "value_schema": {
+          "evidence_url": "url",
+          "service_scope": "list",
+          "is_medical_cdmo": "boolean",
+          "named_oem_customers": "list"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "industry_analyst",
+          "news",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "partners"
+      },
+      {
+        "id": "upward_value_chain_migration",
+        "name": "Migration from component supply into modules/CDMO",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Document whether the competitor has migrated up the value chain from substrate/component supply to module-level or CDMO offerings (Integer-style trajectory). Capture current offering level and module revenue share where disclosed.",
+        "source_field": "strategic_risks_and_uncertainties[4].implies_search_for",
+        "value_schema": {
+          "evidence_url": "url",
+          "current_offering_level": "enum",
+          "module_revenue_share_pct": "number",
+          "started_as_component_supplier": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "industry_analyst",
+          "news",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "transaction"
+      },
+      {
+        "id": "disclosed_margin_profile",
+        "name": "Disclosed gross margin profile for medical components/modules",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "atom",
+        "prompt_hint": "Capture the competitor's most recently disclosed gross margin for its medical components or modules segment, citing 10-K/annual reports or earnings transcripts.",
+        "source_field": "strategic_risks_and_uncertainties[4].risk",
+        "value_schema": {
+          "fiscal_year": "short_string",
+          "evidence_url": "url",
+          "gross_margin_pct": "number",
+          "segment_reported": "short_string"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "transaction"
+      },
+      {
+        "id": "big_tech_bci_partnerships_or_investments",
+        "name": "Big Tech investments / exclusive BCI partnerships",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify any investments, acquisitions, or exclusive supply/co-development agreements between the competitor and Big Tech (Apple, Google, Meta) or well-capitalized BCI startups (Neuralink, Precision Neuroscience, Synchron) in the last 36 months.",
+        "source_field": "strategic_risks_and_uncertainties[5].implies_search_for",
+        "value_schema": {
+          "evidence_url": "url",
+          "announcement_date": "short_string",
+          "exclusivity_terms": "short_string",
+          "investor_or_partner": "short_string",
+          "has_big_tech_investor": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "news",
+          "official_company",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "partners"
+      },
+      {
+        "id": "minimum_feature_size_um",
+        "name": "Minimum fine-pattern line/space capability (μm)",
+        "tier": "dynamic",
+        "value_type": "number",
+        "cell_budget": "atom",
+        "prompt_hint": "Capture the competitor's smallest publicly disclosed line/space pattern capability on flexible substrates, in micrometers. Cite datasheet or technical disclosure.",
+        "source_field": "dimensions.product_solution.core_features",
+        "value_schema": {
+          "unit": "micrometers"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "roll_to_roll_manufacturing_capability",
+        "name": "Roll-to-roll flexible substrate manufacturing capability",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor operates roll-to-roll (R2R) flexible substrate manufacturing lines and whether any are medical-grade/cleanroom-segregated. Cite facility disclosures.",
+        "source_field": "dimensions.capital_asset.manufacturing_footprint",
+        "value_schema": {
+          "line_count": "number",
+          "evidence_url": "url",
+          "has_r2r_line": "boolean",
+          "is_medical_grade": "boolean"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "industry_analyst",
+          "news",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "biocompatible_material_stack",
+        "name": "Biocompatible material stack supported (LCP/PET/Au/Ag-AgCl/Carbon)",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "atom",
+        "prompt_hint": "List which biocompatible substrate and electrode materials the competitor supports (LCP, PET, polyimide, Au, Ag/AgCl, Carbon, PEDOT, etc.). Cite datasheets or product pages.",
+        "source_field": "dimensions.product_solution.core_features",
+        "value_schema": {
+          "items": "short_string"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "geographic_manufacturing_footprint",
+        "name": "Medical-component manufacturing geography",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "atom",
+        "prompt_hint": "List the countries where the competitor operates medical-grade manufacturing facilities serving CGM/neurostim/BCI customers. Cite annual report, plant locator, or press releases.",
+        "source_field": "dimensions.geography_regulatory.target_geographies",
+        "value_schema": {
+          "countries": "short_string"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "named_bci_or_cgm_oem_customers",
+        "name": "Named CGM / neurostim / BCI OEM customers",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "atom",
+        "prompt_hint": "List publicly disclosed CGM, neurostimulation, or BCI OEM customers of the competitor. Cite press releases, case studies, or filings.",
+        "source_field": "dimensions.customers.target_sub_segments",
+        "value_schema": {
+          "customers": "short_string"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "customers"
+      }
+    ]
+  },
+  {
+    "run_id": "56c65c36-f059-49cc-82ef-89a96654d8fc",
+    "created_at": "2026-05-20T20:52:32.918Z",
+    "codename": "VentureX",
+    "venture_description": "VentureX currently lacks an offering in the Rack PDU (Power Distribution Unit) market, a segment estimated at $2B+ globally. Rack PDUs are socket outlet strips with protection and measurement elements used to power servers in data centers. Competitors already have strong positions, while VentureX is",
+    "synthetic_description": "VentureX is a contemplated new business line that would enter the global rack-level power distribution market for data centers — vertically-mounted intelligent outlet strips (rack PDUs) that deliver, protect, monitor, and meter electrical power to servers inside IT cabinets. The venture is backed by",
+    "maturity": "pre_concept",
+    "substitution_count": 6,
+    "risk_count": 6,
+    "dynamic_count": 18,
+    "full_count": 54,
+    "params_beyond_floor": 6,
+    "dynamic_by_dimension": {
+      "partners": 2,
+      "transaction": 1,
+      "capital_asset": 2,
+      "product_solution": 11,
+      "geography_regulatory": 2
+    },
+    "dynamic_param_list": "Ownership status and acquirability signals [capital_asset] <- strategic_risks_and_uncertainties[3].implies_search_for\nManufacturing footprint locations [capital_asset] <- dimensions.capital_asset.manufacturing_footprint\nIndia market access and local presence [geography_regulatory] <- strategic_risks_and_uncertainties[4].risk\nChina market access and local presence [geography_regulatory] <- strategic_risks_and_uncertainties[4].implies_search_for\nIT channel relationships (server OEMs, integrators, DCIM) [partners] <- strategic_risks_and_uncertainties[2].implies_search_for\nDCIM/software platform attach [partners] <- strategic_risks_and_uncertainties[2].risk\nSmart busway with per-tap metering [product_solution] <- dimensions.product_solution.substitution_landscape[5]\nAI/high-density data center power product line [product_solution] <- strategic_risks_and_uncertainties[0].risk\nDC-native rack power product offerings [product_solution] <- strategic_risks_and_uncertainties[1].implies_search_for\nBusbar + tap-off unit offering [product_solution] <- dimensions.product_solution.substitution_landscape[0]\nRack/row-level power shelf offering [product_solution] <- dimensions.product_solution.substitution_landscape[1]\nHigh-density Remote Power Panel (RPP) offering [product_solution] <- dimensions.product_solution.substitution_landscape[4]\nServer-OEM-integrated power distribution [product_solution] <- dimensions.product_solution.substitution_landscape[3]\nIn-rack DC distribution offering [product_solution] <- dimensions.product_solution.substitution_landscape[2]\nMaximum supported rack power density (kW) [product_solution] <- strategic_risks_and_uncertainties[0].implies_search_for\nSolid-state protection / differentiated PDU technology [product_solution] <- strategic_risks_and_uncertainties[5].risk\nRack PDU SKU breadth across plug/voltage standards [product_solution] <- dimensions.product_solution.core_features\nSoftware/recurring revenue monetization above hardware [transaction] <- strategic_risks_and_uncertainties[5].implies_search_for",
+    "generation_notes": "Walked the checklist literally: 6 substitution params at exact indices, plus risk coverage with two params per risk index 0,2,4,5 and one each for 1,3. Avoided hardcoded ids (core_offering, certifications, revenue_model, geographic_footprint, capital_intensity). 18 parameters total.",
+    "model_id": "anthropic/claude-opus-4.7",
+    "tokens_in": 10511,
+    "tokens_out": 5535,
+    "cost_usd": "0.19093",
+    "latency_ms": 63297,
+    "dynamic_parameters": [
+      {
+        "id": "busbar_tapoff_offering",
+        "name": "Busbar + tap-off unit offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Does the competitor sell or OEM busbar + tap-off unit systems for overhead decentralized rack power distribution? Check product catalogs, datasheets, and data center power portfolio pages.",
+        "source_field": "dimensions.product_solution.substitution_landscape[0]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partnership",
+            "in_development",
+            "no",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "power_shelf_offering",
+        "name": "Rack/row-level power shelf offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Does the competitor offer rack- or row-level power shelves, particularly OCP-style designs used in hyperscale deployments? Look at OCP contributor lists, product pages, and hyperscale reference designs.",
+        "source_field": "dimensions.product_solution.substitution_landscape[1]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partnership",
+            "in_development",
+            "no",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "dc_distribution_offering",
+        "name": "In-rack DC distribution offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Does the competitor sell in-rack DC power distribution products (e.g., 380V DC, 48V DC bus) that could replace AC rack PDUs? Check datasheets and any OCP/Open19 alignment statements.",
+        "source_field": "dimensions.product_solution.substitution_landscape[2]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partnership",
+            "in_development",
+            "no",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "server_oem_integrated_power",
+        "name": "Server-OEM-integrated power distribution",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Does the competitor supply or bundle power distribution integrated with server OEMs (e.g., Dell, HPE, Lenovo, Supermicro) such that the PDU is shipped as part of the IT equipment stack?",
+        "source_field": "dimensions.product_solution.substitution_landscape[3]",
+        "value_schema": {
+          "enum": [
+            "yes_oem_supplier",
+            "yes_bundled_offering",
+            "no",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "high_density_rpp_offering",
+        "name": "High-density Remote Power Panel (RPP) offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Does the competitor offer high-density RPP products that extend more outlets directly from the room-level panel, displacing the need for rack-level PDUs? Check power distribution portfolio pages.",
+        "source_field": "dimensions.product_solution.substitution_landscape[4]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "in_development",
+            "no",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "smart_busway_metering",
+        "name": "Smart busway with per-tap metering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Does the competitor offer smart busway systems with per-tap metering that absorb the metering function of rack PDUs? Look for intelligent busway, metered tap-off boxes, and integrated monitoring.",
+        "source_field": "dimensions.product_solution.substitution_landscape[5]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partnership",
+            "in_development",
+            "no",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "high_density_rack_support_kw",
+        "name": "Maximum supported rack power density (kW)",
+        "tier": "dynamic",
+        "value_type": "number",
+        "cell_budget": "atom",
+        "prompt_hint": "What is the maximum per-rack kW the competitor's highest-density rack PDU or rack power product supports? Look for AI/HPC-targeted SKUs and three-phase 400V/415V variants on datasheets.",
+        "source_field": "strategic_risks_and_uncertainties[0].implies_search_for",
+        "value_schema": {
+          "min": 0,
+          "unit": "kW"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "ai_high_density_product_line",
+        "name": "AI/high-density data center power product line",
+        "tier": "dynamic",
+        "value_type": "short_string",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify any named product line, reference design, or announced solution from the competitor explicitly targeting 50kW+ AI racks (busbar, tap-off, row-level distribution). Cite product page or press release.",
+        "source_field": "strategic_risks_and_uncertainties[0].risk",
+        "value_schema": {
+          "max_length": 200
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "dc_native_rack_power_products",
+        "name": "DC-native rack power product offerings",
+        "tier": "dynamic",
+        "value_type": "short_string",
+        "cell_budget": "sentence",
+        "prompt_hint": "Does the competitor offer 380V DC distribution, OCP DC power shelves, or other DC-native rack power solutions? Name the specific SKU/program and link to its datasheet or OCP contribution.",
+        "source_field": "strategic_risks_and_uncertainties[1].implies_search_for",
+        "value_schema": {
+          "max_length": 240
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "it_channel_relationships",
+        "name": "IT channel relationships (server OEMs, integrators, DCIM)",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List named server OEM bundling agreements, IT system integrator partnerships, and DCIM platform integrations the competitor publicly discloses. Sources: partner pages, press releases, OEM marketplaces.",
+        "source_field": "strategic_risks_and_uncertainties[2].implies_search_for",
+        "value_schema": {
+          "item_type": "short_string",
+          "max_items": 15
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "partners"
+      },
+      {
+        "id": "dcim_software_attach",
+        "name": "DCIM/software platform attach",
+        "tier": "dynamic",
+        "value_type": "short_string",
+        "cell_budget": "sentence",
+        "prompt_hint": "Does the competitor own a DCIM/power management software platform, or is it certified/integrated with major DCIM vendors (Schneider EcoStruxure, Vertiv Trellis/Environet, Sunbird, Nlyte)? Name the product and integration depth.",
+        "source_field": "strategic_risks_and_uncertainties[2].risk",
+        "value_schema": {
+          "max_length": 240
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "partners"
+      },
+      {
+        "id": "acquisition_status_and_ownership",
+        "name": "Ownership status and acquirability signals",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Capture ownership type, estimated annual revenue, HQ country, and any recent M&A activity (rumored or completed). Sources: company About page, Crunchbase, PitchBook summaries, press releases.",
+        "source_field": "strategic_risks_and_uncertainties[3].implies_search_for",
+        "value_schema": {
+          "properties": {
+            "ownership": "enum[public,private,pe_backed,subsidiary]",
+            "headquarters": "string",
+            "recent_ma_activity": "string",
+            "estimated_revenue_usd": "number"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "china_market_access",
+        "name": "China market access and local presence",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor is a Chinese domestic vendor, a foreign vendor with local Chinese manufacturing/JV, export-only, or absent. Look for CCC certification, .cn site, JV announcements, and local factory locations.",
+        "source_field": "strategic_risks_and_uncertainties[4].implies_search_for",
+        "value_schema": {
+          "enum": [
+            "domestic_china_vendor",
+            "foreign_vendor_with_local_mfg_or_jv",
+            "foreign_vendor_export_only",
+            "no_china_presence",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "india_market_access",
+        "name": "India market access and local presence",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor has a domestic India presence (BIS certification, local manufacturing, JV) or sells via export only. Sources: BIS database, .in site, India press releases.",
+        "source_field": "strategic_risks_and_uncertainties[4].risk",
+        "value_schema": {
+          "enum": [
+            "domestic_india_vendor",
+            "foreign_vendor_with_local_mfg_or_jv",
+            "foreign_vendor_export_only",
+            "no_india_presence",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "software_monetization_model",
+        "name": "Software/recurring revenue monetization above hardware",
+        "tier": "dynamic",
+        "value_type": "short_string",
+        "cell_budget": "sentence",
+        "prompt_hint": "Does the competitor monetize software, DCIM subscriptions, or analytics above the hardware layer (named SaaS/subscription SKU, license fees)? Quote pricing pages, investor materials, or press releases.",
+        "source_field": "strategic_risks_and_uncertainties[5].implies_search_for",
+        "value_schema": {
+          "max_length": 240
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "transaction"
+      },
+      {
+        "id": "solid_state_protection_offering",
+        "name": "Solid-state protection / differentiated PDU technology",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Does the competitor offer solid-state circuit protection, electronic breakers, or other differentiated PDU technology used to escape commodity pricing? Cite product page or technical brief.",
+        "source_field": "strategic_risks_and_uncertainties[5].risk",
+        "value_schema": {
+          "enum": [
+            "yes_shipping",
+            "announced_or_roadmap",
+            "no",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "rack_pdu_product_breadth_sku_count",
+        "name": "Rack PDU SKU breadth across plug/voltage standards",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Capture the breadth of rack PDU SKUs offered: approximate SKU count, supported plug standards (NEMA, IEC C13/C19), voltage variants, and intelligence tiers (basic/metered/monitored/switched). Source: product configurator or catalog.",
+        "source_field": "dimensions.product_solution.core_features",
+        "value_schema": {
+          "properties": {
+            "supports_nema": "boolean",
+            "approx_sku_count": "number",
+            "intelligence_tiers": "list",
+            "supports_iec_c13_c19": "boolean",
+            "supports_three_phase_400v": "boolean"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "manufacturing_footprint_locations",
+        "name": "Manufacturing footprint locations",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List the competitor's rack PDU manufacturing locations (own plants and disclosed contract manufacturers) by country/region. Sources: About/Operations pages, 10-K, sustainability reports.",
+        "source_field": "dimensions.capital_asset.manufacturing_footprint",
+        "value_schema": {
+          "item_type": "short_string",
+          "max_items": 12
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "official_third_party",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "capital_asset"
+      }
+    ]
+  }
+]

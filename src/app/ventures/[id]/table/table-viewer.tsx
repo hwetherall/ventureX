@@ -1,6 +1,12 @@
 "use client";
 
-import { Download, ExternalLink, Link as LinkIcon, X } from "lucide-react";
+import {
+  Download,
+  ExternalLink,
+  FileText,
+  Link as LinkIcon,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import {
   type CSSProperties,
@@ -131,10 +137,19 @@ export function ComparisonTableViewer({
           </a>
           <a
             href={`/api/ventures/${ventureId}/table/export`}
-            className="vx-primary-button"
+            className="vx-secondary-button"
           >
             <Download size={14} aria-hidden="true" />
-            Download HTML
+            Matrix HTML
+          </a>
+          <a
+            href={`/api/ventures/${ventureId}/report/export`}
+            className="vx-primary-button"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FileText size={14} aria-hidden="true" />
+            Investor report
           </a>
         </div>
       </header>

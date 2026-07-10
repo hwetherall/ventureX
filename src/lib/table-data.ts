@@ -151,7 +151,13 @@ export async function loadComparisonTableData(
         candidate_id: candidate.id,
         name: candidate.name,
         product_line: null,
-        logo_url: null,
+        // The research matrix already captures each company's homepage in
+        // `primary_urls`. Use its origin favicon as the lightweight logo
+        // source for both the working table and the investor report. This
+        // avoids adding a second company-enrichment pipeline just for marks,
+        // while the UI/report still provide an initial fallback if a site
+        // does not expose /favicon.ico.
+        logo_url: logoUrlFromCells(candidateCells),
         candidate_type: candidate.type,
         aggregate_score: normalizeAggregateScore(candidate.aggregate_score),
         dimension_scores: normalizeDimensionScores(candidate.dimension_scores),
@@ -227,4 +233,38 @@ function normalizeCitation(input: unknown): ComparisonCitation | null {
 
 function firstLine(value: string): string {
   return value.split(/\r?\n/).find((line) => line.trim().length > 0)?.trim() ?? "";
+}
+
+function logoUrlFromCells(cells: ComparisonCell[]): string | null {
+  const primaryUrls = cells.find(
+    (cell) => cell.parameter_key === "primary_urls",
+  );
+  if (!primaryUrls) return null;
+
+  const homepage = homepageFromValue(primaryUrls.value);
+  if (!homepage) return null;
+
+  try {
+    const url = new URL(homepage);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    return new URL("/favicon.ico", url.origin).toString();
+  } catch {
+    return null;
+  }
+}
+
+function homepageFromValue(value: unknown): string | null {
+  if (typeof value === "string") {
+    return value.startsWith("http://") || value.startsWith("https://")
+      ? value
+      : null;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+
+  const record = value as Record<string, unknown>;
+  const preferredKeys = ["homepage", "website", "home", "url"];
+  for (const key of preferredKeys) {
+    if (typeof record[key] === "string") return record[key];
+  }
+  return null;
 }

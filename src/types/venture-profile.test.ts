@@ -103,4 +103,21 @@ describe("VentureProfileSchema — D1 enforcement", () => {
     raw.venture_codename = "VentureX-001"; // pre-D1 numbered codename
     expect(() => VentureProfileSchema.parse(raw)).toThrow();
   });
+
+  it("coerces comma-separated target_sub_segments string into a string[]", () => {
+    const raw = JSON.parse(
+      readFileSync(
+        resolve("test-cases/abb-rack-pdu/expected_profile.json"),
+        "utf-8",
+      ),
+    );
+    raw.dimensions.customers.target_sub_segments =
+      "hyperscale data centers, colocation providers, enterprise on-prem";
+    const parsed = VentureProfileSchema.parse(raw);
+    expect(parsed.dimensions.customers.target_sub_segments).toEqual([
+      "hyperscale data centers",
+      "colocation providers",
+      "enterprise on-prem",
+    ]);
+  });
 });

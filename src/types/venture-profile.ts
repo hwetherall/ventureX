@@ -11,6 +11,35 @@ const SupportingQuoteSchema = z.object({
 
 const ConfidenceSchema = z.number().min(0).max(1);
 
+/**
+ * Frontier models often emit a comma-separated string where the schema wants
+ * `string[]` (especially `target_sub_segments`). Coerce before validating so
+ * a near-correct Stage 1 response doesn't fail the whole run.
+ */
+function coerceStringList(input: unknown): unknown {
+  if (Array.isArray(input)) return input;
+  if (typeof input !== "string") return input;
+  const trimmed = input.trim();
+  if (!trimmed) return [];
+  if (trimmed.includes(",")) {
+    return trimmed
+      .split(",")
+      .map((part) => part.trim())
+      .filter((part) => part.length > 0);
+  }
+  return [trimmed];
+}
+
+const StringListSchema = z.preprocess(
+  coerceStringList,
+  z.array(z.string().min(1)),
+);
+
+const NonEmptyStringListSchema = z.preprocess(
+  coerceStringList,
+  z.array(z.string().min(1)).min(1),
+);
+
 // Enum policy: when CLAUDE.md Section 8 lists a closed enum AND the example
 // output stays inside that enum, we enforce it. When the spec says "pick top
 // 1-2" or the example uses free-form (e.g., "scale + brand (data center
@@ -25,11 +54,11 @@ export const ProductSolutionSchema = z.object({
   job_to_be_done: z.string().min(1),
   solution_mechanism: z.string().min(1),
   platform_or_pipe: z.enum(["pipe", "platform", "hybrid"]),
-  core_features: z.array(z.string().min(1)).min(1),
+  core_features: NonEmptyStringListSchema,
   // The substitution_landscape is load-bearing for Phase 3 candidate generation.
   // We require at least 1 entry; the prompt asks for 3-6. Zero entries here
   // would silently break downstream.
-  substitution_landscape: z.array(z.string().min(1)).min(1),
+  substitution_landscape: NonEmptyStringListSchema,
   confidence: ConfidenceSchema,
   supporting_quotes: z.array(SupportingQuoteSchema).max(5),
   notes: z.string().optional(),
@@ -39,7 +68,7 @@ export const CustomersSchema = z.object({
   segment_type: z.enum(["B2C", "B2B-SME", "B2B-Enterprise", "B2G", "mixed"]),
   buyer: z.string().min(1),
   user: z.string().min(1),
-  target_sub_segments: z.array(z.string().min(1)),
+  target_sub_segments: StringListSchema,
   buyer_sophistication: z.enum(["low", "medium", "high"]),
   confidence: ConfidenceSchema,
   supporting_quotes: z.array(SupportingQuoteSchema).max(5),
@@ -66,11 +95,11 @@ export const TransactionSchema = z.object({
 });
 
 export const PartnersSchema = z.object({
-  distribution_channels: z.array(z.string().min(1)),
-  key_suppliers: z.array(z.string().min(1)),
-  regulators_certifications: z.array(z.string().min(1)),
-  system_integrators_resellers: z.array(z.string().min(1)),
-  complementary_product_partners: z.array(z.string().min(1)),
+  distribution_channels: StringListSchema,
+  key_suppliers: StringListSchema,
+  regulators_certifications: StringListSchema,
+  system_integrators_resellers: StringListSchema,
+  complementary_product_partners: StringListSchema,
   confidence: ConfidenceSchema,
   supporting_quotes: z.array(SupportingQuoteSchema).max(5),
   notes: z.string().optional(),
@@ -88,10 +117,10 @@ export const AccessSchema = z.object({
 });
 
 export const GeographyRegulatorySchema = z.object({
-  target_geographies: z.array(z.string().min(1)),
-  accessible_market_constraints: z.array(z.string().min(1)),
+  target_geographies: StringListSchema,
+  accessible_market_constraints: StringListSchema,
   regulatory_regime: z.enum(["Light", "Medium", "Heavy"]),
-  localization_requirements: z.array(z.string().min(1)),
+  localization_requirements: StringListSchema,
   confidence: ConfidenceSchema,
   supporting_quotes: z.array(SupportingQuoteSchema).max(5),
   notes: z.string().optional(),
@@ -173,7 +202,10 @@ export const VentureProfileSchema = z.object({
     .array(StrategicRiskSchema)
     .min(1)
     .max(6),
-  gaps_in_input: z.array(z.string().min(1)).max(5),
+  gaps_in_input: z.preprocess(
+    coerceStringList,
+    z.array(z.string().min(1)).max(5),
+  ),
 });
 
 export type VentureProfile = z.infer<typeof VentureProfileSchema>;

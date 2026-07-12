@@ -52,8 +52,8 @@ export type TriggerStage3Result =
  *      function; the success return statement is unreachable but kept for
  *      type clarity.
  *
- * Wall time: ~10-30s on a typical ABB-shaped profile. Synchronous keeps the
- * state machine simple — same trade-off as Stage 1 + Stage 2 actions.
+ * Current PoC scope returns exactly three candidates. Synchronous execution
+ * keeps the state machine simple — same trade-off as Stage 1 + Stage 2.
  */
 export async function triggerStage3Generation(args: {
   ventureId: string;

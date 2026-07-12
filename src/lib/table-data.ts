@@ -1,4 +1,5 @@
 import type { InsForgeClient } from "@/lib/insforge/server";
+import { selectPocResearchParameters } from "@/lib/poc-scope";
 import {
   type ComparisonCandidate,
   type ComparisonCell,
@@ -73,7 +74,9 @@ export async function loadComparisonTableData(
   if (runError) return { data: null, error: runError.message };
 
   const parameterRun = (runRaw as unknown as ParameterRunRow | null) ?? null;
-  const parameters = parseParameterSchema(parameterRun?.full_parameter_schema);
+  const parameters = selectPocResearchParameters(
+    parseParameterSchema(parameterRun?.full_parameter_schema),
+  );
 
   const { data: candidatesRaw, error: candidatesError } = await insforge.database
     .from("candidate_companies")

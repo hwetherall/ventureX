@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { POC_CANDIDATE_COUNT } from "@/lib/poc-scope";
 import { DIMENSION_KEYS } from "./venture-profile";
 
 // ────────────────────────────────────────────────────────────────────────
@@ -105,6 +106,43 @@ export const Stage3CandidatesOutputSchema = z.object({
   candidates: z.array(CandidateCompanySchema).min(10).max(60),
   generation_notes: z.string().max(800).optional(),
 });
+
+/**
+ * Current PoC contract: exactly three distinct companies, with one company
+ * representing each of VentureX's three candidate categories. This schema is
+ * what the live Stage 3 orchestrator uses; the broader 10-60 schema above is
+ * retained for the later production-scale discovery mode.
+ */
+export const Stage3PocCandidatesOutputSchema = z
+  .object({
+    candidates: z.array(CandidateCompanySchema).length(POC_CANDIDATE_COUNT),
+    generation_notes: z.string().max(800).optional(),
+  })
+  .superRefine((output, context) => {
+    const normalizedNames = output.candidates.map((candidate) =>
+      candidate.name.trim().toLocaleLowerCase("en-US"),
+    );
+    if (new Set(normalizedNames).size !== POC_CANDIDATE_COUNT) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["candidates"],
+        message: `PoC output must contain ${POC_CANDIDATE_COUNT} distinct companies.`,
+      });
+    }
+
+    for (const type of CandidateTypeSchema.options) {
+      const count = output.candidates.filter(
+        (candidate) => candidate.type === type,
+      ).length;
+      if (count !== 1) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["candidates"],
+          message: `PoC output must contain exactly one ${type} candidate; received ${count}.`,
+        });
+      }
+    }
+  });
 
 export type CandidateType = z.infer<typeof CandidateTypeSchema>;
 export type Citation = z.infer<typeof CitationSchema>;

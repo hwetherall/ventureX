@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { POC_CANDIDATE_COUNT } from "@/lib/poc-scope";
 import { triggerStage3Generation } from "./candidates/actions";
 
 /**
@@ -47,13 +48,16 @@ export function GenerateCandidatesButton({
         disabled={isPending}
         className="rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-accent-foreground hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {isPending ? "Generating candidates…" : "Generate competitor candidates"}
+        {isPending
+          ? `Generating ${POC_CANDIDATE_COUNT} candidates…`
+          : `Generate exactly ${POC_CANDIDATE_COUNT} candidates`}
       </button>
 
       {isPending && (
         <p className="mt-2 text-xs text-muted-foreground">
-          Calling Opus 4.7 with the latest profile + canonical weights. Typically
-          10–30 seconds; redirects to the candidates list on completion.
+          PoC run: one Direct, one Category, and one SPDM candidate. The server
+          rejects any response that is not exactly {POC_CANDIDATE_COUNT} unique
+          companies.
         </p>
       )}
 

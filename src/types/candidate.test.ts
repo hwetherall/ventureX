@@ -3,6 +3,7 @@ import {
   CandidateCompanySchema,
   CitationSchema,
   Stage3CandidatesOutputSchema,
+  Stage3PocCandidatesOutputSchema,
 } from "./candidate";
 
 // Representative Stage 3 output for the ABB Rack PDU venture. Hits all three
@@ -91,6 +92,65 @@ const SAMPLE_CANDIDATES_OUTPUT = {
   generation_notes:
     "Candidates skew toward US/EU/Taiwan vendors due to training-data bias. Expect M13 web search to surface Chinese and Indian PDU vendors invisible to LLM-only brainstorm.",
 };
+
+const SAMPLE_POC_CANDIDATES_OUTPUT = {
+  candidates: [
+    SAMPLE_CANDIDATES_OUTPUT.candidates[0],
+    SAMPLE_CANDIDATES_OUTPUT.candidates[5],
+    SAMPLE_CANDIDATES_OUTPUT.candidates[6],
+  ],
+  generation_notes:
+    "One strongest candidate selected per category for the credit-controlled PoC.",
+};
+
+describe("Stage3PocCandidatesOutputSchema", () => {
+  it("accepts exactly three distinct candidates with one per category", () => {
+    const parsed = Stage3PocCandidatesOutputSchema.parse(
+      SAMPLE_POC_CANDIDATES_OUTPUT,
+    );
+    expect(parsed.candidates).toHaveLength(3);
+  });
+
+  it("rejects fewer or more than three candidates", () => {
+    expect(() =>
+      Stage3PocCandidatesOutputSchema.parse({
+        candidates: SAMPLE_POC_CANDIDATES_OUTPUT.candidates.slice(0, 2),
+      }),
+    ).toThrow();
+    expect(() =>
+      Stage3PocCandidatesOutputSchema.parse({
+        candidates: [
+          ...SAMPLE_POC_CANDIDATES_OUTPUT.candidates,
+          SAMPLE_CANDIDATES_OUTPUT.candidates[1],
+        ],
+      }),
+    ).toThrow();
+  });
+
+  it("rejects a set that does not contain exactly one candidate per category", () => {
+    expect(() =>
+      Stage3PocCandidatesOutputSchema.parse({
+        candidates: SAMPLE_CANDIDATES_OUTPUT.candidates.slice(0, 3),
+      }),
+    ).toThrow();
+  });
+
+  it("rejects case-insensitive duplicate company names", () => {
+    const duplicate = {
+      ...SAMPLE_POC_CANDIDATES_OUTPUT.candidates[1],
+      name: SAMPLE_POC_CANDIDATES_OUTPUT.candidates[0]!.name.toUpperCase(),
+    };
+    expect(() =>
+      Stage3PocCandidatesOutputSchema.parse({
+        candidates: [
+          SAMPLE_POC_CANDIDATES_OUTPUT.candidates[0],
+          duplicate,
+          SAMPLE_POC_CANDIDATES_OUTPUT.candidates[2],
+        ],
+      }),
+    ).toThrow();
+  });
+});
 
 describe("Stage3CandidatesOutputSchema", () => {
   it("parses a representative Stage 3 output without errors", () => {

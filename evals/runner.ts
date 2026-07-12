@@ -28,7 +28,7 @@ import {
 } from "./lib/prompts";
 import type { EvalCase, EvalResult, StageResultSummary } from "./types";
 
-const DEFAULT_STAGE_1_MODEL = "anthropic/claude-opus-4.7";
+const DEFAULT_STAGE_1_MODEL = "anthropic/claude-sonnet-5";
 const DEFAULT_STAGE_2_MODEL = "anthropic/claude-opus-4.7";
 
 // Stage 1's ABB-scale corpus runs in 30-120s typically; keep parity with

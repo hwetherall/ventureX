@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/insforge/auth";
 import { createAuthedServerClient } from "@/lib/insforge/server";
 import { predictStage5Cost } from "@/lib/openrouter/predict";
+import { selectPocResearchParameters } from "@/lib/poc-scope";
 import { ParameterSchema, type Parameter } from "@/types/parameter";
 import type { CandidateType, Citation } from "@/types/candidate";
 import type { Dimension } from "@/types/venture-profile";
@@ -151,11 +152,11 @@ export default async function CandidatesPage({
       </div>
 
       <p className="mt-6 text-sm text-muted-foreground">
-        Web-augmented brainstorm (M13). Each <code className="font-mono text-xs">implies_search_for</code>
-        risk-string in the venture profile is run through Exa neural search; the
-        Opus call gets the bundled evidence and grounds candidates in real URLs.
-        Per-candidate citations appear inline below the rationale. Per-dimension
-        scoring lands in M14.
+        Credit-controlled web-augmented PoC. Up to three{" "}
+        <code className="font-mono text-xs">implies_search_for</code>{" "}
+        risk-strings are run through a bounded Exa search; Opus then selects one
+        strongest company per candidate category. Per-candidate citations
+        appear inline below the rationale.
       </p>
 
       <BatchResearchPanel
@@ -284,7 +285,11 @@ async function loadDossierContext(
         if (ok.success) parsed.push(ok.data);
       }
       if (parsed.length > 0) {
-        const p = predictStage5Cost({ parameters: parsed, candidateCount: 1 });
+        const pocParameters = selectPocResearchParameters(parsed);
+        const p = predictStage5Cost({
+          parameters: pocParameters,
+          candidateCount: 1,
+        });
         prediction = {
           costMin: p.costUsd.min,
           costMax: p.costUsd.max,
@@ -353,11 +358,11 @@ function CandidatesSection({
       <ul className="mt-5 space-y-3">
         {candidates.length === 0 && (
           <li className="rounded-md border border-dashed border-border p-4 text-xs text-muted-foreground">
-            No candidates surfaced in this category. The prompt enforces a
-            soft floor of 5 per category — if this is empty after a real run,
-            iterate on{" "}
+            No candidate surfaced in this category. The PoC schema requires
+            exactly one per category, so this indicates legacy or inconsistent
+            data rather than a valid PoC generation run. Review{" "}
             <code className="font-mono">
-              prompts/stage_3_candidate_generation.md
+              prompts/stage_3_candidate_generation_poc.md
             </code>
             .
           </li>

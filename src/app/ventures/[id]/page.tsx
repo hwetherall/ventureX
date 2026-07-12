@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { POC_CANDIDATE_COUNT } from "@/lib/poc-scope";
 import { requireUser } from "@/lib/insforge/auth";
 import { createAuthedServerClient } from "@/lib/insforge/server";
 import { submitStage1ExtractionForm } from "./actions";
@@ -154,6 +155,15 @@ export default async function VenturePage({
     venture.status === "candidates_ready" && candidatesExist && !parametersExist;
   const showParametersLink = parametersExist;
   const showTableLink = cellsExist;
+  // Stage 5 writes the comparison-table cells by researching each candidate.
+  // Before the first cell exists, the table link is intentionally hidden, so
+  // make the next action explicit instead of leaving the user at a dead end
+  // after parameter generation completes.
+  const showStartTableResearch =
+    venture.status === "parameters_ready" &&
+    candidatesExist &&
+    parametersExist &&
+    !cellsExist;
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
@@ -318,10 +328,10 @@ export default async function VenturePage({
             Stage 3 — Candidate generation
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Brainstorm 36–45 competitor candidates across the three categories
-            (Direct / Category / Same-Problem-Different-Mechanism) using the
-            human-refined profile + canonical dimension weights. LLM-only at
-            M12; web-augmented evidence lands in M13.
+            Credit-controlled PoC: generate exactly {POC_CANDIDATE_COUNT}
+            companies—one Direct, one Category, and one
+            Same-Problem-Different-Mechanism candidate. The prompt, validator,
+            output-token limit, and evidence search are all capped server-side.
           </p>
           <div className="mt-3">
             <GenerateCandidatesButton ventureId={venture.id} />
@@ -349,10 +359,32 @@ export default async function VenturePage({
           <p className="mt-2 text-muted-foreground">
             Generate the Tier 3 brief-specific parameters, merge them with the
             Universal and Framework parameter catalogs, and snapshot the full
-            schema for downstream cell research.
+            schema. The catalog remains complete, but paid PoC research is
+            server-capped to a mixed-difficulty set of 10 parameters.
           </p>
           <div className="mt-3">
             <GenerateParametersButton ventureId={venture.id} />
+          </div>
+        </section>
+      )}
+
+      {showStartTableResearch && (
+        <section className="mt-8 rounded-md border border-dashed border-border p-4 text-sm">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Stage 5 — Fill comparison table
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Research the PoC parameter set for each candidate to populate the
+            comparison table. The Candidates page shows the estimate and asks
+            for confirmation before starting the batch.
+          </p>
+          <div className="mt-3">
+            <Link
+              href={`/ventures/${venture.id}/candidates`}
+              className="inline-block rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+            >
+              Research candidates and fill table →
+            </Link>
           </div>
         </section>
       )}

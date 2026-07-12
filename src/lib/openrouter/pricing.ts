@@ -14,8 +14,10 @@ export const MODEL_PRICING: Record<
   { input: number; output: number }
 > = {
   // Claude family
+  "anthropic/claude-opus-4.8": { input: 15e-6, output: 75e-6 },
   "anthropic/claude-opus-4.7": { input: 15e-6, output: 75e-6 },
   "anthropic/claude-opus-4.6": { input: 15e-6, output: 75e-6 },
+  "anthropic/claude-sonnet-5": { input: 2e-6, output: 10e-6 },
   "anthropic/claude-sonnet-4.6": { input: 3e-6, output: 15e-6 },
   "anthropic/claude-haiku-4.5": { input: 1e-6, output: 5e-6 },
 

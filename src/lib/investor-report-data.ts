@@ -1,4 +1,8 @@
 import type { InsForgeClient } from "@/lib/insforge/server";
+import {
+  POC_CANDIDATE_COUNT,
+  POC_PARAMETER_COUNT,
+} from "@/lib/poc-scope";
 import { loadComparisonTableData } from "@/lib/table-data";
 import type {
   ComparisonCandidate,
@@ -18,8 +22,8 @@ import {
  * ranked companies and ten parameters. The production expansion is a data
  * volume change (10 companies + the complete schema), not a report redesign.
  */
-export const REPORT_CANDIDATE_LIMIT = 3;
-export const REPORT_PARAMETER_LIMIT = 10;
+export const REPORT_CANDIDATE_LIMIT = POC_CANDIDATE_COUNT;
+export const REPORT_PARAMETER_LIMIT = POC_PARAMETER_COUNT;
 
 export interface InvestorReportWeight {
   dimension: Dimension;

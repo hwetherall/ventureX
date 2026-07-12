@@ -17,6 +17,12 @@ const DEFAULT_TIMEOUT_MS = 60_000;
 const CHARS_PER_TOKEN = 4;
 const DEFAULT_ESTIMATED_OUTPUT_TOKENS = 2_000;
 
+// Always send max_tokens to OpenRouter. When omitted, OpenRouter reserves
+// credits for the model's full max output (often 64k–128k on frontier models),
+// which returns HTTP 402 even when the account has enough credits for the
+// actual response. 16k covers Stage 1 profile JSON with headroom.
+const DEFAULT_MAX_TOKENS = 16_000;
+
 // Env-derived defaults resolved once at module load. Override per-call via args.
 const ENV_MAX_INPUT_TOKENS = parseEnvInt("MAX_INPUT_TOKENS", 200_000);
 const ENV_MAX_COST_USD_PER_RUN = parseEnvFloat("MAX_COST_USD_PER_RUN", 5);
@@ -67,6 +73,12 @@ export interface CallLLMArgs<T> {
   inputDocuments?: { filename: string; doc_id?: string }[];
   /** Conservative output-token estimate for the pre-call cost guardrail. */
   estimatedOutputTokens?: number;
+  /**
+   * Hard cap sent to OpenRouter as `max_tokens`. Defaults to
+   * {@link DEFAULT_MAX_TOKENS}. Must be set — omitting it makes OpenRouter
+   * reserve the model's full max output and commonly triggers HTTP 402.
+   */
+  maxTokens?: number;
 }
 
 /**
@@ -135,6 +147,13 @@ export async function callLLM<T = string>(
   const maxCostPerRun = args.maxCostUsdPerRun ?? ENV_MAX_COST_USD_PER_RUN;
   const estimatedOutputTokens =
     args.estimatedOutputTokens ?? DEFAULT_ESTIMATED_OUTPUT_TOKENS;
+  // Prefer an explicit maxTokens; otherwise size the OpenRouter reservation
+  // from the cost-estimate with a floor so tiny estimates (e.g. 400) don't
+  // truncate real responses, and a default that avoids full-context holds.
+  const maxTokens = Math.max(
+    args.maxTokens ?? DEFAULT_MAX_TOKENS,
+    estimatedOutputTokens,
+  );
   const wantsJson = args.expectJson === true || args.schema !== undefined;
 
   const estInputTokens = estimateTokens(args.prompt);
@@ -158,6 +177,7 @@ export async function callLLM<T = string>(
       args,
       llmCallId,
       timeoutMs,
+      maxTokens,
       wantsJson,
     });
   } catch (error) {
@@ -276,9 +296,10 @@ async function executeWithValidationRetry<T>(params: {
   args: CallLLMArgs<T>;
   llmCallId: string;
   timeoutMs: number;
+  maxTokens: number;
   wantsJson: boolean;
 }): Promise<CallLLMResult<T>> {
-  const { args, llmCallId, timeoutMs, wantsJson } = params;
+  const { args, llmCallId, timeoutMs, maxTokens, wantsJson } = params;
   let currentPrompt = args.prompt;
 
   for (let attempt = 1; attempt <= 2; attempt++) {
@@ -286,6 +307,7 @@ async function executeWithValidationRetry<T>(params: {
       model: args.model,
       prompt: currentPrompt,
       timeoutMs,
+      maxTokens,
     });
 
     const rawResponse = response.choices[0]?.message.content;
@@ -347,7 +369,7 @@ async function executeWithValidationRetry<T>(params: {
         );
       }
 
-      currentPrompt = buildRetryPrompt(args.prompt);
+      currentPrompt = buildRetryPrompt(args.prompt, validationError);
     }
   }
 
@@ -363,11 +385,20 @@ function validateJsonResponse<T>(
   return schema ? schema.parse(parsed) : (parsed as T);
 }
 
-function buildRetryPrompt(originalPrompt: string): string {
+function buildRetryPrompt(
+  originalPrompt: string,
+  validationError: unknown,
+): string {
+  const detail = stringifyError(validationError).slice(0, 1500);
   return (
     originalPrompt +
     "\n\n# IMPORTANT — RETRY\n" +
-    "Your previous response could not be parsed or did not match the required schema. " +
+    "Your previous response could not be parsed or did not match the required schema.\n" +
+    "Validation errors from the previous attempt:\n" +
+    detail +
+    "\n\nFix every listed field. In particular: any field described as a list/" +
+    "array MUST be a JSON array (e.g. `[\"a\", \"b\"]`), never a single " +
+    "comma-separated string.\n" +
     "Return ONLY a single valid JSON object matching the schema above. " +
     "Do not include prose preamble or postamble, and do not wrap the JSON in code fences."
   );
@@ -435,8 +466,9 @@ async function callOpenRouterRaw(args: {
   model: string;
   prompt: string;
   timeoutMs: number;
+  maxTokens: number;
 }): Promise<{ response: OpenRouterResponse; latencyMs: number }> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
     throw new OpenRouterError("OPENROUTER_API_KEY not set in environment");
   }
@@ -458,12 +490,25 @@ async function callOpenRouterRaw(args: {
       body: JSON.stringify({
         model: args.model,
         messages: [{ role: "user", content: args.prompt }],
+        // Required: without this, OpenRouter holds credits for the model's
+        // full max output and returns 402 on funded accounts.
+        max_tokens: args.maxTokens,
       }),
       signal: controller.signal,
     });
 
     if (!res.ok) {
       const body = await res.text().catch(() => "");
+      if (res.status === 402) {
+        throw new OpenRouterError(
+          `OpenRouter returned 402 (insufficient credits for this request). ` +
+            `Often caused by a per-key spend limit or by OpenRouter reserving ` +
+            `more than your remaining balance for max_tokens=${args.maxTokens}. ` +
+            `Check https://openrouter.ai/settings/credits and the key's limit. ` +
+            `Body: ${body.slice(0, 400)}`,
+          res.status,
+        );
+      }
       throw new OpenRouterError(
         `OpenRouter returned ${res.status}: ${body.slice(0, 500)}`,
         res.status,

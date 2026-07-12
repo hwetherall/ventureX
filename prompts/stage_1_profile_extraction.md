@@ -57,18 +57,21 @@ or redacted, leave it out and pick a different one.
   technology approach. "Rack-mounted hardware device with monitored outlets" 
   is good; "power product" is not.
 - platform_or_pipe: "pipe" | "platform" | "hybrid"
-- core_features: List of 3–7 features that define the offering
-- substitution_landscape: What ALTERNATIVE mechanisms could serve the same JTBD? 
-  This is critical — list 3–6 substitutes even if they're not currently 
-  competitors. (e.g., for a rack PDU venture: busbar+tap-off, power shelves, 
-  DC distribution, integrated server-mounted power)
+- core_features: **JSON array of strings** (3–7 entries). One feature per
+  element — never a single comma-separated string.
+- substitution_landscape: **JSON array of strings** (3–6 entries). What
+  ALTERNATIVE mechanisms could serve the same JTBD? Critical — list substitutes
+  even if they're not currently competitors. One mechanism per element
+  (e.g. `["busbar+tap-off", "power shelves", "DC distribution",
+  "integrated server-mounted power"]`).
 
 ## dimensions.customers
 - segment_type: B2C | B2B-SME | B2B-Enterprise | B2G | mixed
 - buyer: Who writes the check
 - user: Who actually uses the product (may differ from buyer)
-- target_sub_segments: e.g., "hyperscale data centers, colocation providers, 
-  enterprise on-prem"
+- target_sub_segments: **JSON array of strings.** One sub-segment per element —
+  never a single comma-separated string. Example:
+  `["hyperscale data centers", "colocation providers", "enterprise on-prem"]`
 - buyer_sophistication: low | medium | high
 
 ## dimensions.transaction
@@ -82,11 +85,11 @@ or redacted, leave it out and pick a different one.
 - revenue_recurrence: one_time | recurring | mixed
 
 ## dimensions.partners
-- distribution_channels: List
-- key_suppliers: List (if known)
-- regulators_certifications: List (UL, CE, FCC, regional bodies)
-- system_integrators_resellers: List
-- complementary_product_partners: List
+- distribution_channels: **JSON array of strings**
+- key_suppliers: **JSON array of strings** (if known; empty array if unknown)
+- regulators_certifications: **JSON array of strings** (UL, CE, FCC, regional bodies)
+- system_integrators_resellers: **JSON array of strings**
+- complementary_product_partners: **JSON array of strings**
 
 ## dimensions.access (LRAM model)
 - learn: How customers learn the offering exists
@@ -208,7 +211,7 @@ under `dimensions`, NOT at the top level):
   "current_maturity": "pre_concept",
   "dimensions": {
     "product_solution":     { "job_to_be_done": "...", "solution_mechanism": "...", "platform_or_pipe": "...", "core_features": [...], "substitution_landscape": [...], "confidence": 0.9, "supporting_quotes": [...] },
-    "customers":            { ... },
+    "customers":            { "segment_type": "B2B-Enterprise", "buyer": "...", "user": "...", "target_sub_segments": ["hyperscale data centers", "colocation providers"], "buyer_sophistication": "high", "confidence": 0.8, "supporting_quotes": [...] },
     "transaction":          { ... },
     "partners":             { ... },
     "access":               { ... },

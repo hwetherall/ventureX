@@ -2,6 +2,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/insforge/auth";
 import { createAuthedServerClient } from "@/lib/insforge/server";
+import {
+  POC_PARAMETER_COUNT,
+  selectPocResearchParameters,
+} from "@/lib/poc-scope";
 import { ParameterSchema, type Parameter } from "@/types/parameter";
 
 interface VentureRow {
@@ -95,6 +99,9 @@ export default async function ParametersPage({
 
   const parameters = parsed.data;
   const dynamicCount = parameters.filter((p) => p.tier === "dynamic").length;
+  const pocParameterIds = new Set(
+    selectPocResearchParameters(parameters).map((parameter) => parameter.id),
+  );
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
@@ -106,6 +113,9 @@ export default async function ParametersPage({
         </span>
         <span className="rounded bg-muted px-2 py-1 font-medium">
           {dynamicCount} dynamic
+        </span>
+        <span className="rounded bg-[color:var(--color-success-bg,transparent)] px-2 py-1 font-medium text-[color:var(--color-success-fg)]">
+          {POC_PARAMETER_COUNT} researched in PoC
         </span>
         <span className="rounded bg-muted px-2 py-1 font-mono">
           run {run.id.slice(0, 8)}
@@ -127,11 +137,19 @@ export default async function ParametersPage({
         </p>
       )}
 
+      <p className="mt-6 rounded-md border border-border bg-surface p-3 text-sm text-muted-foreground">
+        This page preserves the complete parameter catalog for later scaling.
+        Paid PoC research is server-capped to the ten cards marked “PoC
+        research”: 3 Universal, 4 Framework, and 3 Dynamic parameters sampled
+        across the schema.
+      </p>
+
       {TIER_ORDER.map((tier) => (
         <ParameterTierSection
           key={tier}
           tier={tier}
           parameters={parameters.filter((p) => p.tier === tier)}
+          pocParameterIds={pocParameterIds}
         />
       ))}
     </main>
@@ -141,9 +159,11 @@ export default async function ParametersPage({
 function ParameterTierSection({
   tier,
   parameters,
+  pocParameterIds,
 }: {
   tier: Parameter["tier"];
   parameters: Parameter[];
+  pocParameterIds: Set<string>;
 }) {
   return (
     <section className="mt-10">
@@ -157,14 +177,24 @@ function ParameterTierSection({
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         {parameters.map((parameter) => (
-          <ParameterCard key={parameter.id} parameter={parameter} />
+          <ParameterCard
+            key={parameter.id}
+            parameter={parameter}
+            selectedForPoc={pocParameterIds.has(parameter.id)}
+          />
         ))}
       </div>
     </section>
   );
 }
 
-function ParameterCard({ parameter }: { parameter: Parameter }) {
+function ParameterCard({
+  parameter,
+  selectedForPoc,
+}: {
+  parameter: Parameter;
+  selectedForPoc: boolean;
+}) {
   return (
     <article className="rounded-md border border-border bg-surface p-4 text-sm">
       <div className="flex items-start justify-between gap-3">
@@ -188,6 +218,11 @@ function ParameterCard({ parameter }: { parameter: Parameter }) {
         {parameter.citation_required && (
           <span className="rounded bg-muted px-2 py-0.5 font-mono">
             cite
+          </span>
+        )}
+        {selectedForPoc && (
+          <span className="rounded bg-[color:var(--color-success-bg,transparent)] px-2 py-0.5 font-medium text-[color:var(--color-success-fg)]">
+            PoC research
           </span>
         )}
       </div>

@@ -22,7 +22,7 @@ const STAGE = "stage_1_extract";
 // ABB-scale corpus typically complete in 30-120s; this leaves headroom.
 const STAGE_1_TIMEOUT_MS = 180_000;
 
-const DEFAULT_STAGE_1_MODEL = "anthropic/claude-opus-4.7";
+const DEFAULT_STAGE_1_MODEL = "anthropic/claude-sonnet-5";
 
 // Placeholder line that lives at the bottom of the prompt template. We strip
 // it before appending the real document section so the LLM doesn't see two
@@ -134,6 +134,8 @@ export async function runStage1Extraction(
       runId,
       schema: VentureProfileSchema,
       timeoutMs: STAGE_1_TIMEOUT_MS,
+      // Full 7-dimension profile JSON with quotes routinely lands 4–10k tokens.
+      estimatedOutputTokens: 12_000,
       inputDocuments: docs.map((d) => ({ filename: d.filename, doc_id: d.id })),
     });
 

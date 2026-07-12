@@ -11,9 +11,17 @@ import {
   TokenLimitError,
 } from "@/lib/openrouter/errors";
 import { loadPrompt } from "@/lib/prompts";
+import {
+  POC_CANDIDATE_COUNT,
+  POC_CANDIDATE_SCOPE,
+  POC_STAGE3_ESTIMATED_OUTPUT_TOKENS,
+  POC_STAGE3_MAX_OUTPUT_TOKENS,
+  POC_STAGE3_MAX_SEARCH_QUERIES,
+  POC_STAGE3_RESULTS_PER_QUERY,
+} from "@/lib/poc-scope";
 import { errorMessage } from "@/lib/utils";
 import {
-  Stage3CandidatesOutputSchema,
+  Stage3PocCandidatesOutputSchema,
   type CandidateCompany,
   type Citation,
   type Stage3CandidatesOutput,
@@ -27,17 +35,17 @@ import {
 
 const STAGE = "stage_3_candidates";
 
-// PHASE3.md §7: Stage 3 input is ≈8-10k tokens (profile JSON + weights JSON +
-// the prompt body itself). Output is the bigger driver — 36-45 candidates
-// with ~500-char rationales = ~4-5.5k output tokens, comparable to Stage 1's
-// full profile JSON. At Opus 4.7's sustained ~40 tok/s generation, pure
-// streaming time is 100-140s before TTFT and network overhead, so 90s cut
-// off mid-stream on the first ABB run. Mirror Stage 1 at 180s.
+// The production discovery path historically produced 36-45 candidates.
+// The current PoC path is hard-capped at three, but the input still carries a
+// profile, weights, and bounded web evidence. Retain the generous timeout for
+// slow provider starts while constraining output tokens separately below.
 const STAGE_3_TIMEOUT_MS = 180_000;
 
 const DEFAULT_STAGE_3_MODEL = "anthropic/claude-opus-4.7";
+const POC_PROMPT = "stage_3_candidate_generation_poc.md";
+const POC_SCOPE_PLACEHOLDER = "{{POC_CANDIDATE_SCOPE}}";
 
-// Matches the placeholder line at the end of prompts/stage_3_candidate_generation.md.
+// Matches the placeholder line at the end of the PoC Stage 3 prompt.
 // The orchestrator strips it before appending the three input blocks (profile,
 // weights, web evidence) so the prompt file stays self-documenting.
 const DOCUMENTS_PLACEHOLDER =
@@ -60,8 +68,9 @@ export interface RunStage3CandidatesInput {
  * @public
  * Result of {@link runStage3Candidates}.
  *
- *   - `ok: true` — Stage 3 ran, 10-60 `candidate_companies` rows were inserted
- *     with a shared `generation_run_id`, venture is in `candidates_ready`.
+ *   - `ok: true` — Stage 3 ran, exactly three PoC `candidate_companies` rows
+ *     were inserted with a shared `generation_run_id`; venture is in
+ *     `candidates_ready`.
  *   - `ok: false` — Hard failure (precondition violated, budget exhausted,
  *     validation failed, DB write failure). Venture status is `error`.
  *
@@ -125,9 +134,9 @@ interface WebEvidenceBlock {
  * evidence by running one Exa neural search per
  * `strategic_risks_and_uncertainties[].implies_search_for` (parallel), calls
  * Opus 4.7 with profile + weights + evidence, validates the output against
- * `Stage3CandidatesOutputSchema`, deduplicates within-run by case-folded
- * name (merging citations), and inserts 10-60 `candidate_companies` rows
- * sharing one `generation_run_id`. Candidates grounded in web evidence
+ * `Stage3PocCandidatesOutputSchema`, deduplicates within-run by case-folded
+ * name (merging citations), and inserts exactly three `candidate_companies`
+ * rows sharing one `generation_run_id`. Candidates grounded in web evidence
  * carry up to 3 citations; training-data-only candidates carry no
  * citations. P3-D12: this path supersedes the M12 LLM-only flow.
  *
@@ -186,7 +195,7 @@ export async function runStage3Candidates(
     // prefix so the user can distinguish search failures from LLM failures.
     const webEvidence = await gatherWebEvidence(profileVersion.profile);
 
-    const promptBody = await loadPrompt("stage_3_candidate_generation.md");
+    const promptBody = await loadPrompt(POC_PROMPT);
     const prompt = assembleStage3Prompt(
       promptBody,
       profileVersion.profile,
@@ -203,12 +212,13 @@ export async function runStage3Candidates(
       prompt,
       ventureId,
       runId,
-      schema: Stage3CandidatesOutputSchema,
+      schema: Stage3PocCandidatesOutputSchema,
       timeoutMs: STAGE_3_TIMEOUT_MS,
-      // The brainstorm output is larger than Stage 1/2 — 36-45 candidates ×
-      // ~150 tokens each = ~6-7k completion tokens. Set the budget estimate
-      // accordingly so the pre-call guardrail doesn't surprise-clip the run.
-      estimatedOutputTokens: 7_000,
+      // Credit-control guardrail: the PoC schema needs only three concise
+      // candidates, so both the pre-call estimate and provider reservation
+      // are far below the old 7k-token production brainstorm allowance.
+      estimatedOutputTokens: POC_STAGE3_ESTIMATED_OUTPUT_TOKENS,
+      maxTokens: POC_STAGE3_MAX_OUTPUT_TOKENS,
     });
 
     // Within-run dedup by case-folded name. The web-search step can surface
@@ -217,6 +227,11 @@ export async function runStage3Candidates(
     // occurrence's type/rationale (model's primary placement) and merge
     // citation URLs from later duplicates, capping at 3 per candidate.
     const dedupedCandidates = dedupCandidates(result.data.candidates);
+    if (dedupedCandidates.length !== POC_CANDIDATE_COUNT) {
+      throw new OrchestratorError(
+        `PoC candidate generation must persist exactly ${POC_CANDIDATE_COUNT} distinct companies; deduplication produced ${dedupedCandidates.length}.`,
+      );
+    }
 
     const candidateIds = await insertCandidates(insforge, {
       ventureId,
@@ -462,7 +477,15 @@ function assembleStage3Prompt(
   weights: CanonicalWeights,
   webEvidence: WebEvidenceBlock[],
 ): string {
-  const stripped = promptBody.replace(DOCUMENTS_PLACEHOLDER, "").trimEnd();
+  if (!promptBody.includes(POC_SCOPE_PLACEHOLDER)) {
+    throw new OrchestratorError(
+      `${POC_PROMPT} is missing the required PoC scope placeholder.`,
+    );
+  }
+  const stripped = promptBody
+    .replace(POC_SCOPE_PLACEHOLDER, POC_CANDIDATE_SCOPE)
+    .replace(DOCUMENTS_PLACEHOLDER, "")
+    .trimEnd();
 
   // The weights block carries weight + rationale per dimension. The model uses
   // weight for tilt + rationale for context — see prompts/stage_3_*.md
@@ -606,15 +629,17 @@ async function insertCandidates(
 async function gatherWebEvidence(
   profile: VentureProfile,
 ): Promise<WebEvidenceBlock[]> {
-  const queries = profile.strategic_risks_and_uncertainties.map(
-    (r) => r.implies_search_for,
-  );
+  const queries = profile.strategic_risks_and_uncertainties
+    .slice(0, POC_STAGE3_MAX_SEARCH_QUERIES)
+    .map((r) => r.implies_search_for);
 
   if (queries.length === 0) {
     return [];
   }
 
-  const responses = await exaSearchBatch(queries);
+  const responses = await exaSearchBatch(queries, {
+    numResults: POC_STAGE3_RESULTS_PER_QUERY,
+  });
 
   return responses.map((r) => ({
     query: r.query,

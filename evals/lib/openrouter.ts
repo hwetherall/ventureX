@@ -19,14 +19,14 @@
  *   - No `runId` plumbing — irrelevant without DB
  */
 
-import type { ZodSchema } from "zod";
+import type { ZodType, ZodTypeDef } from "zod";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 export interface DirectCallOptions<T> {
   model: string;
   prompt: string;
-  schema: ZodSchema<T>;
+  schema: ZodType<T, ZodTypeDef, unknown>;
   timeoutMs?: number;
   /** Visible in OpenRouter dashboards as the request title. */
   title?: string;
@@ -100,7 +100,7 @@ export async function callOpenRouterDirect<T>(
           `LLM output failed validation after 2 attempts: ${validationError instanceof Error ? validationError.message : String(validationError)}`,
         );
       }
-      currentPrompt = buildRetryPrompt(opts.prompt);
+      currentPrompt = buildRetryPrompt(opts.prompt, validationError);
     }
   }
 
@@ -131,6 +131,9 @@ async function callRaw(args: {
       body: JSON.stringify({
         model: args.model,
         messages: [{ role: "user", content: args.prompt }],
+        // Without max_tokens, OpenRouter reserves the model's full max output
+        // and commonly returns HTTP 402 on otherwise-funded keys.
+        max_tokens: 56_000,
       }),
       signal: controller.signal,
     });
@@ -163,11 +166,24 @@ function extractAndParseJson(text: string): unknown {
   }
 }
 
-function buildRetryPrompt(originalPrompt: string): string {
+function buildRetryPrompt(
+  originalPrompt: string,
+  validationError: unknown,
+): string {
+  const detail = (
+    validationError instanceof Error
+      ? validationError.message
+      : String(validationError)
+  ).slice(0, 1500);
   return (
     originalPrompt +
     "\n\n# IMPORTANT — RETRY\n" +
-    "Your previous response could not be parsed or did not match the required schema. " +
+    "Your previous response could not be parsed or did not match the required schema.\n" +
+    "Validation errors from the previous attempt:\n" +
+    detail +
+    "\n\nFix every listed field. In particular: any field described as a list/" +
+    "array MUST be a JSON array (e.g. `[\"a\", \"b\"]`), never a single " +
+    "comma-separated string.\n" +
     "Return ONLY a single valid JSON object matching the schema above. " +
     "Do not include prose preamble or postamble, and do not wrap the JSON in code fences."
   );

@@ -15,6 +15,10 @@ import {
   TokenLimitError,
 } from "@/lib/openrouter/errors";
 import { predictStage5Cost } from "@/lib/openrouter/predict";
+import {
+  POC_PARAMETER_COUNT,
+  selectPocResearchParameters,
+} from "@/lib/poc-scope";
 import { loadPrompt } from "@/lib/prompts";
 import { errorMessage } from "@/lib/utils";
 import {
@@ -249,10 +253,17 @@ export async function runStage5CellResearchMulti(
 
   try {
     const venture = await claimCellsResearchingStatus(insforge, ventureId);
-    const { parameters } = await loadLatestParameterSchema(insforge, ventureId);
+    const { parameters: fullParameterSchema } =
+      await loadLatestParameterSchema(insforge, ventureId);
+    const parameters = selectPocResearchParameters(fullParameterSchema);
+    if (parameters.length !== POC_PARAMETER_COUNT) {
+      throw new OrchestratorError(
+        `PoC research requires ${POC_PARAMETER_COUNT} parameters; the available schema produced ${parameters.length}.`,
+      );
+    }
 
-    // Pre-flight predictor over the FULL batch. Single point at which we
-    // gate the per-venture budget cap.
+    // Pre-flight predictor over the capped 3×10 PoC batch. Single point at
+    // which we gate the per-venture budget cap.
     const prediction = predictStage5Cost({
       parameters,
       candidateCount: candidateIds.length,

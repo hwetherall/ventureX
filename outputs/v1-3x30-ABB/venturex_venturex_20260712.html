@@ -1,0 +1,1104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VentureX - VentureX comparison table</title>
+  <style>
+    
+:root {
+  --vx-bg: var(--color-background, #fafafa);
+  --vx-surface: var(--color-surface, #ffffff);
+  --vx-surface-raised: var(--color-surface-elevated, #f4f4f5);
+  --vx-text: var(--color-foreground, #18181b);
+  --vx-muted: var(--color-muted-foreground, #71717a);
+  --vx-border: var(--color-border, #e4e4e7);
+  --vx-hover: color-mix(in srgb, var(--vx-surface-raised) 70%, transparent);
+  --vx-verified: #059669;
+  --vx-inferred: #d97706;
+  --vx-unknown: #9ca3af;
+  --vx-error: var(--color-error-fg, #b91c1c);
+  --vx-warning-bg: var(--color-warning-bg, #fffbeb);
+  --vx-warning-fg: var(--color-warning-fg, #b45309);
+  --vx-focus: var(--color-ring, #818cf8);
+  --vx-accent: var(--color-accent, #4f46e5);
+}
+
+.vx-page {
+  min-height: 100vh;
+  background: var(--vx-bg);
+  color: var(--vx-text);
+}
+
+.vx-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--vx-border);
+  background: var(--vx-bg);
+}
+
+.vx-toolbar h1 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.vx-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.vx-link-button,
+.vx-secondary-button,
+.vx-primary-button,
+.vx-icon-button {
+  border: 1px solid var(--vx-border);
+  border-radius: 4px;
+  background: var(--vx-surface);
+  color: var(--vx-text);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.vx-link-button,
+.vx-secondary-button,
+.vx-primary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 0 10px;
+}
+
+.vx-primary-button {
+  background: var(--vx-text);
+  border-color: var(--vx-text);
+  color: var(--vx-bg);
+}
+
+.vx-icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+}
+
+.vx-link-button:hover,
+.vx-secondary-button:hover,
+.vx-icon-button:hover {
+  background: var(--vx-surface-raised);
+}
+
+.vx-primary-button:hover {
+  opacity: 0.9;
+}
+
+.vx-link-button:focus-visible,
+.vx-secondary-button:focus-visible,
+.vx-primary-button:focus-visible,
+.vx-icon-button:focus-visible,
+.vx-cell-button:focus-visible,
+.vx-tier-toggle:focus-visible {
+  outline: 2px solid var(--vx-focus);
+  outline-offset: -2px;
+}
+
+.vx-table-viewport {
+  height: calc(100vh - 69px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.vx-table-grid {
+  display: grid;
+  grid-template-columns: 240px repeat(var(--candidate-count), 280px);
+  align-items: stretch;
+  min-width: calc(240px + (var(--candidate-count) * 280px));
+}
+
+.vx-corner,
+.vx-candidate-header,
+.vx-param-cell,
+.vx-tier-left,
+.vx-tier-fill,
+.vx-data-cell {
+  box-sizing: border-box;
+  border-right: 1px solid var(--vx-border);
+  border-bottom: 1px solid var(--vx-border);
+  background: var(--vx-surface);
+}
+
+.vx-corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  height: 96px;
+  padding: 12px 14px;
+  border-right-color: var(--vx-text);
+  border-bottom-color: var(--vx-text);
+}
+
+.vx-brand {
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--vx-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.vx-venture-title {
+  margin-top: 7px;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.vx-corner-meta,
+.vx-candidate-meta,
+.vx-param-key,
+.vx-modal-meta,
+.vx-citation-url {
+  color: var(--vx-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.vx-corner-meta {
+  margin-top: 4px;
+}
+
+.vx-candidate-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  height: 96px;
+  padding: 12px 14px;
+}
+
+.vx-candidate-inner {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 10px;
+  align-items: center;
+  height: 100%;
+}
+
+.vx-logo,
+.vx-logo-fallback {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--vx-border);
+  border-radius: 4px;
+  object-fit: contain;
+  background: var(--vx-surface-raised);
+}
+
+.vx-logo-fallback {
+  display: grid;
+  place-items: center;
+  color: var(--vx-muted);
+  font-weight: 600;
+}
+
+.vx-candidate-name {
+  font-size: 15px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.vx-stats-button {
+  display: block;
+  margin: 4px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vx-muted);
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: default;
+}
+
+.vx-score-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vx-rank-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--vx-muted);
+}
+
+.vx-rank-badge {
+  border: 1px solid var(--vx-accent);
+  border-radius: 4px;
+  padding: 0 4px;
+  color: var(--vx-accent);
+  font-weight: 600;
+}
+
+.vx-rank-score {
+  font-weight: 600;
+  color: var(--vx-text);
+}
+
+.vx-tier-left,
+.vx-tier-fill {
+  min-height: 48px;
+  background: var(--vx-surface-raised);
+}
+
+.vx-tier-left {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  padding: 0;
+  border-right-color: var(--vx-text);
+}
+
+.vx-tier-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--vx-text);
+  padding: 0 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vx-tier-fill {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  color: var(--vx-muted);
+  font-size: 12px;
+}
+
+.vx-param-cell {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  min-height: 96px;
+  padding: 12px 14px;
+  border-right-color: var(--vx-text);
+}
+
+.vx-param-label {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.vx-tier-badge {
+  flex: 0 0 auto;
+  border: 1px solid var(--vx-border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--vx-muted);
+  font-size: 10px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.vx-tier-badge[data-tier="1"] { border-color: #a7f3d0; }
+.vx-tier-badge[data-tier="2"] { border-color: #fde68a; }
+.vx-tier-badge[data-tier="3"] { border-color: #c7d2fe; }
+
+.vx-param-key {
+  margin-top: 6px;
+  font-family: var(--font-plex-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  overflow-wrap: anywhere;
+}
+
+.vx-data-cell {
+  position: relative;
+  min-height: 96px;
+  padding: 0;
+}
+
+.vx-cell-button {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 95px;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 12px 14px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vx-cell-button:hover {
+  background: var(--vx-hover);
+}
+
+.vx-cell-summary {
+  max-height: 66px;
+  padding-right: 18px;
+  overflow: hidden;
+  color: var(--vx-text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.vx-cell-summary-muted {
+  color: var(--vx-muted);
+  font-style: italic;
+}
+
+.vx-confidence-dot {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--vx-unknown);
+}
+
+.vx-confidence-dot[data-confidence="verified"] { background: var(--vx-verified); }
+.vx-confidence-dot[data-confidence="inferred"] { background: var(--vx-inferred); }
+.vx-confidence-dot[data-confidence="unknown"] { background: var(--vx-unknown); }
+
+.vx-citation-mark {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  color: var(--vx-muted);
+  font-size: 13px;
+}
+
+.vx-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.vx-modal {
+  width: min(720px, 100%);
+  max-height: 80vh;
+  overflow: auto;
+  border: 1px solid var(--vx-border);
+  border-radius: 4px;
+  background: var(--vx-surface);
+  box-shadow: 0 24px 60px rgba(0,0,0,.20);
+}
+
+.vx-modal-header,
+.vx-modal-footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.vx-modal-header {
+  border-bottom: 1px solid var(--vx-border);
+}
+
+.vx-modal-title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.vx-modal-body {
+  padding: 22px 24px 24px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.vx-modal-section + .vx-modal-section {
+  margin-top: 22px;
+}
+
+.vx-modal-section-title {
+  margin: 0 0 8px;
+  color: var(--vx-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.vx-kv {
+  display: grid;
+  grid-template-columns: minmax(120px, 200px) 1fr;
+  gap: 8px 14px;
+}
+
+.vx-kv-key {
+  color: var(--vx-muted);
+  font-family: var(--font-plex-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.vx-kv-value,
+.vx-modal-prose {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.vx-json {
+  overflow: auto;
+  border: 1px solid var(--vx-border);
+  border-radius: 4px;
+  background: var(--vx-surface-raised);
+  padding: 12px;
+  font-family: var(--font-plex-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.vx-citation {
+  border: 1px solid var(--vx-border);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.vx-citation + .vx-citation {
+  margin-top: 10px;
+}
+
+.vx-citation-title {
+  color: var(--vx-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.vx-citation-title:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.vx-citation-url {
+  margin-top: 3px;
+  font-family: var(--font-plex-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  overflow-wrap: anywhere;
+}
+
+.vx-citation blockquote {
+  margin: 10px 0 0;
+  border-left: 2px solid var(--vx-border);
+  padding-left: 10px;
+  color: var(--vx-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.vx-callout {
+  border: 1px solid var(--vx-border);
+  border-radius: 4px;
+  padding: 12px;
+  color: var(--vx-muted);
+  background: var(--vx-surface-raised);
+}
+
+.vx-callout[data-kind="warning"] {
+  border-color: var(--color-warning-border, #fde68a);
+  color: var(--vx-warning-fg);
+  background: var(--vx-warning-bg);
+}
+
+.vx-callout[data-kind="error"] {
+  border-color: var(--color-error-border, #fecaca);
+  color: var(--vx-error);
+  background: var(--color-error-bg, #fef2f2);
+}
+
+.vx-modal-footer {
+  border-top: 1px solid var(--vx-border);
+}
+
+.vx-hidden {
+  display: none !important;
+}
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--vx-bg);
+      color: var(--vx-text);
+    }
+  </style>
+</head>
+<body>
+  <script>window.__venturexStartedAt = performance.now();</script>
+  <script type="application/json" id="venturex-data">{"venture":{"id":"cf724783-065c-44c8-93a4-be29cb154ff9","slug":"venturex","title":"VentureX","generated_at":"2026-07-12T16:08:45.740639+00:00"},"candidates":[{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","name":"Vertiv Holdings","product_line":null,"logo_url":null,"candidate_type":"direct","aggregate_score":null,"dimension_scores":null,"stats":{"total":10,"verified":3,"inferred":5,"unknown":2},"rank":null},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","name":"EMS Elektro Metall Schwanenmühle","product_line":null,"logo_url":null,"candidate_type":"category","aggregate_score":null,"dimension_scores":null,"stats":{"total":10,"verified":2,"inferred":3,"unknown":5},"rank":null},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","name":"Schneider Electric","product_line":null,"logo_url":null,"candidate_type":"same_problem_different_mechanism","aggregate_score":null,"dimension_scores":null,"stats":{"total":10,"verified":3,"inferred":5,"unknown":2},"rank":null}],"parameters":[{"parameter_key":"legal_name","parameter_label":"Legal Name","tier":1,"description":"Find the registered legal name from an official company page, filing, or corporate registry.","value_shape":"string"},{"parameter_key":"headcount","parameter_label":"Headcount (most recent disclosure)","tier":1,"description":"Find the most recent disclosed employee count and date.","value_shape":"object"},{"parameter_key":"latest_material_event","parameter_label":"Latest Material Event (past 12mo)","tier":1,"description":"Find the most recent public material event from the past 12 months.","value_shape":"object"},{"parameter_key":"core_offering","parameter_label":"Core Product / Service Offering","tier":2,"description":"Summarize the competitor's core offering using verifiable product or service facts.","value_shape":"string"},{"parameter_key":"pricing_disclosure","parameter_label":"Pricing Disclosure & Tier Range","tier":2,"description":"Determine whether pricing is public, partially public, or opaque; capture range where disclosed.","value_shape":"object"},{"parameter_key":"sales_cycle_length","parameter_label":"Sales Cycle Length","tier":2,"description":"Capture disclosed sales-cycle length, or a brief qualitative estimate if not disclosed.","value_shape":"string"},{"parameter_key":"rd_capacity","parameter_label":"R&D Capacity (spend / centers / patents)","tier":2,"description":"Capture public R&D spend, centers, patents, or equivalent technical-capacity facts.","value_shape":"string"},{"parameter_key":"busbar_tap_off_offering","parameter_label":"Busbar + tap-off unit offering","tier":3,"description":"Check the competitor's product catalog and datasheets for overhead/vertical busbar systems with tap-off boxes used to distribute power inside data-center rows/racks. Cite product page or datasheet URL.","value_shape":"string"},{"parameter_key":"server_oem_integrator_relationships","parameter_label":"Server OEM and IT integrator relationships","tier":3,"description":"List named server OEM (Dell, HPE, Lenovo, Supermicro, etc.) and IT integrator/reseller partnerships or bundle/reference-sell arrangements the competitor has for rack PDUs. Cite press releases or partner pages.","value_shape":"array"},{"parameter_key":"hyperscaler_reference_wins","parameter_label":"Named hyperscaler / colocation reference wins","tier":3,"description":"List named hyperscaler (AWS, Azure, Google, Meta, Oracle) or top colocation (Equinix, Digital Realty, NTT) customers publicly disclosed as using the competitor's rack PDUs. Cite press releases or case studies.","value_shape":"array"}],"cells":[{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","parameter_key":"hyperscaler_reference_wins","tier":3,"confidence":"unknown","value":null,"citations":[],"reason":"no_evidence_found — snippets describe product announcements (PowerBar Track busway, NVIDIA 800 VDC collaboration, OneCore prefabricated solution) but do not name any specific hyperscaler (AWS, Azure, Google, Meta, Oracle) or colocation (Equinix, Digital Realty, NTT) customers publicly disclosed as using Vertiv rack PDUs.","retrieved_at":"2026-07-12T16:15:16.620474+00:00"},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","parameter_key":"busbar_tap_off_offering","tier":3,"confidence":"inferred","value":"yes_productized","citations":[{"source_title":"🦢 EMS | ⚡️ Busbar Systems Vision®Electric Customized","url":"https://ems-power.com/en/busbar-systems","snippet":"EMS has many years of experience in the engineering, manufacture and installation of innovative Busbar Systems. With our Vision®Electric brand, we have already demonstrated our expertise in numerous projects, including in the data center market. Especially for harsh and industrial environments, we engineer and manufacture Busbar Systems from 1,200 to 300,000 amperes (A) according to your specifications and requirements.","retrieved_at":"2026-07-12T16:13:25.277Z"}],"reason":"The snippet confirms EMS offers productized busbar systems under the Vision®Electric brand, including for data centers, covering a wide current range (1,200–300,000 A). Tap-off units are not explicitly named in the snippets, but the data center busbar system offering with row/rack power distribution is the standard use case for such products, and the product line is clearly commercially available and named, indicating a productized offering rather than a partnership or development stage.","retrieved_at":"2026-07-12T16:13:25.277Z"},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","parameter_key":"pricing_disclosure","tier":2,"confidence":"inferred","value":{"notes":"Powerbus Busway brochure and corporate materials describe product configuration and channel-based sales but do not publish list prices; pricing is quoted via direct sales / channel partners.","range_low":null,"disclosure":"opaque","range_high":null},"citations":[{"source_title":"Powerbus Busway","url":"https://download.schneider-electric.com/files?p_File_Name=5600BR1201.pdf&p_enDocType=Brochure","snippet":"The Powerbus Busway brochure describes technical specifications and configurations but contains no list pricing; Schneider transacts via direct sales and IT/Alliance partner channels.","retrieved_at":"2026-07-12T16:13:25.278Z"}],"reason":"No public price list appears in the M13/T2 citation set; product brochure and partner-program pages indicate quote-based channel/direct sales, consistent with opaque disclosure typical for data center electrical infrastructure.","retrieved_at":"2026-07-12T16:13:25.278Z"},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","parameter_key":"latest_material_event","tier":1,"confidence":"unknown","value":null,"citations":[],"reason":"Cannot reliably identify a specific material event within the past 12 months relative to the current date without fresh research. Schneider has ongoing M&A activity (e.g., Motivair acquisition for liquid cooling announced in 2024, increased stake in AVEVA completed 2024), but pinning the single most recent material event to a verifiable date requires current sourcing.","retrieved_at":"2026-07-12T16:13:33.749273+00:00"},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","parameter_key":"pricing_disclosure","tier":2,"confidence":"inferred","value":{"notes":"EMS sells engineered/customized high-current connection products made-to-order; no list pricing is published on the company site or corporate materials.","range_low":null,"disclosure":"opaque","range_high":null},"citations":[{"source_title":"ELECTRICAL CONNECTIONS made to order","url":"https://ems-power.com/wp-content/uploads/2022/12/EMS_Imagebroschure-EN.pdf","snippet":"INTEGRATED SYSTEMS SOLUTIONS – powered by EMS: ELECTRICAL CONNECTIONS made to order. EMS Elektro Metall Schwanenmühle GmbH — ENGINEERING, PRODUCTION, ASSEMBLY, SERVICE.","retrieved_at":"2026-07-12T16:13:25.277Z"}],"reason":"Brochure positions EMS as an engineered made-to-order supplier with no published price list; pricing is project-quoted, hence opaque.","retrieved_at":"2026-07-12T16:13:25.277Z"},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","parameter_key":"sales_cycle_length","tier":2,"confidence":"inferred","value":"Long (multi-month, project-based)","citations":[{"source_title":"ELECTRICAL CONNECTIONS made to order","url":"https://ems-power.com/wp-content/uploads/2022/12/EMS_Imagebroschure-EN.pdf","snippet":"EMS delivers engineered, made-to-order electrical connections through an engineering, production, assembly and service workflow — implying custom project engagements rather than catalog transactions.","retrieved_at":"2026-07-12T16:13:25.277Z"}],"reason":"Custom-engineered busbar systems for industrial/e-mobility/grid customers typically involve multi-month specification, prototyping and qualification cycles; not explicitly disclosed.","retrieved_at":"2026-07-12T16:13:25.277Z"},{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","parameter_key":"legal_name","tier":1,"confidence":"verified","value":"Vertiv Holdings Co","citations":[],"reason":null,"retrieved_at":"2026-07-12T16:13:41.78334+00:00"},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","parameter_key":"latest_material_event","tier":1,"confidence":"unknown","value":null,"citations":[],"reason":"No specific material event from the past 12 months for EMS Elektro Metall Schwanenmühle GmbH is recalled with confidence from training data. As a private industrial supplier, its news flow is limited and not systematically covered.","retrieved_at":"2026-07-12T16:13:33.662771+00:00"},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","parameter_key":"hyperscaler_reference_wins","tier":3,"confidence":"inferred","value":["Equinix (HK1, liquid cooling deployment)","Google (anchor tenant at TeraWulf Lake Mariner campus)"],"citations":[{"source_title":"Equinix, Dell Technologies and Schneider Electric Support AI Infrastructure in Hong Kong","url":"https://equinix.mediaroom.com/2025-09-10-Equinix,-Dell-Technologies-and-Schneider-Electric-Support-AI-Infrastructure-in-Hong-Kong","snippet":"Equinix, Inc., Dell Technologies and Schneider Electric today announced the successful deployment of liquid cooling technology in Equinix's HK1. Close, cross-industry collaboration enabled this important milestone in supporting advanced AI infrastructure in Hong Kong.","retrieved_at":"2026-07-12T16:13:25.278Z"}],"reason":"Equinix HK1 is directly named as a colocation reference win (Result 2). Google is named as the anchor tenant backer at TeraWulf's Lake Mariner campus (Results 1 & 3), making it an inferred hyperscaler reference win via their backed tenant deployment. Neither press release explicitly names rack PDU deployments specifically, but both confirm Schneider Electric infrastructure deployments at these named customers.","retrieved_at":"2026-07-12T16:13:25.278Z"},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","parameter_key":"server_oem_integrator_relationships","tier":3,"confidence":"inferred","value":["Lenovo"],"citations":[{"source_title":"Schneider Electric Extends Strategic Partnerships with AVEVA, Lenovo and Stratus to Enable IT/OT Convergence","url":"https://www.prnewswire.com/news-releases/schneider-electric-extends-strategic-partnerships-with-aveva-lenovo-and-stratus-to-enable-itot-convergence-301078656.html","snippet":"Schneider Electric today announced the expansion of its partnerships with leading technology companies to address the convergence of IT and OT. The expanded partnerships have resulted in the immediate release of three programs including: new reference designs, co-developed with AVEVA, and integrating solutions from Lenovo and Stratus.","retrieved_at":"2026-07-12T16:13:25.278Z"}],"reason":"Snippet confirms a named server OEM partnership with Lenovo for integrated edge computing solutions, including reference designs. The partnership is IT/OT convergence focused rather than rack PDU-specific, and the evidence is from 2020. No other server OEM (Dell, HPE, Supermicro) or rack PDU-specific integrator relationships are evidenced in the supplied snippets.","retrieved_at":"2026-07-12T16:13:25.278Z"},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","parameter_key":"rd_capacity","tier":2,"confidence":"unknown","value":null,"citations":[],"reason":"Supplied M13/T2 citations describe EMS's engineering and manufacturing capabilities but do not disclose R&D spend, dedicated R&D centers, or patent counts.","retrieved_at":"2026-07-12T16:14:12.856666+00:00"},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","parameter_key":"legal_name","tier":1,"confidence":"verified","value":"EMS Elektro Metall Schwanenmühle GmbH","citations":[],"reason":null,"retrieved_at":"2026-07-12T16:13:33.662771+00:00"},{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","parameter_key":"latest_material_event","tier":1,"confidence":"unknown","value":null,"citations":[],"reason":"Cannot reliably identify a specific material event within a rolling 12-month window without current news access; Vertiv has had frequent product launches, earnings beats, and acquisitions (e.g., CoolTera in 2023), but pinning one to the past 12 months relative to today risks inaccuracy.","retrieved_at":"2026-07-12T16:13:41.78334+00:00"},{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","parameter_key":"pricing_disclosure","tier":2,"confidence":"inferred","value":{"notes":"Vertiv rack PDU product pages and engineered-to-order data sheets describe configurations and features but do not publish list pricing; pricing is quoted via channel/distribution partners and direct sales.","range_low":null,"disclosure":"opaque","range_high":null},"citations":[{"source_title":"Vertiv™ PowerIT Engineered-to-Order","url":"https://www.vertiv.com/49794e/globalassets/products/critical-power/power-distribution/vertiv-geist-custom-rack-pdus-data-sheet.pdf","snippet":"The Geist custom/engineered-to-order rack PDU data sheet describes configurable options and features but does not publish list pricing, consistent with a quote-based B2B model transacted via distributors and direct sales.","retrieved_at":"2026-07-12T16:13:25.282Z"}],"reason":"Product data sheets and catalog pages disclose specifications but no list prices; rack PDUs (especially engineered-to-order) are sold via quote through channel/distribution partners.","retrieved_at":"2026-07-12T16:13:25.282Z"},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","parameter_key":"rd_capacity","tier":2,"confidence":"unknown","value":null,"citations":[],"reason":"Supplied M13/T2 citations cover FY24/FY25 revenue results, partner programs, and a UK manufacturing site, but none disclose R&D spend, R&D center count, or patent figures.","retrieved_at":"2026-07-12T16:13:57.5125+00:00"},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","parameter_key":"core_offering","tier":2,"confidence":"verified","value":"Engineered high-current electrical connection technology and busbar systems (1,200A to 300,000A) for industrial, e-mobility, energy storage, grid, and renewable applications, with data centers as one served vertical.","citations":[{"source_title":"🦢 EMS | ⚡️ Busbar Systems Vision®Electric Customized","url":"https://ems-power.com/en/busbar-systems","snippet":"EMS designs and manufactures customized busbar systems and high-current electrical connections spanning industrial, e-mobility, energy storage, power supply & grids, and renewable energy applications.","retrieved_at":"2026-07-12T16:13:25.277Z"}],"reason":null,"retrieved_at":"2026-07-12T16:13:25.277Z"},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","parameter_key":"headcount","tier":1,"confidence":"inferred","value":{"as_of":"2023-12-31","value":168000},"citations":[],"reason":"Schneider Electric's 2023 Universal Registration Document reported approximately 168,000 employees globally at year-end 2023; more recent 2024 figure may differ slightly.","retrieved_at":"2026-07-12T16:13:33.749273+00:00"},{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","parameter_key":"headcount","tier":1,"confidence":"inferred","value":{"as_of":"2024-12-31","value":30000},"citations":[],"reason":"Vertiv's 10-K disclosures have reported approximately 27,000–30,000 employees globally in recent years; exact figure as of the most recent annual report may vary slightly.","retrieved_at":"2026-07-12T16:13:41.78334+00:00"},{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","parameter_key":"busbar_tap_off_offering","tier":3,"confidence":"verified","value":"yes_productized","citations":[{"source_title":"Vertiv Announces Scalable, High-Capacity Double Stack Busway System that Preserves White Space for Growing AI Data Center Demands","url":"https://www.prnewswire.com/news-releases/vertiv-announces-scalable-high-capacity-double-stack-busway-system-that-preserves-white-space-for-growing-ai-data-center-demands-302702423.html","snippet":"Vertiv (NYSE: VRT), a global leader in critical digital infrastructure, today announced the expansion of the Vertiv™ PowerBar Track busway family with the introduction of a compact, high-capacity double-stack design that enables higher power density while optimizing valuable white-space. Designed to address rapidly evolving AI workloads within colocation and hyperscale data centers, the scalable system delivers high-capacity power distribution through a flexible, modular architecture that supports future growth, enables improved energy efficiency, and provides simplified deployment.","retrieved_at":"2026-07-12T16:13:25.282Z"}],"reason":null,"retrieved_at":"2026-07-12T16:13:25.282Z"},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","parameter_key":"busbar_tap_off_offering","tier":3,"confidence":"verified","value":"yes_productized","citations":[{"source_title":"Powerbus Busway","url":"https://download.schneider-electric.com/files?p_File_Name=5600BR1201.pdf&p_enDocType=Brochure","snippet":"The Powerbus busway delivers flexible and efficient overhead power distribution and offers scalability by featuring the highest tap-off unit density on the market. This modular solution minimizes unintended downtime and improves safety while optimizing energy efficiency. High plug-in unit density — up to 20 ports every 10 feet.","retrieved_at":"2026-07-12T16:13:25.278Z"}],"reason":null,"retrieved_at":"2026-07-12T16:13:25.278Z"},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","parameter_key":"server_oem_integrator_relationships","tier":3,"confidence":"unknown","value":null,"citations":[],"reason":"no_evidence_found — all three snippets cover EMS Elektro Metall Schwanenmühle's company history, busbar systems, and general product categories (e-mobility, energy storage, switchgear). None mention server OEM partnerships (Dell, HPE, Lenovo, Supermicro, etc.) or IT integrator/reseller arrangements for rack PDUs.","retrieved_at":"2026-07-12T16:15:01.585398+00:00"},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","parameter_key":"sales_cycle_length","tier":2,"confidence":"inferred","value":"months to quarters (data center infrastructure project sale)","citations":[],"reason":"Powerbus Busway is a data center electrical-infrastructure product sold through IT/Alliance partner programs and direct sales; such capex-linked deployments typically run multi-month sales cycles. No explicit cycle length disclosed in citations.","retrieved_at":"2026-07-12T16:13:57.5125+00:00"},{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","parameter_key":"core_offering","tier":2,"confidence":"verified","value":"Vertiv's PowerIT/Geist line delivers rack-mounted power distribution units — from basic to monitored, switched, and engineered-to-order intelligent rack PDUs — for data center rack-level power distribution, metering, and monitoring.","citations":[{"source_title":"Vertiv™ PowerIT Monitored Rack PDU | Power Distribution","url":"https://www.vertiv.com/en-anz/products-catalog/critical-power/power-distribution/vertiv-monitored-rack-pdu/","snippet":"Vertiv PowerIT Monitored Rack PDU provides rack-level power distribution with input monitoring for data center environments, part of a broader ladder that includes basic, monitored, switched, and engineered-to-order rack PDU variants.","retrieved_at":"2026-07-12T16:13:25.282Z"}],"reason":null,"retrieved_at":"2026-07-12T16:13:25.282Z"},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","parameter_key":"core_offering","tier":2,"confidence":"verified","value":"Schneider Electric offers Powerbus Busway — an overhead busway power distribution system with high-density tap-off units for delivering protected, metered power to IT racks in data centers, positioned as an alternative to rack-mounted PDUs.","citations":[{"source_title":"Powerbus Busway","url":"https://download.schneider-electric.com/files?p_File_Name=5600BR1201.pdf&p_enDocType=Brochure","snippet":"Powerbus Busway is Schneider Electric's overhead busway system delivering protected, metered power distribution to IT racks via configurable tap-off units, designed for high-density data center environments.","retrieved_at":"2026-07-12T16:13:25.278Z"}],"reason":null,"retrieved_at":"2026-07-12T16:13:25.278Z"},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","parameter_key":"headcount","tier":1,"confidence":"unknown","value":null,"citations":[],"reason":"Private German Mittelstand company; no recent public disclosure of employee count recalled from training data. Company profiles occasionally cite figures in the low hundreds, but I cannot pin this to a specific dated disclosure.","retrieved_at":"2026-07-12T16:13:33.662771+00:00"},{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","parameter_key":"rd_capacity","tier":2,"confidence":"inferred","value":"Vertiv is a NYSE-listed global critical-infrastructure vendor whose 2024 10-K and 2025 Annual Report document a broad power/thermal/IT product portfolio and continued investment in engineering and manufacturing capacity, including a new North American infrastructure solutions manufacturing facility.","citations":[{"source_title":"Vertiv Holdings Co. - Vertiv Expands North American Production Capacity with New Infrastructure Solutions Manufacturing Facility","url":"https://investors.vertiv.com/news/news-details/2024/Vertiv-Expands-North-American-Production-Capacity-with-New-Infrastructure-Solutions-Manufacturing-Facility/default.aspx","snippet":"Vertiv announced expansion of North American production capacity with a new Infrastructure Solutions manufacturing facility, reflecting ongoing capital investment behind its power, thermal, and IT infrastructure product engineering footprint.","retrieved_at":"2026-07-12T16:13:25.282Z"}],"reason":"M13 citations confirm Vertiv's scale (10-K, annual report, manufacturing expansion) but do not disclose specific R&D spend figures, center counts, or patent totals; capacity is inferred from public corporate footprint.","retrieved_at":"2026-07-12T16:13:25.282Z"},{"candidate_id":"2bfb8c50-686f-41e3-b144-ae4d66c68ee5","parameter_key":"hyperscaler_reference_wins","tier":3,"confidence":"unknown","value":null,"citations":[],"reason":"no_evidence_found — none of the supplied snippets name any hyperscaler (AWS, Azure, Google, Meta, Oracle) or top colocation provider (Equinix, Digital Realty, NTT) as a named customer of EMS Elektro Metall Schwanenmühle's rack PDUs or busbar products. The snippets cover company history, product categories, and an acquisition announcement without disclosing specific reference customers.","retrieved_at":"2026-07-12T16:15:01.585398+00:00"},{"candidate_id":"2ef850c6-1efa-4458-99ff-e34dcd2d2252","parameter_key":"legal_name","tier":1,"confidence":"verified","value":"Schneider Electric SE","citations":[],"reason":null,"retrieved_at":"2026-07-12T16:13:33.749273+00:00"},{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","parameter_key":"sales_cycle_length","tier":2,"confidence":"inferred","value":"Weeks to several months (project-based B2B; longer for engineered-to-order and hyperscale deployments)","citations":[],"reason":"Rack PDUs are sold both as catalog SKUs through distributors (short cycle) and as engineered-to-order configurations tied to data center build-outs (multi-month cycle); no explicit disclosure in M13 citations.","retrieved_at":"2026-07-12T16:14:35.389518+00:00"},{"candidate_id":"8691b160-4bad-4bd2-bb1e-5f44481df65c","parameter_key":"server_oem_integrator_relationships","tier":3,"confidence":"inferred","value":["NVIDIA"],"citations":[{"source_title":"From Vision to Readiness: Vertiv Collaborates with NVIDIA to Advance 800 VDC Platform Designs to Power the Next Generation of AI Factories","url":"https://www.prnewswire.com/news-releases/from-vision-to-readiness-vertiv-collaborates-with-nvidia-to-advance-800-vdc-platform-designs-to-power-the-next-generation-of-ai-factories-302582190.html","snippet":"Vertiv has significantly advanced its platform designs to accelerate its 'unit of compute' strategy, moving from concept to engineering readiness. The 800 VDC power portfolio is planned to release in the second half of 2026, aligning to support the 2027 rollout of NVIDIA Rubin Ultra platforms.","retrieved_at":"2026-07-12T16:13:25.282Z"}],"reason":"Snippets confirm a named collaboration with NVIDIA for power infrastructure (800 VDC platform designs), but none of the supplied results specifically address rack PDU bundle/reference-sell arrangements with server OEMs such as Dell, HPE, Lenovo, or Supermicro. Only NVIDIA is evidenced; other OEM/integrator relationships are not covered by the supplied snippets.","retrieved_at":"2026-07-12T16:13:25.282Z"}]}</script>
+  <div class="vx-page">
+  <header class="vx-toolbar">
+    <h1>VentureX comparison table</h1>
+    <div class="vx-toolbar-actions">
+      <span class="vx-corner-meta">exported 2026-07-12</span>
+    </div>
+  </header>
+  <div class="vx-table-viewport">
+    <div class="vx-table-grid" style="--candidate-count: 3">
+      <div class="vx-corner">
+        <div class="vx-brand">VentureX</div>
+        <div class="vx-venture-title">VentureX</div>
+        <div class="vx-corner-meta">3 candidates - 30 cells</div>
+        <div class="vx-corner-meta">generated 2026-07-12</div>
+      </div>
+      <div class="vx-candidate-header">
+  <div class="vx-candidate-inner">
+    <div class="vx-logo-fallback" aria-hidden="true">V</div>
+    <div>
+      <div class="vx-candidate-name">Vertiv Holdings</div>
+      
+      <div class="vx-rank-line">Direct</div>
+      <button type="button" class="vx-stats-button" title="3 verified, 5 inferred, 2 unknown">10 - 3v - 5i - 2u</button>
+    </div>
+  </div>
+</div>
+<div class="vx-candidate-header">
+  <div class="vx-candidate-inner">
+    <div class="vx-logo-fallback" aria-hidden="true">E</div>
+    <div>
+      <div class="vx-candidate-name">EMS Elektro Metall Schwanenmühle</div>
+      
+      <div class="vx-rank-line">Category</div>
+      <button type="button" class="vx-stats-button" title="2 verified, 3 inferred, 5 unknown">10 - 2v - 3i - 5u</button>
+    </div>
+  </div>
+</div>
+<div class="vx-candidate-header">
+  <div class="vx-candidate-inner">
+    <div class="vx-logo-fallback" aria-hidden="true">S</div>
+    <div>
+      <div class="vx-candidate-name">Schneider Electric</div>
+      
+      <div class="vx-rank-line">SPDM</div>
+      <button type="button" class="vx-stats-button" title="3 verified, 5 inferred, 2 unknown">10 - 3v - 5i - 2u</button>
+    </div>
+  </div>
+</div>
+      <div class="vx-tier-left">
+  <button type="button" class="vx-tier-toggle" data-tier-toggle="1" aria-expanded="true">
+    <span>Tier 1 - Universal</span><span aria-hidden="true">-</span>
+  </button>
+</div>
+<div class="vx-tier-fill" style="grid-column: span 3">3 parameters</div>
+<div class="vx-param-cell" data-tier-row="1" title="Find the registered legal name from an official company page, filing, or corporate registry.">
+  <div class="vx-param-label">
+    <span>Legal Name</span>
+    <span class="vx-tier-badge" data-tier="1">T1</span>
+  </div>
+  <div class="vx-param-key">legal_name</div>
+</div>
+<div class="vx-data-cell" data-tier-row="1">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="8691b160-4bad-4bd2-bb1e-5f44481df65c" data-parameter-key="legal_name" title="Vertiv Holdings Co">
+    <span class="vx-confidence-dot" data-confidence="verified" title="verified"></span>
+    <span class="vx-cell-summary">Vertiv Holdings Co</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="1">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2bfb8c50-686f-41e3-b144-ae4d66c68ee5" data-parameter-key="legal_name" title="EMS Elektro Metall Schwanenmühle GmbH">
+    <span class="vx-confidence-dot" data-confidence="verified" title="verified"></span>
+    <span class="vx-cell-summary">EMS Elektro Metall Schwanenmühle GmbH</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="1">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2ef850c6-1efa-4458-99ff-e34dcd2d2252" data-parameter-key="legal_name" title="Schneider Electric SE">
+    <span class="vx-confidence-dot" data-confidence="verified" title="verified"></span>
+    <span class="vx-cell-summary">Schneider Electric SE</span>
+    
+  </button>
+</div>
+<div class="vx-param-cell" data-tier-row="1" title="Find the most recent disclosed employee count and date.">
+  <div class="vx-param-label">
+    <span>Headcount (most recent disclosure)</span>
+    <span class="vx-tier-badge" data-tier="1">T1</span>
+  </div>
+  <div class="vx-param-key">headcount</div>
+</div>
+<div class="vx-data-cell" data-tier-row="1">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="8691b160-4bad-4bd2-bb1e-5f44481df65c" data-parameter-key="headcount" title="{&quot;as_of&quot;:&quot;2024-12-31&quot;,&quot;value&quot;:30000}">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">as of: 2024-12-31
+value: 30,000</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="1">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2bfb8c50-686f-41e3-b144-ae4d66c68ee5" data-parameter-key="headcount" title="Private German Mittelstand company; no recent public disclosure of employee count recalled from training data. Company profiles occasionally cite figures in the low hundreds, but I cannot pin this to a specific dated disclosure.">
+    <span class="vx-confidence-dot" data-confidence="unknown" title="unknown"></span>
+    <span class="vx-cell-summary vx-cell-summary-muted">Private German Mittelstand company; no recent public disclosure of employee count recalled from training data. Company profiles occasionally cite figures in the low hundreds, but I cannot pin this to a specific dated disclosure.</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="1">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2ef850c6-1efa-4458-99ff-e34dcd2d2252" data-parameter-key="headcount" title="{&quot;as_of&quot;:&quot;2023-12-31&quot;,&quot;value&quot;:168000}">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">as of: 2023-12-31
+value: 168,000</span>
+    
+  </button>
+</div>
+<div class="vx-param-cell" data-tier-row="1" title="Find the most recent public material event from the past 12 months.">
+  <div class="vx-param-label">
+    <span>Latest Material Event (past 12mo)</span>
+    <span class="vx-tier-badge" data-tier="1">T1</span>
+  </div>
+  <div class="vx-param-key">latest_material_event</div>
+</div>
+<div class="vx-data-cell" data-tier-row="1">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="8691b160-4bad-4bd2-bb1e-5f44481df65c" data-parameter-key="latest_material_event" title="Cannot reliably identify a specific material event within a rolling 12-month window without current news access; Vertiv has had frequent product launches, earnings beats, and acquisitions (e.g., CoolTera in 2023), but pinning one to the past 12 months relative to today risks inaccuracy.">
+    <span class="vx-confidence-dot" data-confidence="unknown" title="unknown"></span>
+    <span class="vx-cell-summary vx-cell-summary-muted">Cannot reliably identify a specific material event within a rolling 12-month window without current news access; Vertiv has had frequent product launches, earnings beats, and acquisitions (e.g., CoolTera in 2023), but pinning one to the past 12 months relative to today risks inaccuracy.</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="1">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2bfb8c50-686f-41e3-b144-ae4d66c68ee5" data-parameter-key="latest_material_event" title="No specific material event from the past 12 months for EMS Elektro Metall Schwanenmühle GmbH is recalled with confidence from training data. As a private industrial supplier, its news flow is limited and not systematically covered.">
+    <span class="vx-confidence-dot" data-confidence="unknown" title="unknown"></span>
+    <span class="vx-cell-summary vx-cell-summary-muted">No specific material event from the past 12 months for EMS Elektro Metall Schwanenmühle GmbH is recalled with confidence from training data. As a private industrial supplier, its news flow is limited and not systematically covered.</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="1">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2ef850c6-1efa-4458-99ff-e34dcd2d2252" data-parameter-key="latest_material_event" title="Cannot reliably identify a specific material event within the past 12 months relative to the current date without fresh research. Schneider has ongoing M&amp;A activity (e.g., Motivair acquisition for liquid cooling announced in 2024, increased stake in AVEVA completed 2024), but pinning the single most recent material event to a verifiable date requires current sourcing.">
+    <span class="vx-confidence-dot" data-confidence="unknown" title="unknown"></span>
+    <span class="vx-cell-summary vx-cell-summary-muted">Cannot reliably identify a specific material event within the past 12 months relative to the current date without fresh research. Schneider has ongoing M&amp;A activity (e.g., Motivair acquisition for liquid cooling announced in 2024, increased stake in AVEVA completed 2024), but pinning the single most recent material event to a verifiable date requires current sourcing.</span>
+    
+  </button>
+</div>
+<div class="vx-tier-left">
+  <button type="button" class="vx-tier-toggle" data-tier-toggle="2" aria-expanded="true">
+    <span>Tier 2 - Framework</span><span aria-hidden="true">-</span>
+  </button>
+</div>
+<div class="vx-tier-fill" style="grid-column: span 3">4 parameters</div>
+<div class="vx-param-cell" data-tier-row="2" title="Summarize the competitor&#39;s core offering using verifiable product or service facts.">
+  <div class="vx-param-label">
+    <span>Core Product / Service Offering</span>
+    <span class="vx-tier-badge" data-tier="2">T2</span>
+  </div>
+  <div class="vx-param-key">core_offering</div>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="8691b160-4bad-4bd2-bb1e-5f44481df65c" data-parameter-key="core_offering" title="Vertiv&#39;s PowerIT/Geist line delivers rack-mounted power distribution units — from basic to monitored, switched, and engineered-to-order intelligent rack PDUs — for data center rack-level power distribution, metering, and monitoring.">
+    <span class="vx-confidence-dot" data-confidence="verified" title="verified"></span>
+    <span class="vx-cell-summary">Vertiv&#39;s PowerIT/Geist line delivers rack-mounted power distribution units — from basic to monitored, switched, and engineered-to-order intelligent rack PDUs —  ...</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2bfb8c50-686f-41e3-b144-ae4d66c68ee5" data-parameter-key="core_offering" title="Engineered high-current electrical connection technology and busbar systems (1,200A to 300,000A) for industrial, e-mobility, energy storage, grid, and renewable applications, with data centers as one served vertical.">
+    <span class="vx-confidence-dot" data-confidence="verified" title="verified"></span>
+    <span class="vx-cell-summary">Engineered high-current electrical connection technology and busbar systems (1,200A to 300,000A) for industrial, e-mobility, energy storage, grid, and renewable ...</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2ef850c6-1efa-4458-99ff-e34dcd2d2252" data-parameter-key="core_offering" title="Schneider Electric offers Powerbus Busway — an overhead busway power distribution system with high-density tap-off units for delivering protected, metered power to IT racks in data centers, positioned as an alternative to rack-mounted PDUs.">
+    <span class="vx-confidence-dot" data-confidence="verified" title="verified"></span>
+    <span class="vx-cell-summary">Schneider Electric offers Powerbus Busway — an overhead busway power distribution system with high-density tap-off units for delivering protected, metered power ...</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-param-cell" data-tier-row="2" title="Determine whether pricing is public, partially public, or opaque; capture range where disclosed.">
+  <div class="vx-param-label">
+    <span>Pricing Disclosure &amp; Tier Range</span>
+    <span class="vx-tier-badge" data-tier="2">T2</span>
+  </div>
+  <div class="vx-param-key">pricing_disclosure</div>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="8691b160-4bad-4bd2-bb1e-5f44481df65c" data-parameter-key="pricing_disclosure" title="{&quot;notes&quot;:&quot;Vertiv rack PDU product pages and engineered-to-order data sheets describe configurations and features but do not publish list pricing; pricing is quoted via channel/distribution partners and direct sales.&quot;,&quot;range_low&quot;:null,&quot;disclosure&quot;:&quot;opaque&quot;,&quot;range_high&quot;:null}">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">notes: Vertiv rack PDU product pages and engineered-to-order data sheets describe configurations and features but do not publish list pricing; pricing is quoted via channel/distribution partners and direct sales.
+range low: None</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2bfb8c50-686f-41e3-b144-ae4d66c68ee5" data-parameter-key="pricing_disclosure" title="{&quot;notes&quot;:&quot;EMS sells engineered/customized high-current connection products made-to-order; no list pricing is published on the company site or corporate materials.&quot;,&quot;range_low&quot;:null,&quot;disclosure&quot;:&quot;opaque&quot;,&quot;range_high&quot;:null}">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">notes: EMS sells engineered/customized high-current connection products made-to-order; no list pricing is published on the company site or corporate materials.
+range low: None</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2ef850c6-1efa-4458-99ff-e34dcd2d2252" data-parameter-key="pricing_disclosure" title="{&quot;notes&quot;:&quot;Powerbus Busway brochure and corporate materials describe product configuration and channel-based sales but do not publish list prices; pricing is quoted via direct sales / channel partners.&quot;,&quot;range_low&quot;:null,&quot;disclosure&quot;:&quot;opaque&quot;,&quot;range_high&quot;:null}">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">notes: Powerbus Busway brochure and corporate materials describe product configuration and channel-based sales but do not publish list prices; pricing is quoted via direct sales / channel partners.
+range low: None</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-param-cell" data-tier-row="2" title="Capture disclosed sales-cycle length, or a brief qualitative estimate if not disclosed.">
+  <div class="vx-param-label">
+    <span>Sales Cycle Length</span>
+    <span class="vx-tier-badge" data-tier="2">T2</span>
+  </div>
+  <div class="vx-param-key">sales_cycle_length</div>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="8691b160-4bad-4bd2-bb1e-5f44481df65c" data-parameter-key="sales_cycle_length" title="Weeks to several months (project-based B2B; longer for engineered-to-order and hyperscale deployments)">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">Weeks to several months (project-based B2B; longer for engineered-to-order and hyperscale deployments)</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2bfb8c50-686f-41e3-b144-ae4d66c68ee5" data-parameter-key="sales_cycle_length" title="Long (multi-month, project-based)">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">Long (multi-month, project-based)</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2ef850c6-1efa-4458-99ff-e34dcd2d2252" data-parameter-key="sales_cycle_length" title="months to quarters (data center infrastructure project sale)">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">months to quarters (data center infrastructure project sale)</span>
+    
+  </button>
+</div>
+<div class="vx-param-cell" data-tier-row="2" title="Capture public R&amp;D spend, centers, patents, or equivalent technical-capacity facts.">
+  <div class="vx-param-label">
+    <span>R&amp;D Capacity (spend / centers / patents)</span>
+    <span class="vx-tier-badge" data-tier="2">T2</span>
+  </div>
+  <div class="vx-param-key">rd_capacity</div>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="8691b160-4bad-4bd2-bb1e-5f44481df65c" data-parameter-key="rd_capacity" title="Vertiv is a NYSE-listed global critical-infrastructure vendor whose 2024 10-K and 2025 Annual Report document a broad power/thermal/IT product portfolio and continued investment in engineering and manufacturing capacity, including a new North American infrastructure solutions manufacturing facility.">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">Vertiv is a NYSE-listed global critical-infrastructure vendor whose 2024 10-K and 2025 Annual Report document a broad power/thermal/IT product portfolio and con ...</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2bfb8c50-686f-41e3-b144-ae4d66c68ee5" data-parameter-key="rd_capacity" title="Supplied M13/T2 citations describe EMS&#39;s engineering and manufacturing capabilities but do not disclose R&amp;D spend, dedicated R&amp;D centers, or patent counts.">
+    <span class="vx-confidence-dot" data-confidence="unknown" title="unknown"></span>
+    <span class="vx-cell-summary vx-cell-summary-muted">Supplied M13/T2 citations describe EMS&#39;s engineering and manufacturing capabilities but do not disclose R&amp;D spend, dedicated R&amp;D centers, or patent counts.</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="2">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2ef850c6-1efa-4458-99ff-e34dcd2d2252" data-parameter-key="rd_capacity" title="Supplied M13/T2 citations cover FY24/FY25 revenue results, partner programs, and a UK manufacturing site, but none disclose R&amp;D spend, R&amp;D center count, or patent figures.">
+    <span class="vx-confidence-dot" data-confidence="unknown" title="unknown"></span>
+    <span class="vx-cell-summary vx-cell-summary-muted">Supplied M13/T2 citations cover FY24/FY25 revenue results, partner programs, and a UK manufacturing site, but none disclose R&amp;D spend, R&amp;D center count, or patent figures.</span>
+    
+  </button>
+</div>
+<div class="vx-tier-left">
+  <button type="button" class="vx-tier-toggle" data-tier-toggle="3" aria-expanded="true">
+    <span>Tier 3 - Dynamic</span><span aria-hidden="true">-</span>
+  </button>
+</div>
+<div class="vx-tier-fill" style="grid-column: span 3">3 parameters</div>
+<div class="vx-param-cell" data-tier-row="3" title="Check the competitor&#39;s product catalog and datasheets for overhead/vertical busbar systems with tap-off boxes used to distribute power inside data-center rows/racks. Cite product page or datasheet URL.">
+  <div class="vx-param-label">
+    <span>Busbar + tap-off unit offering</span>
+    <span class="vx-tier-badge" data-tier="3">T3</span>
+  </div>
+  <div class="vx-param-key">busbar_tap_off_offering</div>
+</div>
+<div class="vx-data-cell" data-tier-row="3">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="8691b160-4bad-4bd2-bb1e-5f44481df65c" data-parameter-key="busbar_tap_off_offering" title="yes_productized">
+    <span class="vx-confidence-dot" data-confidence="verified" title="verified"></span>
+    <span class="vx-cell-summary">yes_productized</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="3">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2bfb8c50-686f-41e3-b144-ae4d66c68ee5" data-parameter-key="busbar_tap_off_offering" title="yes_productized">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">yes_productized</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="3">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2ef850c6-1efa-4458-99ff-e34dcd2d2252" data-parameter-key="busbar_tap_off_offering" title="yes_productized">
+    <span class="vx-confidence-dot" data-confidence="verified" title="verified"></span>
+    <span class="vx-cell-summary">yes_productized</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-param-cell" data-tier-row="3" title="List named server OEM (Dell, HPE, Lenovo, Supermicro, etc.) and IT integrator/reseller partnerships or bundle/reference-sell arrangements the competitor has for rack PDUs. Cite press releases or partner pages.">
+  <div class="vx-param-label">
+    <span>Server OEM and IT integrator relationships</span>
+    <span class="vx-tier-badge" data-tier="3">T3</span>
+  </div>
+  <div class="vx-param-key">server_oem_integrator_relationships</div>
+</div>
+<div class="vx-data-cell" data-tier-row="3">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="8691b160-4bad-4bd2-bb1e-5f44481df65c" data-parameter-key="server_oem_integrator_relationships" title="[&quot;NVIDIA&quot;]">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">NVIDIA</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="3">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2bfb8c50-686f-41e3-b144-ae4d66c68ee5" data-parameter-key="server_oem_integrator_relationships" title="no_evidence_found — all three snippets cover EMS Elektro Metall Schwanenmühle&#39;s company history, busbar systems, and general product categories (e-mobility, energy storage, switchgear). None mention server OEM partnerships (Dell, HPE, Lenovo, Supermicro, etc.) or IT integrator/reseller arrangements for rack PDUs.">
+    <span class="vx-confidence-dot" data-confidence="unknown" title="unknown"></span>
+    <span class="vx-cell-summary vx-cell-summary-muted">No supporting evidence found.</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="3">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2ef850c6-1efa-4458-99ff-e34dcd2d2252" data-parameter-key="server_oem_integrator_relationships" title="[&quot;Lenovo&quot;]">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">Lenovo</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+<div class="vx-param-cell" data-tier-row="3" title="List named hyperscaler (AWS, Azure, Google, Meta, Oracle) or top colocation (Equinix, Digital Realty, NTT) customers publicly disclosed as using the competitor&#39;s rack PDUs. Cite press releases or case studies.">
+  <div class="vx-param-label">
+    <span>Named hyperscaler / colocation reference wins</span>
+    <span class="vx-tier-badge" data-tier="3">T3</span>
+  </div>
+  <div class="vx-param-key">hyperscaler_reference_wins</div>
+</div>
+<div class="vx-data-cell" data-tier-row="3">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="8691b160-4bad-4bd2-bb1e-5f44481df65c" data-parameter-key="hyperscaler_reference_wins" title="no_evidence_found — snippets describe product announcements (PowerBar Track busway, NVIDIA 800 VDC collaboration, OneCore prefabricated solution) but do not name any specific hyperscaler (AWS, Azure, Google, Meta, Oracle) or colocation (Equinix, Digital Realty, NTT) customers publicly disclosed as using Vertiv rack PDUs.">
+    <span class="vx-confidence-dot" data-confidence="unknown" title="unknown"></span>
+    <span class="vx-cell-summary vx-cell-summary-muted">No supporting evidence found.</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="3">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2bfb8c50-686f-41e3-b144-ae4d66c68ee5" data-parameter-key="hyperscaler_reference_wins" title="no_evidence_found — none of the supplied snippets name any hyperscaler (AWS, Azure, Google, Meta, Oracle) or top colocation provider (Equinix, Digital Realty, NTT) as a named customer of EMS Elektro Metall Schwanenmühle&#39;s rack PDUs or busbar products. The snippets cover company history, product categories, and an acquisition announcement without disclosing specific reference customers.">
+    <span class="vx-confidence-dot" data-confidence="unknown" title="unknown"></span>
+    <span class="vx-cell-summary vx-cell-summary-muted">No supporting evidence found.</span>
+    
+  </button>
+</div>
+<div class="vx-data-cell" data-tier-row="3">
+  <button type="button" class="vx-cell-button" data-cell-button data-candidate-id="2ef850c6-1efa-4458-99ff-e34dcd2d2252" data-parameter-key="hyperscaler_reference_wins" title="[&quot;Equinix (HK1, liquid cooling deployment)&quot;,&quot;Google (anchor tenant at TeraWulf Lake Mariner campus)&quot;]">
+    <span class="vx-confidence-dot" data-confidence="inferred" title="inferred"></span>
+    <span class="vx-cell-summary">Equinix (HK1, liquid cooling deployment) - Google (anchor tenant at TeraWulf Lake Mariner campus)</span>
+    <span class="vx-citation-mark" title="Citation available">link</span>
+  </button>
+</div>
+    </div>
+  </div>
+</div>
+  <div id="vx-modal-root"></div>
+  <script>
+(function () {
+  var dataEl = document.getElementById("venturex-data");
+  var data = JSON.parse(dataEl.textContent || "{}");
+  var modalRoot = document.getElementById("vx-modal-root");
+  var opener = null;
+
+  function key(candidateId, parameterKey) {
+    return candidateId + "::" + parameterKey;
+  }
+
+  var cells = new Map();
+  data.cells.forEach(function (cell) {
+    cells.set(key(cell.candidate_id, cell.parameter_key), cell);
+  });
+
+  function findCandidate(id) {
+    return data.candidates.find(function (candidate) {
+      return candidate.candidate_id === id;
+    });
+  }
+
+  function findParameter(parameterKey) {
+    return data.parameters.find(function (parameter) {
+      return parameter.parameter_key === parameterKey;
+    });
+  }
+
+  function escape(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function formatDate(value) {
+    if (!value) return "";
+    var date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toISOString().slice(0, 10);
+  }
+
+  var plainIntegerParameterKeys = { founded_year: true };
+
+  function formatDisplayNumber(value, parameterKey) {
+    if (parameterKey && plainIntegerParameterKeys[parameterKey]) return String(value);
+    return new Intl.NumberFormat("en-US").format(value);
+  }
+
+  function inlineValue(value, parameterKey) {
+    if (value == null) return "None";
+    if (typeof value === "boolean") return value ? "Yes" : "No";
+    if (typeof value === "number") return formatDisplayNumber(value, parameterKey);
+    if (Array.isArray(value)) return value.map(inlineValue).join(", ");
+    if (typeof value === "object") return JSON.stringify(value);
+    return String(value);
+  }
+
+  function humanize(key) {
+    return key.replace(/_/g, " ");
+  }
+
+  function reasonKind(reason) {
+    var lower = (reason || "").toLowerCase();
+    if (lower.indexOf("extraction_error") >= 0) return "error";
+    if (lower.indexOf("no_evidence_found") >= 0 || lower.indexOf("m13 citations") >= 0) return "warning";
+    return "neutral";
+  }
+
+  function renderValue(value, parameterKey) {
+    if (value == null) return '<p class="vx-modal-prose">None</p>';
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      return '<p class="vx-modal-prose">' + escape(inlineValue(value, parameterKey)) + '</p>';
+    }
+    if (Array.isArray(value)) {
+      if (value.length === 0) return '<p class="vx-modal-prose">None</p>';
+      return '<ul>' + value.map(function (item) {
+        return '<li>' + escape(inlineValue(item, parameterKey)) + '</li>';
+      }).join("") + '</ul>';
+    }
+    if (typeof value === "object") {
+      var entries = Object.entries(value);
+      if (entries.length <= 8) {
+        return '<div class="vx-kv">' + entries.map(function (entry) {
+          return '<div class="vx-kv-key">' + escape(humanize(entry[0])) + '</div><div class="vx-kv-value">' + escape(inlineValue(entry[1])) + '</div>';
+        }).join("") + '</div>';
+      }
+      return '<pre class="vx-json">' + escape(JSON.stringify(value, null, 2)) + '</pre>';
+    }
+    return '<p class="vx-modal-prose">' + escape(String(value)) + '</p>';
+  }
+
+  function renderEvidence(cell, parameter) {
+    if (!cell) {
+      return '<div class="vx-callout" data-kind="warning">Not researched.</div>';
+    }
+    if (cell.confidence === "unknown" && cell.reason) {
+      return '<div class="vx-callout" data-kind="' + reasonKind(cell.reason) + '">' + escape(cell.reason) + '</div>';
+    }
+    if (cell.citations && cell.citations.length > 0) {
+      return cell.citations.map(function (citation) {
+        return '<div class="vx-citation"><a class="vx-citation-title" href="' + escape(citation.url) + '" target="_blank" rel="noopener noreferrer">' + escape(citation.source_title || citation.url) + '</a><div class="vx-citation-url">' + escape(citation.url) + '</div>' + (citation.retrieved_at ? '<div class="vx-modal-meta">retrieved ' + escape(formatDate(citation.retrieved_at)) + '</div>' : '') + (citation.snippet ? '<blockquote>' + escape(citation.snippet) + '</blockquote>' : '') + '</div>';
+      }).join("");
+    }
+    if (parameter.tier === 1) {
+      return '<p class="vx-modal-prose"><em>Training-data value - no citation required for Tier 1 identity facts.</em></p>';
+    }
+    return '<div class="vx-callout">No citation attached.</div>';
+  }
+
+  function openModal(button) {
+    var candidate = findCandidate(button.getAttribute("data-candidate-id"));
+    var parameter = findParameter(button.getAttribute("data-parameter-key"));
+    if (!candidate || !parameter) return;
+    var cell = cells.get(key(candidate.candidate_id, parameter.parameter_key)) || null;
+    opener = button;
+    modalRoot.innerHTML = '<div class="vx-modal-backdrop" role="presentation" data-modal-backdrop><div class="vx-modal" role="dialog" aria-modal="true" aria-labelledby="vx-modal-title"><div class="vx-modal-header"><div><h2 id="vx-modal-title" class="vx-modal-title">' + escape(parameter.parameter_label) + '</h2><div class="vx-modal-meta">T' + parameter.tier + ' - ' + escape(cell ? cell.confidence : 'not researched') + ' - ' + escape(candidate.name) + '</div></div><button type="button" class="vx-icon-button" data-close-modal aria-label="Close modal">x</button></div><div class="vx-modal-body"><section class="vx-modal-section"><h3 class="vx-modal-section-title">Value</h3>' + (cell ? renderValue(cell.value, parameter.parameter_key) : '<div class="vx-callout" data-kind="warning">Not researched. This candidate/parameter pair has no row in the cells table.</div>') + '</section><section class="vx-modal-section"><h3 class="vx-modal-section-title">Evidence</h3>' + renderEvidence(cell, parameter) + '</section></div><div class="vx-modal-footer"><button type="button" class="vx-secondary-button" data-copy-key="' + escape(parameter.parameter_key) + '">Copy parameter key</button><button type="button" class="vx-primary-button" data-close-modal>Close</button></div></div></div>';
+    var closeButton = modalRoot.querySelector("[data-close-modal]");
+    if (closeButton) closeButton.focus();
+  }
+
+  function closeModal() {
+    modalRoot.innerHTML = "";
+    if (opener) opener.focus();
+  }
+
+  document.addEventListener("click", function (event) {
+    var cellButton = event.target.closest("[data-cell-button]");
+    if (cellButton) {
+      openModal(cellButton);
+      return;
+    }
+    var toggle = event.target.closest("[data-tier-toggle]");
+    if (toggle) {
+      var tier = toggle.getAttribute("data-tier-toggle");
+      var expanded = toggle.getAttribute("aria-expanded") !== "false";
+      toggle.setAttribute("aria-expanded", expanded ? "false" : "true");
+      toggle.querySelector("span:last-child").textContent = expanded ? "+" : "-";
+      document.querySelectorAll('[data-tier-row="' + tier + '"]').forEach(function (row) {
+        row.classList.toggle("vx-hidden", expanded);
+      });
+      return;
+    }
+    if (event.target.closest("[data-close-modal]")) {
+      closeModal();
+      return;
+    }
+    var backdrop = event.target.closest("[data-modal-backdrop]");
+    if (backdrop && event.target === backdrop) closeModal();
+    var copy = event.target.closest("[data-copy-key]");
+    if (copy && navigator.clipboard) navigator.clipboard.writeText(copy.getAttribute("data-copy-key"));
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (!modalRoot.innerHTML) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeModal();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    var focusable = modalRoot.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  window.__venturexRenderMs = performance.now() - (window.__venturexStartedAt || performance.now());
+  console.info("VentureX standalone table render: " + Math.round(window.__venturexRenderMs) + "ms");
+})();</script>
+</body>
+</html>

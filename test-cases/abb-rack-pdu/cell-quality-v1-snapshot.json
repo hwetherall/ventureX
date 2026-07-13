@@ -1,0 +1,1545 @@
+{
+  "schema_version": 1,
+  "pipeline_version": "v1_snapshot",
+  "captured_at": "2026-07-13T00:12:46.978Z",
+  "venture": {
+    "id": "cf724783-065c-44c8-93a4-be29cb154ff9",
+    "status": "cells_ready",
+    "user_provided_description": "VentureX currently lacks an offering in the Rack PDU (Power Distribution Unit) market, a segment estimated at $2B+ globally. Rack PDUs are socket outlet strips with protection and measurement elements used to power servers in data centers. Competitors already have strong positions, while VentureX is absent in this space.Strategic Motivation:•\tData centers are evolving toward higher power density, making protection and energy management at the rack level increasingly important.•\tVentureX hypothesizes that entering Rack PDUs could yield at least $50M/year revenue contribution within 3 years, the minimum threshold for a strategic project.",
+    "created_at": "2026-07-10T21:36:16.929728+00:00"
+  },
+  "candidates": [
+    {
+      "id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "name": "Schneider Electric",
+      "type": "same_problem_different_mechanism"
+    },
+    {
+      "id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "name": "Vertiv Holdings",
+      "type": "direct"
+    },
+    {
+      "id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "name": "EMS Elektro Metall Schwanenmühle",
+      "type": "category"
+    }
+  ],
+  "parameter_run": {
+    "id": "638c9967-c503-4e60-b79a-4237fe92e8b6",
+    "full_parameter_schema": [
+      {
+        "id": "legal_name",
+        "name": "Legal Name",
+        "tier": "universal",
+        "value_type": "short_string",
+        "cell_budget": "atom",
+        "prompt_hint": "Find the registered legal name from an official company page, filing, or corporate registry.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "common_name",
+        "name": "Common / Trading Name",
+        "tier": "universal",
+        "value_type": "short_string",
+        "cell_budget": "atom",
+        "prompt_hint": "Use the name the company trades under publicly.",
+        "citation_required": false,
+        "source_preference": [
+          "official_company",
+          "official_third_party"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "founded_year",
+        "name": "Founded Year",
+        "tier": "universal",
+        "value_type": "number",
+        "cell_budget": "atom",
+        "prompt_hint": "Find the year the company was founded from an official company history, filing, or reliable profile.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "status",
+        "name": "Operating Status",
+        "tier": "universal",
+        "value_type": "enum",
+        "cell_budget": "atom",
+        "prompt_hint": "Determine whether the company is currently operating, acquired, defunct, pivoted, or unknown.",
+        "value_schema": {
+          "values": [
+            "operating",
+            "acquired",
+            "defunct",
+            "pivoted",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "hq_location",
+        "name": "HQ Location (City, Country)",
+        "tier": "universal",
+        "value_type": "short_string",
+        "cell_budget": "atom",
+        "prompt_hint": "Find the headquarters city and country from an official company page or filing.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "ownership_type",
+        "name": "Ownership Type",
+        "tier": "universal",
+        "value_type": "enum",
+        "cell_budget": "atom",
+        "prompt_hint": "Identify whether the company is public, private, a subsidiary, PE-backed, government-owned, or unknown.",
+        "value_schema": {
+          "values": [
+            "public",
+            "private",
+            "subsidiary",
+            "pe_backed",
+            "government",
+            "unknown"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "parent_company",
+        "name": "Parent Company",
+        "tier": "universal",
+        "value_type": "short_string",
+        "cell_budget": "atom",
+        "prompt_hint": "If the company is a subsidiary or brand, identify the parent company; otherwise return null.",
+        "value_schema": {
+          "nullable": true
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "headcount",
+        "name": "Headcount (most recent disclosure)",
+        "tier": "universal",
+        "value_type": "object",
+        "cell_budget": "atom",
+        "prompt_hint": "Find the most recent disclosed employee count and date.",
+        "value_schema": {
+          "as_of": "string | null",
+          "value": "number | string"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "annual_revenue",
+        "name": "Annual Revenue",
+        "tier": "universal",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Find the latest annual revenue, fiscal year, currency, and whether the source is audited, estimated, or reported.",
+        "value_schema": {
+          "fy": "string",
+          "value": "number | string",
+          "currency": "string",
+          "source_type": "audited | estimated | reported"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "funding_ma_history",
+        "name": "Key Funding / M&A Events",
+        "tier": "universal",
+        "value_type": "list",
+        "cell_budget": "paragraph",
+        "prompt_hint": "Capture major funding, acquisition, merger, or divestiture events relevant to company control and scale.",
+        "value_schema": {
+          "item": {
+            "date": "string",
+            "type": "string",
+            "amount": "string | null",
+            "counterparty": "string | null"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "official_third_party"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "key_leadership",
+        "name": "Key Leadership (top 2-3)",
+        "tier": "universal",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify the top 2-3 public leaders most relevant to corporate strategy.",
+        "value_schema": {
+          "item": {
+            "name": "string",
+            "role": "string"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "primary_urls",
+        "name": "Public URLs",
+        "tier": "universal",
+        "value_type": "object",
+        "cell_budget": "atom",
+        "prompt_hint": "Collect the company's primary public URLs where available.",
+        "value_schema": {
+          "ir": "url | null",
+          "blog": "url | null",
+          "press": "url | null",
+          "careers": "url | null",
+          "pricing": "url | null",
+          "homepage": "url | null"
+        },
+        "citation_required": false,
+        "source_preference": [
+          "official_company"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "stock_ticker",
+        "name": "Stock Ticker / Exchange",
+        "tier": "universal",
+        "value_type": "short_string",
+        "cell_budget": "atom",
+        "prompt_hint": "If public, provide ticker and exchange; otherwise return null.",
+        "value_schema": {
+          "nullable": true
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_third_party",
+          "official_company"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "last_valuation",
+        "name": "Last Known Valuation",
+        "tier": "universal",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Find the latest public valuation disclosure, if any.",
+        "value_schema": {
+          "as_of": "string | null",
+          "value": "number | string | null",
+          "currency": "string | null"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "news",
+          "official_third_party",
+          "official_company"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "latest_material_event",
+        "name": "Latest Material Event (past 12mo)",
+        "tier": "universal",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Find the most recent public material event from the past 12 months.",
+        "value_schema": {
+          "date": "string",
+          "description": "string"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news"
+        ],
+        "innovera_dimension": "meta"
+      },
+      {
+        "id": "core_offering",
+        "name": "Core Product / Service Offering",
+        "tier": "framework",
+        "value_type": "prose",
+        "cell_budget": "sentence",
+        "prompt_hint": "Summarize the competitor's core offering using verifiable product or service facts.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "pipe_or_platform",
+        "name": "Pipe or Platform",
+        "tier": "framework",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Classify as pipe, platform, or hybrid and include a short justification.",
+        "value_schema": {
+          "values": [
+            "pipe",
+            "platform",
+            "hybrid"
+          ],
+          "include_justification": true
+        },
+        "citation_required": false,
+        "source_preference": [
+          "official_company",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "differentiating_mechanism",
+        "name": "Key Differentiating Mechanism",
+        "tier": "framework",
+        "value_type": "prose",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify the primary factual mechanism the company claims as differentiation.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "industry_analyst",
+          "news"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "customer_segment_type",
+        "name": "Customer Segment Type",
+        "tier": "framework",
+        "value_type": "enum",
+        "cell_budget": "atom",
+        "prompt_hint": "Classify the primary customer segment served by the competitor.",
+        "value_schema": {
+          "values": [
+            "B2C",
+            "B2B-SME",
+            "B2B-E",
+            "B2G",
+            "mixed"
+          ]
+        },
+        "citation_required": false,
+        "source_preference": [
+          "official_company",
+          "inferred"
+        ],
+        "innovera_dimension": "customers"
+      },
+      {
+        "id": "primary_buyer_persona",
+        "name": "Primary Buyer Title / Function",
+        "tier": "framework",
+        "value_type": "short_string",
+        "cell_budget": "atom",
+        "prompt_hint": "Identify the buyer title or function most likely responsible for purchase decisions.",
+        "citation_required": false,
+        "source_preference": [
+          "official_company",
+          "inferred"
+        ],
+        "innovera_dimension": "customers"
+      },
+      {
+        "id": "customer_concentration",
+        "name": "Customer Concentration",
+        "tier": "framework",
+        "value_type": "prose",
+        "cell_budget": "sentence",
+        "prompt_hint": "Find disclosed concentration facts, named large customers, or public dependency statements.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "customers"
+      },
+      {
+        "id": "revenue_model",
+        "name": "Revenue Model",
+        "tier": "framework",
+        "value_type": "enum",
+        "cell_budget": "atom",
+        "prompt_hint": "Classify how the company primarily monetizes the relevant offering.",
+        "value_schema": {
+          "values": [
+            "unit_sales",
+            "subscription",
+            "licensing",
+            "fee_for_service",
+            "commission",
+            "advertising",
+            "rental",
+            "mixed"
+          ]
+        },
+        "citation_required": false,
+        "source_preference": [
+          "official_company",
+          "inferred"
+        ],
+        "innovera_dimension": "transaction"
+      },
+      {
+        "id": "pricing_disclosure",
+        "name": "Pricing Disclosure & Tier Range",
+        "tier": "framework",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether pricing is public, partially public, or opaque; capture range where disclosed.",
+        "value_schema": {
+          "notes": "string",
+          "range_low": "number | null",
+          "disclosure": "public | partial | opaque",
+          "range_high": "number | null"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party"
+        ],
+        "innovera_dimension": "transaction"
+      },
+      {
+        "id": "margin_profile",
+        "name": "Margin Profile",
+        "tier": "framework",
+        "value_type": "prose",
+        "cell_budget": "sentence",
+        "prompt_hint": "Use disclosed gross margin if available; otherwise describe only sourced or clearly inferred margin facts.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "transaction"
+      },
+      {
+        "id": "supply_partners",
+        "name": "Key Supply Partners",
+        "tier": "framework",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List named suppliers or manufacturing partners where public.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst"
+        ],
+        "innovera_dimension": "partners"
+      },
+      {
+        "id": "distribution_partners",
+        "name": "Distribution Partners",
+        "tier": "framework",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List named distributors, resellers, integrators, or OEM channel partners.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "official_third_party"
+        ],
+        "innovera_dimension": "partners"
+      },
+      {
+        "id": "strategic_alliances",
+        "name": "Strategic Alliances / JVs",
+        "tier": "framework",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List strategic alliances, joint ventures, or formal partnerships relevant to the category.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news"
+        ],
+        "innovera_dimension": "partners"
+      },
+      {
+        "id": "gtm_motion",
+        "name": "Go-to-Market Motion",
+        "tier": "framework",
+        "value_type": "enum",
+        "cell_budget": "atom",
+        "prompt_hint": "Classify the primary go-to-market motion for the relevant offering.",
+        "value_schema": {
+          "values": [
+            "direct_sales",
+            "inside_sales",
+            "channel",
+            "plg",
+            "hybrid"
+          ]
+        },
+        "citation_required": false,
+        "source_preference": [
+          "official_company",
+          "inferred"
+        ],
+        "innovera_dimension": "access"
+      },
+      {
+        "id": "sales_cycle_length",
+        "name": "Sales Cycle Length",
+        "tier": "framework",
+        "value_type": "short_string",
+        "cell_budget": "atom",
+        "prompt_hint": "Capture disclosed sales-cycle length, or a brief qualitative estimate if not disclosed.",
+        "citation_required": false,
+        "source_preference": [
+          "official_company",
+          "inferred"
+        ],
+        "innovera_dimension": "access"
+      },
+      {
+        "id": "acquisition_channels",
+        "name": "Primary Acquisition Channels (top 2-3)",
+        "tier": "framework",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List the main customer acquisition channels visible from public information.",
+        "citation_required": false,
+        "source_preference": [
+          "official_company",
+          "inferred"
+        ],
+        "innovera_dimension": "access"
+      },
+      {
+        "id": "geographic_footprint",
+        "name": "Geographic Footprint (sales presence)",
+        "tier": "framework",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify regions or countries where the company sells or operates, weighted if disclosed.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "manufacturing_footprint",
+        "name": "Manufacturing Footprint",
+        "tier": "framework",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List countries or sites where relevant manufacturing occurs.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "certifications",
+        "name": "Industry Certifications & Approvals",
+        "tier": "framework",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List only certifications and approvals relevant to this brief's vertical.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "capital_intensity",
+        "name": "Capital Intensity",
+        "tier": "framework",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Classify capital intensity and justify using public facts about manufacturing, assets, or delivery model.",
+        "value_schema": {
+          "values": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "include_justification": true
+        },
+        "citation_required": false,
+        "source_preference": [
+          "official_company",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "asset_type",
+        "name": "Primary Asset Type",
+        "tier": "framework",
+        "value_type": "enum",
+        "cell_budget": "atom",
+        "prompt_hint": "Classify the primary asset type underlying the relevant offering.",
+        "value_schema": {
+          "values": [
+            "hardware",
+            "software",
+            "services",
+            "data",
+            "brand",
+            "mixed"
+          ]
+        },
+        "citation_required": false,
+        "source_preference": [
+          "official_company",
+          "inferred"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "rd_capacity",
+        "name": "R&D Capacity (spend / centers / patents)",
+        "tier": "framework",
+        "value_type": "prose",
+        "cell_budget": "sentence",
+        "prompt_hint": "Capture public R&D spend, centers, patents, or equivalent technical-capacity facts.",
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "busbar_tap_off_offering",
+        "name": "Busbar + tap-off unit offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Check the competitor's product catalog and datasheets for overhead/vertical busbar systems with tap-off boxes used to distribute power inside data-center rows/racks. Cite product page or datasheet URL.",
+        "source_field": "dimensions.product_solution.substitution_landscape[0]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partnered",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "power_shelf_offering",
+        "name": "Power shelf offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Check whether the competitor sells rack-level power shelves (e.g., OCP-style or hyperscaler-style shelves that convert/distribute power to servers in a rack). Cite product page or datasheet.",
+        "source_field": "dimensions.product_solution.substitution_landscape[1]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partnered",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "rpp_individual_cable_offering",
+        "name": "Remote Power Panel (RPP) with individual cable connections offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor offers Remote Power Panels (RPPs) that distribute power to racks via individual cable connections. Cite product page/datasheet.",
+        "source_field": "dimensions.product_solution.substitution_landscape[2]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partnered",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "in_rack_dc_distribution_offering",
+        "name": "In-rack DC distribution architecture offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Check whether the competitor offers in-rack DC distribution products (e.g., 48V DC busbars, DC PDUs, DC-powered rack architectures) for data-center servers. Cite product page/whitepaper.",
+        "source_field": "dimensions.product_solution.substitution_landscape[3]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partnered",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "server_mounted_power_distribution_offering",
+        "name": "Integrated server-mounted power distribution offering",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor supplies power-distribution modules integrated directly into server chassis or server-power sleds (bypassing traditional PDUs). Cite product page/spec.",
+        "source_field": "dimensions.product_solution.substitution_landscape[4]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partnered",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "solid_state_rack_protection_offering",
+        "name": "Solid-state protection integrated at rack level",
+        "tier": "dynamic",
+        "value_type": "enum",
+        "cell_budget": "sentence",
+        "prompt_hint": "Check for solid-state circuit protection (SSCB / solid-state breakers) integrated at the rack/PDU level in the competitor's product line. Cite product page/whitepaper.",
+        "source_field": "dimensions.product_solution.substitution_landscape[5]",
+        "value_schema": {
+          "enum": [
+            "yes_productized",
+            "yes_partnered",
+            "in_development",
+            "no"
+          ]
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "high_density_rack_support_kw",
+        "name": "Max supported per-rack power density (kW)",
+        "tier": "dynamic",
+        "value_type": "number",
+        "cell_budget": "atom",
+        "prompt_hint": "Find the highest per-rack kW rating supported by the competitor's rack power/PDU products (look for 25kW, 50kW, 100kW, 200kW+ ratings tied to AI/HPC deployments). Cite datasheet.",
+        "source_field": "strategic_risks_and_uncertainties[0].implies_search_for",
+        "value_schema": {
+          "min": 0,
+          "unit": "kW"
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "dc_distribution_product_line",
+        "name": "DC distribution product line for data centers",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify whether the competitor sells DC distribution architectures (DC busbars, 48V/380V DC systems, integrated DC server power) for data centers, and list product names/voltages. Cite product page.",
+        "source_field": "strategic_risks_and_uncertainties[1].implies_search_for",
+        "value_schema": {
+          "properties": {
+            "product_names": {
+              "type": "array"
+            },
+            "has_dc_products": {
+              "type": "boolean"
+            },
+            "voltage_classes": {
+              "type": "array"
+            }
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "industry_analyst",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "server_oem_integrator_relationships",
+        "name": "Server OEM and IT integrator relationships",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List named server OEM (Dell, HPE, Lenovo, Supermicro, etc.) and IT integrator/reseller partnerships or bundle/reference-sell arrangements the competitor has for rack PDUs. Cite press releases or partner pages.",
+        "source_field": "strategic_risks_and_uncertainties[2].implies_search_for",
+        "value_schema": {
+          "items": {
+            "type": "short_string"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "partners"
+      },
+      {
+        "id": "rack_pdu_market_share_position",
+        "name": "Rack PDU market share / position",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Find the competitor's rack PDU market share and rank globally and by region (NA/EU/China/India) from analyst reports (Omdia, Frost, IDC, 650 Group). Cite the analyst report.",
+        "source_field": "strategic_risks_and_uncertainties[3].implies_search_for",
+        "value_schema": {
+          "properties": {
+            "rank": {
+              "type": "short_string"
+            },
+            "source": {
+              "type": "short_string"
+            },
+            "regional_shares": {
+              "type": "object"
+            },
+            "global_share_pct": {
+              "type": "number"
+            }
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "industry_analyst",
+          "official_third_party",
+          "news",
+          "official_company",
+          "inferred"
+        ],
+        "innovera_dimension": "customers"
+      },
+      {
+        "id": "intelligent_pdu_and_dcim_software",
+        "name": "Intelligent PDU tier and DCIM/power-monitoring software attach",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify the competitor's intelligent/monitored/switched PDU lines and any attached DCIM or power-monitoring software (with licensing model). Cite product/software pages.",
+        "source_field": "strategic_risks_and_uncertainties[4].implies_search_for",
+        "value_schema": {
+          "properties": {
+            "intelligent_pdu_skus": {
+              "type": "array"
+            },
+            "dcim_software_product": {
+              "type": "short_string"
+            },
+            "software_recurring_revenue": {
+              "type": "boolean"
+            }
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "industry_analyst",
+          "official_third_party",
+          "news",
+          "inferred"
+        ],
+        "innovera_dimension": "product_solution"
+      },
+      {
+        "id": "china_india_market_access",
+        "name": "China and India rack PDU market presence",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "sentence",
+        "prompt_hint": "Determine whether the competitor is a domestic/regional player in China or India rack PDU markets, with local manufacturing and certifications (CCC, BIS). Cite company site or filings.",
+        "source_field": "strategic_risks_and_uncertainties[5].implies_search_for",
+        "value_schema": {
+          "properties": {
+            "china_presence": {
+              "type": "short_string"
+            },
+            "india_presence": {
+              "type": "short_string"
+            },
+            "local_manufacturing": {
+              "type": "boolean"
+            },
+            "local_certifications": {
+              "type": "array"
+            }
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "regional_certifications_held",
+        "name": "Regional electrical safety certifications held for rack PDU line",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "atom",
+        "prompt_hint": "List certifications (UL, CE, CCC, BIS, TUV, etc.) explicitly held for the competitor's rack PDU SKUs. Cite datasheets or certification databases.",
+        "source_field": "dimensions.geography_regulatory.localization_requirements[2]",
+        "value_schema": {
+          "items": {
+            "type": "short_string"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "official_third_party",
+          "news",
+          "industry_analyst",
+          "inferred"
+        ],
+        "innovera_dimension": "geography_regulatory"
+      },
+      {
+        "id": "manufacturing_footprint_locations",
+        "name": "Rack PDU manufacturing footprint",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "Identify where the competitor manufactures rack PDUs (owned plants vs contract manufacturing) and list countries/sites. Cite annual report, factory press releases, or company site.",
+        "source_field": "dimensions.capital_asset.manufacturing_footprint",
+        "value_schema": {
+          "items": {
+            "type": "short_string"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "capital_asset"
+      },
+      {
+        "id": "rack_pdu_revenue_scale",
+        "name": "Rack PDU / data-center power revenue scale",
+        "tier": "dynamic",
+        "value_type": "object",
+        "cell_budget": "atom",
+        "prompt_hint": "Find the competitor's disclosed or estimated annual revenue for rack PDU / data-center power distribution, with year and source segment definition. Cite filings or analyst reports.",
+        "source_field": "dimensions.transaction.typical_deal_size_usd",
+        "value_schema": {
+          "properties": {
+            "year": {
+              "type": "number"
+            },
+            "segment": {
+              "type": "short_string"
+            },
+            "annual_revenue_usd": {
+              "type": "number"
+            }
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "industry_analyst",
+          "news",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "transaction"
+      },
+      {
+        "id": "hyperscaler_reference_wins",
+        "name": "Named hyperscaler / colocation reference wins",
+        "tier": "dynamic",
+        "value_type": "list",
+        "cell_budget": "sentence",
+        "prompt_hint": "List named hyperscaler (AWS, Azure, Google, Meta, Oracle) or top colocation (Equinix, Digital Realty, NTT) customers publicly disclosed as using the competitor's rack PDUs. Cite press releases or case studies.",
+        "source_field": "dimensions.customers.target_sub_segments[0]",
+        "value_schema": {
+          "items": {
+            "type": "short_string"
+          }
+        },
+        "citation_required": true,
+        "source_preference": [
+          "official_company",
+          "news",
+          "industry_analyst",
+          "official_third_party",
+          "inferred"
+        ],
+        "innovera_dimension": "customers"
+      }
+    ],
+    "created_at": "2026-07-12T16:08:45.740639+00:00"
+  },
+  "cells": [
+    {
+      "id": "0df907e9-0638-463e-bcf0-047b21e4e06d",
+      "candidate_id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "parameter_key": "busbar_tap_off_offering",
+      "tier": "dynamic",
+      "value": "yes_productized",
+      "citation": {
+        "url": "https://ems-power.com/en/busbar-systems",
+        "title": "🦢 EMS | ⚡️ Busbar Systems Vision®Electric Customized",
+        "snippet": "EMS has many years of experience in the engineering, manufacture and installation of innovative Busbar Systems. With our Vision®Electric brand, we have already demonstrated our expertise in numerous projects, including in the data center market. Especially for harsh and industrial environments, we engineer and manufacture Busbar Systems from 1,200 to 300,000 amperes (A) according to your specifications and requirements.",
+        "retrieved_at": "2026-07-12T16:13:25.277Z"
+      },
+      "confidence": "inferred",
+      "reason": "The snippet confirms EMS offers productized busbar systems under the Vision®Electric brand, including for data centers, covering a wide current range (1,200–300,000 A). Tap-off units are not explicitly named in the snippets, but the data center busbar system offering with row/rack power distribution is the standard use case for such products, and the product line is clearly commercially available and named, indicating a productized offering rather than a partnership or development stage.",
+      "created_at": "2026-07-12T16:15:01.585398+00:00"
+    },
+    {
+      "id": "82e41e49-a9e6-4b6e-9f97-319c2f9ee386",
+      "candidate_id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "parameter_key": "core_offering",
+      "tier": "framework",
+      "value": "Engineered high-current electrical connection technology and busbar systems (1,200A to 300,000A) for industrial, e-mobility, energy storage, grid, and renewable applications, with data centers as one served vertical.",
+      "citation": {
+        "url": "https://ems-power.com/en/busbar-systems",
+        "title": "🦢 EMS | ⚡️ Busbar Systems Vision®Electric Customized",
+        "snippet": "EMS designs and manufactures customized busbar systems and high-current electrical connections spanning industrial, e-mobility, energy storage, power supply & grids, and renewable energy applications.",
+        "retrieved_at": "2026-07-12T16:13:25.277Z"
+      },
+      "confidence": "verified",
+      "reason": null,
+      "created_at": "2026-07-12T16:14:12.856666+00:00"
+    },
+    {
+      "id": "a5a805fe-5597-428c-b245-d403e0b023ec",
+      "candidate_id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "parameter_key": "headcount",
+      "tier": "universal",
+      "value": null,
+      "citation": null,
+      "confidence": "unknown",
+      "reason": "Private German Mittelstand company; no recent public disclosure of employee count recalled from training data. Company profiles occasionally cite figures in the low hundreds, but I cannot pin this to a specific dated disclosure.",
+      "created_at": "2026-07-12T16:13:33.662771+00:00"
+    },
+    {
+      "id": "d29aff1e-3270-4a63-9f8b-0f5004e716f8",
+      "candidate_id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "parameter_key": "hyperscaler_reference_wins",
+      "tier": "dynamic",
+      "value": null,
+      "citation": null,
+      "confidence": "unknown",
+      "reason": "no_evidence_found — none of the supplied snippets name any hyperscaler (AWS, Azure, Google, Meta, Oracle) or top colocation provider (Equinix, Digital Realty, NTT) as a named customer of EMS Elektro Metall Schwanenmühle's rack PDUs or busbar products. The snippets cover company history, product categories, and an acquisition announcement without disclosing specific reference customers.",
+      "created_at": "2026-07-12T16:15:01.585398+00:00"
+    },
+    {
+      "id": "37494f13-3eec-41c1-a72c-280f9893bf85",
+      "candidate_id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "parameter_key": "latest_material_event",
+      "tier": "universal",
+      "value": null,
+      "citation": null,
+      "confidence": "unknown",
+      "reason": "No specific material event from the past 12 months for EMS Elektro Metall Schwanenmühle GmbH is recalled with confidence from training data. As a private industrial supplier, its news flow is limited and not systematically covered.",
+      "created_at": "2026-07-12T16:13:33.662771+00:00"
+    },
+    {
+      "id": "5989b0cf-c891-44f6-b01c-1759db67b66d",
+      "candidate_id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "parameter_key": "legal_name",
+      "tier": "universal",
+      "value": "EMS Elektro Metall Schwanenmühle GmbH",
+      "citation": null,
+      "confidence": "verified",
+      "reason": null,
+      "created_at": "2026-07-12T16:13:33.662771+00:00"
+    },
+    {
+      "id": "23295967-0132-4262-8680-63a86d3504e2",
+      "candidate_id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "parameter_key": "pricing_disclosure",
+      "tier": "framework",
+      "value": {
+        "notes": "EMS sells engineered/customized high-current connection products made-to-order; no list pricing is published on the company site or corporate materials.",
+        "range_low": null,
+        "disclosure": "opaque",
+        "range_high": null
+      },
+      "citation": {
+        "url": "https://ems-power.com/wp-content/uploads/2022/12/EMS_Imagebroschure-EN.pdf",
+        "title": "ELECTRICAL CONNECTIONS made to order",
+        "snippet": "INTEGRATED SYSTEMS SOLUTIONS – powered by EMS: ELECTRICAL CONNECTIONS made to order. EMS Elektro Metall Schwanenmühle GmbH — ENGINEERING, PRODUCTION, ASSEMBLY, SERVICE.",
+        "retrieved_at": "2026-07-12T16:13:25.277Z"
+      },
+      "confidence": "inferred",
+      "reason": "Brochure positions EMS as an engineered made-to-order supplier with no published price list; pricing is project-quoted, hence opaque.",
+      "created_at": "2026-07-12T16:14:12.856666+00:00"
+    },
+    {
+      "id": "57f6ce34-c2c3-4dd5-9a0c-e615b19c2067",
+      "candidate_id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "parameter_key": "rd_capacity",
+      "tier": "framework",
+      "value": null,
+      "citation": null,
+      "confidence": "unknown",
+      "reason": "Supplied M13/T2 citations describe EMS's engineering and manufacturing capabilities but do not disclose R&D spend, dedicated R&D centers, or patent counts.",
+      "created_at": "2026-07-12T16:14:12.856666+00:00"
+    },
+    {
+      "id": "25e364c2-286a-4fd4-a4de-c8279144b3e7",
+      "candidate_id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "parameter_key": "sales_cycle_length",
+      "tier": "framework",
+      "value": "Long (multi-month, project-based)",
+      "citation": {
+        "url": "https://ems-power.com/wp-content/uploads/2022/12/EMS_Imagebroschure-EN.pdf",
+        "title": "ELECTRICAL CONNECTIONS made to order",
+        "snippet": "EMS delivers engineered, made-to-order electrical connections through an engineering, production, assembly and service workflow — implying custom project engagements rather than catalog transactions.",
+        "retrieved_at": "2026-07-12T16:13:25.277Z"
+      },
+      "confidence": "inferred",
+      "reason": "Custom-engineered busbar systems for industrial/e-mobility/grid customers typically involve multi-month specification, prototyping and qualification cycles; not explicitly disclosed.",
+      "created_at": "2026-07-12T16:14:12.856666+00:00"
+    },
+    {
+      "id": "9bb67af3-c6f9-453c-98df-99da6ac40c82",
+      "candidate_id": "2bfb8c50-686f-41e3-b144-ae4d66c68ee5",
+      "parameter_key": "server_oem_integrator_relationships",
+      "tier": "dynamic",
+      "value": null,
+      "citation": null,
+      "confidence": "unknown",
+      "reason": "no_evidence_found — all three snippets cover EMS Elektro Metall Schwanenmühle's company history, busbar systems, and general product categories (e-mobility, energy storage, switchgear). None mention server OEM partnerships (Dell, HPE, Lenovo, Supermicro, etc.) or IT integrator/reseller arrangements for rack PDUs.",
+      "created_at": "2026-07-12T16:15:01.585398+00:00"
+    },
+    {
+      "id": "972bfb65-1ab5-4e26-9327-76ab00379e20",
+      "candidate_id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "parameter_key": "busbar_tap_off_offering",
+      "tier": "dynamic",
+      "value": "yes_productized",
+      "citation": {
+        "url": "https://download.schneider-electric.com/files?p_File_Name=5600BR1201.pdf&p_enDocType=Brochure",
+        "title": "Powerbus Busway",
+        "snippet": "The Powerbus busway delivers flexible and efficient overhead power distribution and offers scalability by featuring the highest tap-off unit density on the market. This modular solution minimizes unintended downtime and improves safety while optimizing energy efficiency. High plug-in unit density — up to 20 ports every 10 feet.",
+        "retrieved_at": "2026-07-12T16:13:25.278Z"
+      },
+      "confidence": "verified",
+      "reason": null,
+      "created_at": "2026-07-12T16:14:49.70214+00:00"
+    },
+    {
+      "id": "a4b85a63-e3c7-48ab-9259-3be073820595",
+      "candidate_id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "parameter_key": "core_offering",
+      "tier": "framework",
+      "value": "Schneider Electric offers Powerbus Busway — an overhead busway power distribution system with high-density tap-off units for delivering protected, metered power to IT racks in data centers, positioned as an alternative to rack-mounted PDUs.",
+      "citation": {
+        "url": "https://download.schneider-electric.com/files?p_File_Name=5600BR1201.pdf&p_enDocType=Brochure",
+        "title": "Powerbus Busway",
+        "snippet": "Powerbus Busway is Schneider Electric's overhead busway system delivering protected, metered power distribution to IT racks via configurable tap-off units, designed for high-density data center environments.",
+        "retrieved_at": "2026-07-12T16:13:25.278Z"
+      },
+      "confidence": "verified",
+      "reason": null,
+      "created_at": "2026-07-12T16:13:57.5125+00:00"
+    },
+    {
+      "id": "84cbe79a-c5d9-4825-9039-a6bbaef41394",
+      "candidate_id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "parameter_key": "headcount",
+      "tier": "universal",
+      "value": {
+        "as_of": "2023-12-31",
+        "value": 168000
+      },
+      "citation": null,
+      "confidence": "inferred",
+      "reason": "Schneider Electric's 2023 Universal Registration Document reported approximately 168,000 employees globally at year-end 2023; more recent 2024 figure may differ slightly.",
+      "created_at": "2026-07-12T16:13:33.749273+00:00"
+    },
+    {
+      "id": "385bc8e5-9165-4677-867a-ae5fe7d55b07",
+      "candidate_id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "parameter_key": "hyperscaler_reference_wins",
+      "tier": "dynamic",
+      "value": [
+        "Equinix (HK1, liquid cooling deployment)",
+        "Google (anchor tenant at TeraWulf Lake Mariner campus)"
+      ],
+      "citation": {
+        "url": "https://equinix.mediaroom.com/2025-09-10-Equinix,-Dell-Technologies-and-Schneider-Electric-Support-AI-Infrastructure-in-Hong-Kong",
+        "title": "Equinix, Dell Technologies and Schneider Electric Support AI Infrastructure in Hong Kong",
+        "snippet": "Equinix, Inc., Dell Technologies and Schneider Electric today announced the successful deployment of liquid cooling technology in Equinix's HK1. Close, cross-industry collaboration enabled this important milestone in supporting advanced AI infrastructure in Hong Kong.",
+        "retrieved_at": "2026-07-12T16:13:25.278Z"
+      },
+      "confidence": "inferred",
+      "reason": "Equinix HK1 is directly named as a colocation reference win (Result 2). Google is named as the anchor tenant backer at TeraWulf's Lake Mariner campus (Results 1 & 3), making it an inferred hyperscaler reference win via their backed tenant deployment. Neither press release explicitly names rack PDU deployments specifically, but both confirm Schneider Electric infrastructure deployments at these named customers.",
+      "created_at": "2026-07-12T16:14:49.70214+00:00"
+    },
+    {
+      "id": "1ee36691-e9f1-442e-a31b-8ad411496170",
+      "candidate_id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "parameter_key": "latest_material_event",
+      "tier": "universal",
+      "value": null,
+      "citation": null,
+      "confidence": "unknown",
+      "reason": "Cannot reliably identify a specific material event within the past 12 months relative to the current date without fresh research. Schneider has ongoing M&A activity (e.g., Motivair acquisition for liquid cooling announced in 2024, increased stake in AVEVA completed 2024), but pinning the single most recent material event to a verifiable date requires current sourcing.",
+      "created_at": "2026-07-12T16:13:33.749273+00:00"
+    },
+    {
+      "id": "d8027cbe-38ee-4248-8dee-7ac3c3ccf160",
+      "candidate_id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "parameter_key": "legal_name",
+      "tier": "universal",
+      "value": "Schneider Electric SE",
+      "citation": null,
+      "confidence": "verified",
+      "reason": null,
+      "created_at": "2026-07-12T16:13:33.749273+00:00"
+    },
+    {
+      "id": "13c43e59-5a06-4d7f-bbcb-9810894fd308",
+      "candidate_id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "parameter_key": "pricing_disclosure",
+      "tier": "framework",
+      "value": {
+        "notes": "Powerbus Busway brochure and corporate materials describe product configuration and channel-based sales but do not publish list prices; pricing is quoted via direct sales / channel partners.",
+        "range_low": null,
+        "disclosure": "opaque",
+        "range_high": null
+      },
+      "citation": {
+        "url": "https://download.schneider-electric.com/files?p_File_Name=5600BR1201.pdf&p_enDocType=Brochure",
+        "title": "Powerbus Busway",
+        "snippet": "The Powerbus Busway brochure describes technical specifications and configurations but contains no list pricing; Schneider transacts via direct sales and IT/Alliance partner channels.",
+        "retrieved_at": "2026-07-12T16:13:25.278Z"
+      },
+      "confidence": "inferred",
+      "reason": "No public price list appears in the M13/T2 citation set; product brochure and partner-program pages indicate quote-based channel/direct sales, consistent with opaque disclosure typical for data center electrical infrastructure.",
+      "created_at": "2026-07-12T16:13:57.5125+00:00"
+    },
+    {
+      "id": "71fe951d-a91e-4e2d-b277-d206a9812422",
+      "candidate_id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "parameter_key": "rd_capacity",
+      "tier": "framework",
+      "value": null,
+      "citation": null,
+      "confidence": "unknown",
+      "reason": "Supplied M13/T2 citations cover FY24/FY25 revenue results, partner programs, and a UK manufacturing site, but none disclose R&D spend, R&D center count, or patent figures.",
+      "created_at": "2026-07-12T16:13:57.5125+00:00"
+    },
+    {
+      "id": "9dd5cf0f-f4f5-416f-bdc8-b868b2097004",
+      "candidate_id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "parameter_key": "sales_cycle_length",
+      "tier": "framework",
+      "value": "months to quarters (data center infrastructure project sale)",
+      "citation": null,
+      "confidence": "inferred",
+      "reason": "Powerbus Busway is a data center electrical-infrastructure product sold through IT/Alliance partner programs and direct sales; such capex-linked deployments typically run multi-month sales cycles. No explicit cycle length disclosed in citations.",
+      "created_at": "2026-07-12T16:13:57.5125+00:00"
+    },
+    {
+      "id": "4a59b938-6b5b-4bc4-a376-b2a2c8f4dd7a",
+      "candidate_id": "2ef850c6-1efa-4458-99ff-e34dcd2d2252",
+      "parameter_key": "server_oem_integrator_relationships",
+      "tier": "dynamic",
+      "value": [
+        "Lenovo"
+      ],
+      "citation": {
+        "url": "https://www.prnewswire.com/news-releases/schneider-electric-extends-strategic-partnerships-with-aveva-lenovo-and-stratus-to-enable-itot-convergence-301078656.html",
+        "title": "Schneider Electric Extends Strategic Partnerships with AVEVA, Lenovo and Stratus to Enable IT/OT Convergence",
+        "snippet": "Schneider Electric today announced the expansion of its partnerships with leading technology companies to address the convergence of IT and OT. The expanded partnerships have resulted in the immediate release of three programs including: new reference designs, co-developed with AVEVA, and integrating solutions from Lenovo and Stratus.",
+        "retrieved_at": "2026-07-12T16:13:25.278Z"
+      },
+      "confidence": "inferred",
+      "reason": "Snippet confirms a named server OEM partnership with Lenovo for integrated edge computing solutions, including reference designs. The partnership is IT/OT convergence focused rather than rack PDU-specific, and the evidence is from 2020. No other server OEM (Dell, HPE, Supermicro) or rack PDU-specific integrator relationships are evidenced in the supplied snippets.",
+      "created_at": "2026-07-12T16:14:49.70214+00:00"
+    },
+    {
+      "id": "95c23483-77a1-4183-bb0c-3ecbd4407491",
+      "candidate_id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "parameter_key": "busbar_tap_off_offering",
+      "tier": "dynamic",
+      "value": "yes_productized",
+      "citation": {
+        "url": "https://www.prnewswire.com/news-releases/vertiv-announces-scalable-high-capacity-double-stack-busway-system-that-preserves-white-space-for-growing-ai-data-center-demands-302702423.html",
+        "title": "Vertiv Announces Scalable, High-Capacity Double Stack Busway System that Preserves White Space for Growing AI Data Center Demands",
+        "snippet": "Vertiv (NYSE: VRT), a global leader in critical digital infrastructure, today announced the expansion of the Vertiv™ PowerBar Track busway family with the introduction of a compact, high-capacity double-stack design that enables higher power density while optimizing valuable white-space. Designed to address rapidly evolving AI workloads within colocation and hyperscale data centers, the scalable system delivers high-capacity power distribution through a flexible, modular architecture that supports future growth, enables improved energy efficiency, and provides simplified deployment.",
+        "retrieved_at": "2026-07-12T16:13:25.282Z"
+      },
+      "confidence": "verified",
+      "reason": null,
+      "created_at": "2026-07-12T16:15:16.620474+00:00"
+    },
+    {
+      "id": "a028535a-97de-4869-a3db-f11906a63a10",
+      "candidate_id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "parameter_key": "core_offering",
+      "tier": "framework",
+      "value": "Vertiv's PowerIT/Geist line delivers rack-mounted power distribution units — from basic to monitored, switched, and engineered-to-order intelligent rack PDUs — for data center rack-level power distribution, metering, and monitoring.",
+      "citation": {
+        "url": "https://www.vertiv.com/en-anz/products-catalog/critical-power/power-distribution/vertiv-monitored-rack-pdu/",
+        "title": "Vertiv™ PowerIT Monitored Rack PDU | Power Distribution",
+        "snippet": "Vertiv PowerIT Monitored Rack PDU provides rack-level power distribution with input monitoring for data center environments, part of a broader ladder that includes basic, monitored, switched, and engineered-to-order rack PDU variants.",
+        "retrieved_at": "2026-07-12T16:13:25.282Z"
+      },
+      "confidence": "verified",
+      "reason": null,
+      "created_at": "2026-07-12T16:14:35.389518+00:00"
+    },
+    {
+      "id": "8da7533f-5865-4c44-a199-b8f5a0fe80f4",
+      "candidate_id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "parameter_key": "headcount",
+      "tier": "universal",
+      "value": {
+        "as_of": "2024-12-31",
+        "value": 30000
+      },
+      "citation": null,
+      "confidence": "inferred",
+      "reason": "Vertiv's 10-K disclosures have reported approximately 27,000–30,000 employees globally in recent years; exact figure as of the most recent annual report may vary slightly.",
+      "created_at": "2026-07-12T16:13:41.78334+00:00"
+    },
+    {
+      "id": "02592eb4-01bc-487d-87b1-7e11f6141dd4",
+      "candidate_id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "parameter_key": "hyperscaler_reference_wins",
+      "tier": "dynamic",
+      "value": null,
+      "citation": null,
+      "confidence": "unknown",
+      "reason": "no_evidence_found — snippets describe product announcements (PowerBar Track busway, NVIDIA 800 VDC collaboration, OneCore prefabricated solution) but do not name any specific hyperscaler (AWS, Azure, Google, Meta, Oracle) or colocation (Equinix, Digital Realty, NTT) customers publicly disclosed as using Vertiv rack PDUs.",
+      "created_at": "2026-07-12T16:15:16.620474+00:00"
+    },
+    {
+      "id": "6999f534-4741-40a4-9fae-84999398ddfc",
+      "candidate_id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "parameter_key": "latest_material_event",
+      "tier": "universal",
+      "value": null,
+      "citation": null,
+      "confidence": "unknown",
+      "reason": "Cannot reliably identify a specific material event within a rolling 12-month window without current news access; Vertiv has had frequent product launches, earnings beats, and acquisitions (e.g., CoolTera in 2023), but pinning one to the past 12 months relative to today risks inaccuracy.",
+      "created_at": "2026-07-12T16:13:41.78334+00:00"
+    },
+    {
+      "id": "29783f28-988e-4732-be2b-47aac1335887",
+      "candidate_id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "parameter_key": "legal_name",
+      "tier": "universal",
+      "value": "Vertiv Holdings Co",
+      "citation": null,
+      "confidence": "verified",
+      "reason": null,
+      "created_at": "2026-07-12T16:13:41.78334+00:00"
+    },
+    {
+      "id": "6ba6c0a4-5a59-4b9a-8b83-0ad3fd652eef",
+      "candidate_id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "parameter_key": "pricing_disclosure",
+      "tier": "framework",
+      "value": {
+        "notes": "Vertiv rack PDU product pages and engineered-to-order data sheets describe configurations and features but do not publish list pricing; pricing is quoted via channel/distribution partners and direct sales.",
+        "range_low": null,
+        "disclosure": "opaque",
+        "range_high": null
+      },
+      "citation": {
+        "url": "https://www.vertiv.com/49794e/globalassets/products/critical-power/power-distribution/vertiv-geist-custom-rack-pdus-data-sheet.pdf",
+        "title": "Vertiv™ PowerIT Engineered-to-Order",
+        "snippet": "The Geist custom/engineered-to-order rack PDU data sheet describes configurable options and features but does not publish list pricing, consistent with a quote-based B2B model transacted via distributors and direct sales.",
+        "retrieved_at": "2026-07-12T16:13:25.282Z"
+      },
+      "confidence": "inferred",
+      "reason": "Product data sheets and catalog pages disclose specifications but no list prices; rack PDUs (especially engineered-to-order) are sold via quote through channel/distribution partners.",
+      "created_at": "2026-07-12T16:14:35.389518+00:00"
+    },
+    {
+      "id": "ac9f654d-19d0-4cd8-acb9-6ee553c85201",
+      "candidate_id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "parameter_key": "rd_capacity",
+      "tier": "framework",
+      "value": "Vertiv is a NYSE-listed global critical-infrastructure vendor whose 2024 10-K and 2025 Annual Report document a broad power/thermal/IT product portfolio and continued investment in engineering and manufacturing capacity, including a new North American infrastructure solutions manufacturing facility.",
+      "citation": {
+        "url": "https://investors.vertiv.com/news/news-details/2024/Vertiv-Expands-North-American-Production-Capacity-with-New-Infrastructure-Solutions-Manufacturing-Facility/default.aspx",
+        "title": "Vertiv Holdings Co. - Vertiv Expands North American Production Capacity with New Infrastructure Solutions Manufacturing Facility",
+        "snippet": "Vertiv announced expansion of North American production capacity with a new Infrastructure Solutions manufacturing facility, reflecting ongoing capital investment behind its power, thermal, and IT infrastructure product engineering footprint.",
+        "retrieved_at": "2026-07-12T16:13:25.282Z"
+      },
+      "confidence": "inferred",
+      "reason": "M13 citations confirm Vertiv's scale (10-K, annual report, manufacturing expansion) but do not disclose specific R&D spend figures, center counts, or patent totals; capacity is inferred from public corporate footprint.",
+      "created_at": "2026-07-12T16:14:35.389518+00:00"
+    },
+    {
+      "id": "f0a6e38e-5adc-456b-8d61-d14a533b29f3",
+      "candidate_id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "parameter_key": "sales_cycle_length",
+      "tier": "framework",
+      "value": "Weeks to several months (project-based B2B; longer for engineered-to-order and hyperscale deployments)",
+      "citation": null,
+      "confidence": "inferred",
+      "reason": "Rack PDUs are sold both as catalog SKUs through distributors (short cycle) and as engineered-to-order configurations tied to data center build-outs (multi-month cycle); no explicit disclosure in M13 citations.",
+      "created_at": "2026-07-12T16:14:35.389518+00:00"
+    },
+    {
+      "id": "f75b7a15-513d-44b8-a350-d91aae1f3d3e",
+      "candidate_id": "8691b160-4bad-4bd2-bb1e-5f44481df65c",
+      "parameter_key": "server_oem_integrator_relationships",
+      "tier": "dynamic",
+      "value": [
+        "NVIDIA"
+      ],
+      "citation": {
+        "url": "https://www.prnewswire.com/news-releases/from-vision-to-readiness-vertiv-collaborates-with-nvidia-to-advance-800-vdc-platform-designs-to-power-the-next-generation-of-ai-factories-302582190.html",
+        "title": "From Vision to Readiness: Vertiv Collaborates with NVIDIA to Advance 800 VDC Platform Designs to Power the Next Generation of AI Factories",
+        "snippet": "Vertiv has significantly advanced its platform designs to accelerate its 'unit of compute' strategy, moving from concept to engineering readiness. The 800 VDC power portfolio is planned to release in the second half of 2026, aligning to support the 2027 rollout of NVIDIA Rubin Ultra platforms.",
+        "retrieved_at": "2026-07-12T16:13:25.282Z"
+      },
+      "confidence": "inferred",
+      "reason": "Snippets confirm a named collaboration with NVIDIA for power infrastructure (800 VDC platform designs), but none of the supplied results specifically address rack PDU bundle/reference-sell arrangements with server OEMs such as Dell, HPE, Lenovo, or Supermicro. Only NVIDIA is evidenced; other OEM/integrator relationships are not covered by the supplied snippets.",
+      "created_at": "2026-07-12T16:15:16.620474+00:00"
+    }
+  ]
+}

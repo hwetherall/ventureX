@@ -130,6 +130,12 @@ export interface ExaSearchArgs {
    * produces HTTP 400 with "expected array, received string".
    */
   includeText?: string;
+  /** Optional ISO date bounds used by Cell Research V2 dynamic policies. */
+  startPublishedDate?: string;
+  endPublishedDate?: string;
+  /** Optional domain allow/deny lists. Exa accepts bare hostnames. */
+  includeDomains?: string[];
+  excludeDomains?: string[];
 }
 
 interface ExaApiResult {
@@ -193,6 +199,18 @@ export async function exaSearch(args: ExaSearchArgs): Promise<ExaSearchResponse>
         // unfiltered behavior. Exa requires this as a single-element array
         // of strings — bare string returns HTTP 400.
         ...(args.includeText ? { includeText: [args.includeText] } : {}),
+        ...(args.startPublishedDate
+          ? { startPublishedDate: args.startPublishedDate }
+          : {}),
+        ...(args.endPublishedDate
+          ? { endPublishedDate: args.endPublishedDate }
+          : {}),
+        ...(args.includeDomains?.length
+          ? { includeDomains: args.includeDomains }
+          : {}),
+        ...(args.excludeDomains?.length
+          ? { excludeDomains: args.excludeDomains }
+          : {}),
       }),
       signal: controller.signal,
     });

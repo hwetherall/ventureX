@@ -1,0 +1,1104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VentureX · Cell research comparison</title>
+  <style>
+    :root {
+      --ink: #17332a;
+      --muted: #68766f;
+      --paper: #f5f1e8;
+      --card: #fffdf8;
+      --forest: #104b3d;
+      --forest-2: #0b6a53;
+      --lime: #a9cc4a;
+      --gold: #b98238;
+      --line: #d8d0c2;
+      --purple: #7258a8;
+      --verified: #176b52;
+      --verified-bg: #e3f3eb;
+      --inferred: #9a651e;
+      --inferred-bg: #fff0d3;
+      --unknown: #617069;
+      --unknown-bg: #edf0ed;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 85% 0%, rgba(169,204,74,.2), transparent 28rem),
+        var(--paper);
+      font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    a { color: var(--forest-2); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+    .page { width: min(1560px, calc(100% - 40px)); margin: 0 auto; padding: 28px 0 72px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 26px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; letter-spacing: -.02em; }
+    .brand-mark { width: 34px; height: 34px; border-radius: 9px; background: var(--forest); position: relative; box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+    .brand-mark::after { content: ""; position: absolute; width: 13px; height: 13px; border: 3px solid var(--lime); border-left: 0; border-top: 0; transform: rotate(45deg); left: 9px; top: 6px; }
+    .print-button { border: 1px solid rgba(16,75,61,.28); background: rgba(255,253,248,.84); color: var(--forest); border-radius: 999px; padding: 9px 16px; font: inherit; font-weight: 700; cursor: pointer; }
+    .hero { background: var(--forest); color: white; border-radius: 28px; padding: clamp(28px, 5vw, 64px); overflow: hidden; position: relative; box-shadow: 0 24px 60px rgba(23,51,42,.17); }
+    .hero::after { content: ""; position: absolute; width: 420px; height: 420px; border: 90px solid rgba(169,204,74,.13); border-radius: 50%; right: -210px; top: -230px; }
+    .eyebrow { color: var(--lime); text-transform: uppercase; letter-spacing: .14em; font-size: 12px; font-weight: 800; }
+    h1 { max-width: 900px; margin: 10px 0 16px; font: 800 clamp(38px, 6vw, 72px)/.98 Georgia, "Times New Roman", serif; letter-spacing: -.045em; }
+    .hero-copy { max-width: 760px; margin: 0; color: rgba(255,255,255,.78); font-size: 18px; }
+    .runline { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 9px; }
+    .runline span { border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08); border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+    .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 22px 0 40px; }
+    .metric { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; min-height: 148px; box-shadow: 0 10px 25px rgba(23,51,42,.06); }
+    .metric-label { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    .metric-values { display: flex; align-items: baseline; gap: 10px; margin: 15px 0 7px; }
+    .metric-old { color: #8d9892; font-size: 26px; font-weight: 750; }
+    .metric-arrow { color: var(--gold); font-weight: 900; }
+    .metric-new { color: var(--forest); font: 800 38px/1 Georgia, serif; }
+    .metric p { color: var(--muted); margin: 0; font-size: 13px; }
+    .section { margin-top: 54px; scroll-margin-top: 20px; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 15px; }
+    .section-number { color: var(--gold); font-weight: 800; letter-spacing: .1em; font-size: 12px; text-transform: uppercase; }
+    h2 { margin: 2px 0 0; font: 750 clamp(28px, 4vw, 45px)/1.05 Georgia, "Times New Roman", serif; letter-spacing: -.025em; }
+    .section-note { max-width: 600px; color: var(--muted); margin: 0; text-align: right; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+    .legend span, .confidence, .delta, .difficulty { border-radius: 999px; display: inline-flex; align-items: center; font-weight: 800; white-space: nowrap; }
+    .legend span { padding: 5px 9px; font-size: 12px; }
+    .matrix-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; background: var(--card); box-shadow: 0 10px 28px rgba(23,51,42,.06); }
+    .matrix { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 1080px; table-layout: fixed; }
+    .matrix th, .matrix td { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); vertical-align: top; }
+    .matrix tr:last-child th, .matrix tr:last-child td { border-bottom: 0; }
+    .matrix tr th:last-child, .matrix tr td:last-child { border-right: 0; }
+    .matrix thead th { background: var(--forest); color: white; padding: 15px; text-align: left; font-size: 13px; }
+    .matrix .parameter-heading { width: 205px; }
+    .parameter-cell { width: 205px; padding: 15px; background: #eee8dc; text-align: left; }
+    .parameter-cell span { display: block; line-height: 1.25; }
+    .difficulty { margin-top: 8px; padding: 3px 7px; font-size: 10px; background: rgba(23,51,42,.08); color: var(--muted); }
+    .difficulty-very-hard { background: #eadff2; color: #654187; }
+    .difficulty-hard { background: #f5e4d0; color: #8a5822; }
+    .matrix td { padding: 14px; background: white; }
+    .matrix td.changed { box-shadow: inset 4px 0 0 var(--purple); }
+    .matrix td.withheld { box-shadow: inset 4px 0 0 var(--gold); background: #fffdf7; }
+    .matrix td.strengthened { box-shadow: inset 4px 0 0 var(--lime); background: #fbfdf7; }
+    .cell-top { display: flex; align-items: center; justify-content: space-between; gap: 7px; margin-bottom: 9px; }
+    .confidence { padding: 4px 8px; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+    .verified { color: var(--verified); background: var(--verified-bg); }
+    .inferred { color: var(--inferred); background: var(--inferred-bg); }
+    .unknown { color: var(--unknown); background: var(--unknown-bg); }
+    .delta { padding: 3px 7px; font-size: 9px; letter-spacing: .04em; text-transform: uppercase; background: #ece6f6; color: #63499a; }
+    .delta-withheld { background: var(--inferred-bg); color: var(--inferred); }
+    .delta-strengthened { background: #e7f2d2; color: #4b6d13; }
+    .cell-value { margin: 0; color: #2c433b; font-size: 12px; line-height: 1.43; overflow-wrap: anywhere; }
+    .cell-value.empty { color: #84908a; font-style: italic; }
+    details { margin-top: 9px; }
+    summary { color: var(--forest-2); cursor: pointer; font-size: 11px; font-weight: 750; }
+    .full-value { margin: 7px 0; padding: 9px; background: #f6f3ec; border-radius: 8px; color: #42534d; font-size: 11px; white-space: pre-wrap; }
+    .cell-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; color: var(--muted); font-size: 10px; }
+    .change-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .change-card { border: 1px solid var(--line); border-radius: 18px; padding: 20px; background: var(--card); }
+    .change-card h3 { margin: 0 0 5px; font-size: 16px; }
+    .change-card p { color: var(--muted); margin: 0 0 13px; font-size: 12px; }
+    .change-card ul { padding-left: 19px; margin: 0; }
+    .change-card li { margin: 7px 0; font-size: 12px; }
+    .caveat { margin-top: 36px; padding: 18px 20px; border: 1px solid #d8c6a7; background: #fff8e8; border-radius: 14px; color: #664d29; }
+    .footer { display: flex; justify-content: space-between; gap: 24px; margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    @media (max-width: 900px) {
+      .summary, .change-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .section-heading { display: block; }
+      .section-note { text-align: left; margin-top: 8px; }
+    }
+    @media (max-width: 580px) {
+      .page { width: min(100% - 22px, 1560px); padding-top: 14px; }
+      .summary, .change-grid { grid-template-columns: 1fr; }
+      .hero { border-radius: 20px; }
+      .print-button { display: none; }
+    }
+    @media print {
+      @page { size: A3 landscape; margin: 11mm; }
+      body { background: white; font-size: 10px; }
+      .page { width: 100%; padding: 0; }
+      .topbar, .print-button { display: none; }
+      .hero { box-shadow: none; border-radius: 0; padding: 28px; }
+      .summary { margin: 12px 0 18px; }
+      .metric { min-height: 0; padding: 12px; box-shadow: none; }
+      .section { margin-top: 24px; break-before: page; }
+      .matrix-wrap { overflow: visible; box-shadow: none; }
+      .matrix { min-width: 0; }
+      .matrix .parameter-heading, .parameter-cell { width: 150px; }
+      .matrix td, .matrix thead th, .parameter-cell { padding: 8px; }
+      details { display: none; }
+      .change-grid { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span>VentureX</div>
+      <button class="print-button" type="button" onclick="window.print()">Print / save as PDF</button>
+    </div>
+
+    <header class="hero">
+      <div class="eyebrow">Research quality validation · ABB rack PDU</div>
+      <h1>From plausible answers to defensible evidence.</h1>
+      <p class="hero-copy">A cell-for-cell visual comparison of the original research matrix and VentureX’s new evidence-first pipeline across three competitors and ten deliberately varied parameters.</p>
+      <div class="runline">
+        <span>3 competitors</span><span>10 parameters</span><span>30 paired cells</span><span>Run 60092d5e</span><span>$8.54 research cost</span>
+      </div>
+    </header>
+
+    <section class="summary" aria-label="Executive summary">
+      <article class="metric"><div class="metric-label">Verified claims</div><div class="metric-values"><span class="metric-old">8</span><span class="metric-arrow">→</span><span class="metric-new">13</span></div><p>Four additional cells now meet the direct-evidence standard.</p></article>
+      <article class="metric"><div class="metric-label">Verified share of claims</div><div class="metric-values"><span class="metric-old">38%</span><span class="metric-arrow">→</span><span class="metric-new">81%</span></div><p>The new pipeline makes fewer claims, but a much larger share is verified.</p></article>
+      <article class="metric"><div class="metric-label">Inferred claims</div><div class="metric-values"><span class="metric-old">13</span><span class="metric-arrow">→</span><span class="metric-new">3</span></div><p>Ten speculative cells were either verified or withheld.</p></article>
+      <article class="metric"><div class="metric-label">Cells with source trail</div><div class="metric-values"><span class="metric-old">14/30</span><span class="metric-arrow">→</span><span class="metric-new">30/30</span></div><p>Every new cell retains evidence or the audit trail for an honest unknown.</p></article>
+    </section>
+
+    <section class="section" id="baseline">
+      <div class="section-heading">
+        <div><div class="section-number">01 · Before</div><h2>Original 3×10 matrix</h2></div>
+        <p class="section-note">The baseline produced 21 claims: 8 verified, 13 inferred, and 9 unknown. Each position is preserved in the new matrix below.</p>
+      </div>
+      <div class="legend"><span class="verified">Verified</span><span class="inferred">Inferred</span><span class="unknown">Unknown</span></div>
+      
+    <div class="matrix-wrap">
+      <table class="matrix" aria-label="Original 3 by 10 competitor matrix">
+        <thead>
+          <tr>
+            <th class="parameter-heading">Parameter</th>
+            <th>Schneider Electric</th><th>Vertiv Holdings</th><th>EMS Elektro Metall Schwanenmühle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+                <th class="parameter-cell">
+                  <span>Legal name</span>
+                  <small class="difficulty difficulty-easy">Easy</small>
+                </th>
+                <td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">Schneider Electric SE</p>
+    
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td><td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">Vertiv Holdings Co</p>
+    
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td><td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">EMS Elektro Metall Schwanenmühle GmbH</p>
+    
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Headcount</span>
+                  <small class="difficulty difficulty-medium">Medium</small>
+                </th>
+                <td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">As Of: 2023-12-31 · Value: 168000</p>
+    <details><summary>Read full cell</summary><div class="full-value">As Of: 2023-12-31 · Value: 168000
+
+Rationale: Schneider Electric&#39;s 2023 Universal Registration Document reported approximately 168,000 employees globally at year-end 2023; more recent 2024 figure may differ slightly.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td><td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">As Of: 2024-12-31 · Value: 30000</p>
+    <details><summary>Read full cell</summary><div class="full-value">As Of: 2024-12-31 · Value: 30000
+
+Rationale: Vertiv&#39;s 10-K disclosures have reported approximately 27,000–30,000 employees globally in recent years; exact figure as of the most recent annual report may vary slightly.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">Unknown or unsupported in the original research.</p>
+    <details><summary>Read full cell</summary><div class="full-value">Unknown or unsupported in the original research.
+
+Rationale: Private German Mittelstand company; no recent public disclosure of employee count recalled from training data. Company profiles occasionally cite figures in the low hundreds, but I cannot pin this to a specific dated disclosure.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Latest material event</span>
+                  <small class="difficulty difficulty-hard">Hard</small>
+                </th>
+                <td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">Unknown or unsupported in the original research.</p>
+    <details><summary>Read full cell</summary><div class="full-value">Unknown or unsupported in the original research.
+
+Rationale: Cannot reliably identify a specific material event within the past 12 months relative to the current date without fresh research. Schneider has ongoing M&amp;A activity (e.g., Motivair acquisition for liquid cooling announced in 2024, increased stake in AVEVA completed 2024), but pinning the single most recent material event to a verifiable date requires current sourcing.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">Unknown or unsupported in the original research.</p>
+    <details><summary>Read full cell</summary><div class="full-value">Unknown or unsupported in the original research.
+
+Rationale: Cannot reliably identify a specific material event within a rolling 12-month window without current news access; Vertiv has had frequent product launches, earnings beats, and acquisitions (e.g., CoolTera in 2023), but pinning one to the past 12 months relative to today risks inaccuracy.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">Unknown or unsupported in the original research.</p>
+    <details><summary>Read full cell</summary><div class="full-value">Unknown or unsupported in the original research.
+
+Rationale: No specific material event from the past 12 months for EMS Elektro Metall Schwanenmühle GmbH is recalled with confidence from training data. As a private industrial supplier, its news flow is limited and not systematically covered.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Core offering</span>
+                  <small class="difficulty difficulty-medium">Medium</small>
+                </th>
+                <td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">Schneider Electric offers Powerbus Busway — an overhead busway power distribution system with high-density tap-off units for delivering protected, metered power to IT racks in data…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Schneider Electric offers Powerbus Busway — an overhead busway power distribution system with high-density tap-off units for delivering protected, metered power to IT racks in data centers, positioned as an alternative to rack-mounted PDUs.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://download.schneider-electric.com/files?p_File_Name=5600BR1201.pdf&amp;p_enDocType=Brochure" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">Vertiv&#39;s PowerIT/Geist line delivers rack-mounted power distribution units — from basic to monitored, switched, and engineered-to-order intelligent rack PDUs — for data center rack-level…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Vertiv&#39;s PowerIT/Geist line delivers rack-mounted power distribution units — from basic to monitored, switched, and engineered-to-order intelligent rack PDUs — for data center rack-level power distribution, metering, and monitoring.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://www.vertiv.com/en-anz/products-catalog/critical-power/power-distribution/vertiv-monitored-rack-pdu/" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">Engineered high-current electrical connection technology and busbar systems (1,200A to 300,000A) for industrial, e-mobility, energy storage, grid, and renewable applications, with data…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Engineered high-current electrical connection technology and busbar systems (1,200A to 300,000A) for industrial, e-mobility, energy storage, grid, and renewable applications, with data centers as one served vertical.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://ems-power.com/en/busbar-systems" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Pricing disclosure</span>
+                  <small class="difficulty difficulty-hard">Hard</small>
+                </th>
+                <td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">Notes: Powerbus Busway brochure and corporate materials describe product configuration and channel-based sales but do not publish list prices; pricing is quoted via direct sales / channel…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Notes: Powerbus Busway brochure and corporate materials describe product configuration and channel-based sales but do not publish list prices; pricing is quoted via direct sales / channel partners. · Disclosure: opaque
+
+Rationale: No public price list appears in the M13/T2 citation set; product brochure and partner-program pages indicate quote-based channel/direct sales, consistent with opaque disclosure typical for data center electrical infrastructure.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://download.schneider-electric.com/files?p_File_Name=5600BR1201.pdf&amp;p_enDocType=Brochure" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">Notes: Vertiv rack PDU product pages and engineered-to-order data sheets describe configurations and features but do not publish list pricing; pricing is quoted via channel/distribution…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Notes: Vertiv rack PDU product pages and engineered-to-order data sheets describe configurations and features but do not publish list pricing; pricing is quoted via channel/distribution partners and direct sales. · Disclosure: opaque
+
+Rationale: Product data sheets and catalog pages disclose specifications but no list prices; rack PDUs (especially engineered-to-order) are sold via quote through channel/distribution partners.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://www.vertiv.com/49794e/globalassets/products/critical-power/power-distribution/vertiv-geist-custom-rack-pdus-data-sheet.pdf" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">Notes: EMS sells engineered/customized high-current connection products made-to-order; no list pricing is published on the company site or corporate materials. · Disclosure: opaque</p>
+    <details><summary>Read full cell</summary><div class="full-value">Notes: EMS sells engineered/customized high-current connection products made-to-order; no list pricing is published on the company site or corporate materials. · Disclosure: opaque
+
+Rationale: Brochure positions EMS as an engineered made-to-order supplier with no published price list; pricing is project-quoted, hence opaque.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://ems-power.com/wp-content/uploads/2022/12/EMS_Imagebroschure-EN.pdf" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Sales-cycle length</span>
+                  <small class="difficulty difficulty-hard">Hard</small>
+                </th>
+                <td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">months to quarters (data center infrastructure project sale)</p>
+    <details><summary>Read full cell</summary><div class="full-value">months to quarters (data center infrastructure project sale)
+
+Rationale: Powerbus Busway is a data center electrical-infrastructure product sold through IT/Alliance partner programs and direct sales; such capex-linked deployments typically run multi-month sales cycles. No explicit cycle length disclosed in citations.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td><td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">Weeks to several months (project-based B2B; longer for engineered-to-order and hyperscale deployments)</p>
+    <details><summary>Read full cell</summary><div class="full-value">Weeks to several months (project-based B2B; longer for engineered-to-order and hyperscale deployments)
+
+Rationale: Rack PDUs are sold both as catalog SKUs through distributors (short cycle) and as engineered-to-order configurations tied to data center build-outs (multi-month cycle); no explicit disclosure in M13 citations.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td><td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">Long (multi-month, project-based)</p>
+    <details><summary>Read full cell</summary><div class="full-value">Long (multi-month, project-based)
+
+Rationale: Custom-engineered busbar systems for industrial/e-mobility/grid customers typically involve multi-month specification, prototyping and qualification cycles; not explicitly disclosed.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://ems-power.com/wp-content/uploads/2022/12/EMS_Imagebroschure-EN.pdf" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>R&amp;D capacity</span>
+                  <small class="difficulty difficulty-hard">Hard</small>
+                </th>
+                <td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">Unknown or unsupported in the original research.</p>
+    <details><summary>Read full cell</summary><div class="full-value">Unknown or unsupported in the original research.
+
+Rationale: Supplied M13/T2 citations cover FY24/FY25 revenue results, partner programs, and a UK manufacturing site, but none disclose R&amp;D spend, R&amp;D center count, or patent figures.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td><td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">Vertiv is a NYSE-listed global critical-infrastructure vendor whose 2024 10-K and 2025 Annual Report document a broad power/thermal/IT product portfolio and continued investment in…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Vertiv is a NYSE-listed global critical-infrastructure vendor whose 2024 10-K and 2025 Annual Report document a broad power/thermal/IT product portfolio and continued investment in engineering and manufacturing capacity, including a new North American infrastructure solutions manufacturing facility.
+
+Rationale: M13 citations confirm Vertiv&#39;s scale (10-K, annual report, manufacturing expansion) but do not disclose specific R&amp;D spend figures, center counts, or patent totals; capacity is inferred from public corporate footprint.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://investors.vertiv.com/news/news-details/2024/Vertiv-Expands-North-American-Production-Capacity-with-New-Infrastructure-Solutions-Manufacturing-Facility/default.aspx" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">Unknown or unsupported in the original research.</p>
+    <details><summary>Read full cell</summary><div class="full-value">Unknown or unsupported in the original research.
+
+Rationale: Supplied M13/T2 citations describe EMS&#39;s engineering and manufacturing capabilities but do not disclose R&amp;D spend, dedicated R&amp;D centers, or patent counts.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Busbar tap-off offering</span>
+                  <small class="difficulty difficulty-hard">Hard</small>
+                </th>
+                <td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">yes_productized</p>
+    
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://download.schneider-electric.com/files?p_File_Name=5600BR1201.pdf&amp;p_enDocType=Brochure" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">yes_productized</p>
+    
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://www.prnewswire.com/news-releases/vertiv-announces-scalable-high-capacity-double-stack-busway-system-that-preserves-white-space-for-growing-ai-data-center-demands-302702423.html" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">yes_productized</p>
+    <details><summary>Read full cell</summary><div class="full-value">yes_productized
+
+Rationale: The snippet confirms EMS offers productized busbar systems under the Vision®Electric brand, including for data centers, covering a wide current range (1,200–300,000 A). Tap-off units are not explicitly named in the snippets, but the data center busbar system offering with row/rack power distribution is the standard use case for such products, and the product line is clearly commercially available and named, indicating a productized offering rather than a partnership or development stage.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://ems-power.com/en/busbar-systems" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Server OEM / integrator relationships</span>
+                  <small class="difficulty difficulty-very-hard">Very hard</small>
+                </th>
+                <td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">Lenovo</p>
+    <details><summary>Read full cell</summary><div class="full-value">Lenovo
+
+Rationale: Snippet confirms a named server OEM partnership with Lenovo for integrated edge computing solutions, including reference designs. The partnership is IT/OT convergence focused rather than rack PDU-specific, and the evidence is from 2020. No other server OEM (Dell, HPE, Supermicro) or rack PDU-specific integrator relationships are evidenced in the supplied snippets.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://www.prnewswire.com/news-releases/schneider-electric-extends-strategic-partnerships-with-aveva-lenovo-and-stratus-to-enable-itot-convergence-301078656.html" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">NVIDIA</p>
+    <details><summary>Read full cell</summary><div class="full-value">NVIDIA
+
+Rationale: Snippets confirm a named collaboration with NVIDIA for power infrastructure (800 VDC platform designs), but none of the supplied results specifically address rack PDU bundle/reference-sell arrangements with server OEMs such as Dell, HPE, Lenovo, or Supermicro. Only NVIDIA is evidenced; other OEM/integrator relationships are not covered by the supplied snippets.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://www.prnewswire.com/news-releases/from-vision-to-readiness-vertiv-collaborates-with-nvidia-to-advance-800-vdc-platform-designs-to-power-the-next-generation-of-ai-factories-302582190.html" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">Unknown or unsupported in the original research.</p>
+    <details><summary>Read full cell</summary><div class="full-value">Unknown or unsupported in the original research.
+
+Rationale: no_evidence_found — all three snippets cover EMS Elektro Metall Schwanenmühle&#39;s company history, busbar systems, and general product categories (e-mobility, energy storage, switchgear). None mention server OEM partnerships (Dell, HPE, Lenovo, Supermicro, etc.) or IT integrator/reseller arrangements for rack PDUs.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Hyperscaler reference wins</span>
+                  <small class="difficulty difficulty-very-hard">Very hard</small>
+                </th>
+                <td class="confidence-inferred">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      
+    </div>
+    <p class="cell-value">Equinix (HK1, liquid cooling deployment); Google (anchor tenant at TeraWulf Lake Mariner campus)</p>
+    <details><summary>Read full cell</summary><div class="full-value">Equinix (HK1, liquid cooling deployment); Google (anchor tenant at TeraWulf Lake Mariner campus)
+
+Rationale: Equinix HK1 is directly named as a colocation reference win (Result 2). Google is named as the anchor tenant backer at TeraWulf&#39;s Lake Mariner campus (Results 1 &amp; 3), making it an inferred hyperscaler reference win via their backed tenant deployment. Neither press release explicitly names rack PDU deployments specifically, but both confirm Schneider Electric infrastructure deployments at these named customers.</div></details>
+    <div class="cell-meta">
+      <span>1 cited source</span>
+      <a href="https://equinix.mediaroom.com/2025-09-10-Equinix,-Dell-Technologies-and-Schneider-Electric-Support-AI-Infrastructure-in-Hong-Kong" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">Unknown or unsupported in the original research.</p>
+    <details><summary>Read full cell</summary><div class="full-value">Unknown or unsupported in the original research.
+
+Rationale: no_evidence_found — snippets describe product announcements (PowerBar Track busway, NVIDIA 800 VDC collaboration, OneCore prefabricated solution) but do not name any specific hyperscaler (AWS, Azure, Google, Meta, Oracle) or colocation (Equinix, Digital Realty, NTT) customers publicly disclosed as using Vertiv rack PDUs.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">Unknown or unsupported in the original research.</p>
+    <details><summary>Read full cell</summary><div class="full-value">Unknown or unsupported in the original research.
+
+Rationale: no_evidence_found — none of the supplied snippets name any hyperscaler (AWS, Azure, Google, Meta, Oracle) or top colocation provider (Equinix, Digital Realty, NTT) as a named customer of EMS Elektro Metall Schwanenmühle&#39;s rack PDUs or busbar products. The snippets cover company history, product categories, and an acquisition announcement without disclosing specific reference customers.</div></details>
+    <div class="cell-meta">
+      <span>No stored citation</span>
+      
+    </div>
+  </td>
+              </tr>
+        </tbody>
+      </table>
+    </div>
+    </section>
+
+    <section class="section" id="evidence-first">
+      <div class="section-heading">
+        <div><div class="section-number">02 · After</div><h2>Evidence-first 3×10 matrix</h2></div>
+        <p class="section-note">The new pipeline produced 16 supported claims: 13 verified, 3 inferred, and 14 honest unknowns. Colored rails mark material changes.</p>
+      </div>
+      <div class="legend"><span class="delta delta-strengthened">Strengthened proof</span><span class="delta delta-withheld">Unsupported claim withheld</span><span class="delta">Value refined</span></div>
+      
+    <div class="matrix-wrap">
+      <table class="matrix" aria-label="Evidence-first 3 by 10 competitor matrix">
+        <thead>
+          <tr>
+            <th class="parameter-heading">Parameter</th>
+            <th>Schneider Electric</th><th>Vertiv Holdings</th><th>EMS Elektro Metall Schwanenmühle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+                <th class="parameter-cell">
+                  <span>Legal name</span>
+                  <small class="difficulty difficulty-easy">Easy</small>
+                </th>
+                <td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">Schneider Electric SE</p>
+    <details><summary>Read full cell</summary><div class="full-value">Schneider Electric SE
+
+Rationale: The GLEIF official registry record and Schneider Electric&#39;s official legal-information pages explicitly identify the legal name as Schneider Electric SE. The official page also identifies its Nanterre registration, directly linking the entity to the candidate.</div></details>
+    <div class="cell-meta">
+      <span>3 evidence records</span>
+      <a href="https://api.gleif.org/api/v1/lei-records/969500A1YF1XUYYXS284" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">Vertiv Holdings Co</p>
+    <details><summary>Read full cell</summary><div class="full-value">Vertiv Holdings Co
+
+Rationale: GLEIF official registry record explicitly identifies the legal entity as VERTIV HOLDINGS CO, and the SEC filing source explicitly identifies Vertiv Holdings Co as the registrant for the candidate&#39;s CIK. Both directly support the proposed legal name; the UK Vertiv Holdings Limited record is a distinct entity and does not materially contradict the candidate&#39;s U.S. registrant legal name.</div></details>
+    <div class="cell-meta">
+      <span>4 evidence records</span>
+      <a href="https://api.gleif.org/api/v1/lei-records/549300KTTIRAOGXCRV69" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">EMS Elektro Metall Schwanenmühle GmbH</p>
+    <details><summary>Read full cell</summary><div class="full-value">EMS Elektro Metall Schwanenmühle GmbH
+
+Rationale: The GLEIF official-registry record explicitly identifies the legal entity as EMS Elektro Metall Schwanenmühle GmbH. The candidate-domain official imprint independently names the same entity and supplies commercial-register details (HRB 23350, Local Court Zweibrücken).</div></details>
+    <div class="cell-meta">
+      <span>3 evidence records</span>
+      <a href="https://api.gleif.org/api/v1/lei-records/529900X2WUCV5GCR7I88" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Headcount</span>
+                  <small class="difficulty difficulty-medium">Medium</small>
+                </th>
+                <td class="confidence-verified strengthened">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      <span class="delta delta-strengthened">Strengthened</span>
+    </div>
+    <p class="cell-value">As Of: 2024-12-31 · Value: 177,000</p>
+    <details><summary>Read full cell</summary><div class="full-value">As Of: 2024-12-31 · Value: 177,000
+
+Rationale: The official Schneider Electric 2024 Universal Registration Document explicitly reports “Employees 177k” as the total average workforce by geography in 2024. Its consolidated financial statements are at December 31, 2024, supporting the proposed as-of date; the document was filed March 26, 2025 and is within the 900-day freshness window.</div></details>
+    <div class="cell-meta">
+      <span>4 evidence records</span>
+      <a href="https://www.se.com/ww/en/assets/564/document/510443/2024-universal-registration-document.pdf?p_enDocType=Financial%20release&amp;p_File_Name=Universal%20Registration%20Document%202024" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown withheld">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      <span class="delta delta-withheld">Withheld</span>
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: None of the retrieved records state an employee count or labelled estimate with an applicable date/fiscal period; the 10-K excerpts, annual report letters, and press releases discuss financial results but omit headcount figures.</div></details>
+    <div class="cell-meta">
+      <span>10 evidence records</span>
+      <a href="https://www.sec.gov/Archives/edgar/data/1674101/000110465920032055/tm2011880-1_10k.htm" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: verification_failed: The official onboarding page identifies EMS and states 260 national and 150 international employees, supporting the permitted inference of 410 total employees. However, it does not state an effective date or fiscal period for those counts. Its publication date cannot be used as the headcount as-of date, and the rule requires effective-date evidence for freshness.</div></details>
+    <div class="cell-meta">
+      <span>6 evidence records</span>
+      <a href="https://ems-power.com/" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Latest material event</span>
+                  <small class="difficulty difficulty-hard">Hard</small>
+                </th>
+                <td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: verification_failed: The Cognite newsroom record explicitly supports the agreement, date, $3.1 billion value, 100% acquisition, and planned AVEVA integration, and is within the rolling 12-month window. However, it is classified as &quot;other,&quot; not an allowed official_company, official_filing, or news source. The only allowed news-class record is blocked and contains no substantive claim.</div></details>
+    <div class="cell-meta">
+      <span>7 evidence records</span>
+      <a href="https://www.reuters.com/business/schneider-electric-buy-ai-software-firm-cognite-31-billion-2026-06-30" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified strengthened">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      <span class="delta delta-strengthened">Resolved</span>
+    </div>
+    <p class="cell-value">Date: 2026-07-01 · Description: Vertiv Increases Manufacturing Capacity with New Facility in Malaysia, to Support Growing Demand for AI and Digital Infrastructure Across Asia</p>
+    <details><summary>Read full cell</summary><div class="full-value">Date: 2026-07-01 · Description: Vertiv Increases Manufacturing Capacity with New Facility in Malaysia, to Support Growing Demand for AI and Digital Infrastructure Across Asia
+
+Rationale: Vertiv&#39;s official investor-relations page directly lists the July 1, 2026 announcement titled “Vertiv Increases Manufacturing Capacity with New Facility in Malaysia, to Support Growing Demand for AI and Digital Infrastructure Across Asia.” The manufacturing-capacity expansion is plausibly material to operations and strategy and falls within the rolling 12-month window.</div></details>
+    <div class="cell-meta">
+      <span>6 evidence records</span>
+      <a href="https://investors.vertiv.com/overview/default.aspx" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: The retrieved evidence consists of product/technology blog posts (expansion busbars, hydrogen busbars, battery laminated busbars, etc.) rather than announcements of a material corporate event (e.g., M&amp;A, funding, leadership change, plant opening) with a clear event date. Mentions of &#39;Pantheon Electric&#39; as parent appear even in the oldest 2022 record, so it is not a recent event, and other references (e.g., Kentucky location) lack an explicit event date, so no record directly supports a specific material event within the rolling 12-month window.</div></details>
+    <div class="cell-meta">
+      <span>7 evidence records</span>
+      <a href="https://ems-power.com/en/ems-company" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Core offering</span>
+                  <small class="difficulty difficulty-medium">Medium</small>
+                </th>
+                <td class="confidence-verified changed">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      <span class="delta ">Refined</span>
+    </div>
+    <p class="cell-value">Schneider Electric provides energy management and automation solutions, offering products, software, and services (including its Energy Management and Industrial Automation businesses) as…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Schneider Electric provides energy management and automation solutions, offering products, software, and services (including its Energy Management and Industrial Automation businesses) as the global leader in digital transformation of energy management and automation.
+
+Rationale: The official Schneider Electric factsheet explicitly identifies Schneider Electric as a leader in digital transformation of energy management and automation and presents its Energy Management and Industrial Automation businesses alongside products, software, and services.</div></details>
+    <div class="cell-meta">
+      <span>6 evidence records</span>
+      <a href="https://www.se.com/ww/en/assets/564/document/373425/schneider-electric-factsheet.pdf" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified changed">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      <span class="delta ">Refined</span>
+    </div>
+    <p class="cell-value">Vertiv provides critical digital infrastructure solutions for data centers, including rack power distribution units (PDUs) with monitoring and management (e.g., MPX, MPH2, PowerIT), racks…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Vertiv provides critical digital infrastructure solutions for data centers, including rack power distribution units (PDUs) with monitoring and management (e.g., MPX, MPH2, PowerIT), racks and enclosures (e.g., VE Rack, SmartCabinet), integrated infrastructure solutions (SmartRow, SmartAisle), and DCIM/remote monitoring and management platforms (Avocent, Liebert, Trellis).
+
+Rationale: Official Vertiv materials explicitly describe its data-center white-space solutions as spanning rack PDUs, DCIM, and enclosures; identify SmartCabinet and VE Rack offerings; describe SmartRow Plus and SmartAisle as fully integrated data-center infrastructure solutions; and document MPX, MPH2, and PowerIT rack PDUs with monitoring/management capabilities and integrations with Avocent, Liebert, and Trellis management platforms. No conflicting evidence is present.</div></details>
+    <div class="cell-meta">
+      <span>4 evidence records</span>
+      <a href="https://www.vertiv.com/4aabcf/globalassets/documents/brochures/solutions/vertiv-data-center-white-space-br-en-sea_313512_1.pdf" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified changed">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      <span class="delta ">Refined</span>
+    </div>
+    <p class="cell-value">EMS Elektro Metall Schwanenmühle (a Pantheon Electric company) engineers, manufactures, and installs customized high-current busbar systems (under the Vision®Electric brand, including…</p>
+    <details><summary>Read full cell</summary><div class="full-value">EMS Elektro Metall Schwanenmühle (a Pantheon Electric company) engineers, manufactures, and installs customized high-current busbar systems (under the Vision®Electric brand, including flexible, insulated, and industrial IndustryBars ranging from 1,200 to 300,000 amperes in copper or aluminum) for power distribution in data centers and heavy industrial applications such as metal/mining, chemical processing, and manufacturing, along with related engineering, assembly, logistics, and after-sales services.
+
+Rationale: Official EMS pages explicitly describe the company as a Pantheon Electric company that engineers, manufactures, installs, and supplies customized Vision®Electric high-current busbar systems from 1,200 to 300,000 A, including copper and aluminum systems and IndustryBars. They explicitly identify data centers and metal/mining, chemical/processing, and manufacturing applications, and list engineering, assembly, logistics, and after-sales services.</div></details>
+    <div class="cell-meta">
+      <span>4 evidence records</span>
+      <a href="https://ems-power.com/en/busbar-systems" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Pricing disclosure</span>
+                  <small class="difficulty difficulty-hard">Hard</small>
+                </th>
+                <td class="confidence-inferred changed">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      <span class="delta ">Refined</span>
+    </div>
+    <p class="cell-value">Notes: Product pages direct buyers to &#39;Contact Sales&#39; or an APC sales representative for products such as NetShelter Rack PDUs, with no prices or ranges listed; qualifies as opaque under…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Notes: Product pages direct buyers to &#39;Contact Sales&#39; or an APC sales representative for products such as NetShelter Rack PDUs, with no prices or ranges listed; qualifies as opaque under contact-sales evidence. · Disclosure: opaque
+
+Rationale: Official Schneider Electric APC NetShelter Rack PDU material explicitly directs prospective buyers to contact an APC sales representative (while also allowing online purchase) and provides no explicit monetary price or range. This supports the permitted inferred classification of opaque pricing; no record explicitly labels the pricing disclosure itself as opaque.</div></details>
+    <div class="cell-meta">
+      <span>4 evidence records</span>
+      <a href="https://download.schneider-electric.com/files?p_Doc_Ref=11K_Brochure&amp;p_File_name=1014f-APC_NetShelterAPDU-Gen2_ProductOnePager-EndUser_v012725.pdf" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-inferred changed">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      <span class="delta ">Refined</span>
+    </div>
+    <p class="cell-value">Notes: Vertiv&#39;s product pages direct buyers to &#39;Find Sales Contact,&#39; request a quote, or contact a reseller/representative rather than listing prices, with no numeric price or range…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Notes: Vertiv&#39;s product pages direct buyers to &#39;Find Sales Contact,&#39; request a quote, or contact a reseller/representative rather than listing prices, with no numeric price or range disclosed for rack PDUs. · Disclosure: opaque
+
+Rationale: Official Vertiv rack-PDU pages explicitly direct buyers to request a product quotation or find/contact a sales representative, supporting the permitted inference that rack-PDU pricing is opaque. No supplied record states a numeric price or range, and none materially conflicts.</div></details>
+    <div class="cell-meta">
+      <span>4 evidence records</span>
+      <a href="https://go.vertiv.com/vertiv-rack-pdu" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-inferred changed">
+    <div class="cell-top">
+      <span class="confidence inferred">inferred</span>
+      <span class="delta ">Refined</span>
+    </div>
+    <p class="cell-value">Notes: Products are custom-engineered high-current busbar systems; pricing is not published and the site repeatedly directs prospects to &#39;request a quote&#39; or contact sales for individual…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Notes: Products are custom-engineered high-current busbar systems; pricing is not published and the site repeatedly directs prospects to &#39;request a quote&#39; or contact sales for individual offers. · Disclosure: opaque
+
+Rationale: Official EMS product pages describe customized busbar systems and explicitly invite prospects to request a quote or contact EMS for an individual offer. This supports the permitted inference that pricing is opaque; no public price or price range is stated.</div></details>
+    <div class="cell-meta">
+      <span>4 evidence records</span>
+      <a href="https://ems-power.com/en" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Sales-cycle length</span>
+                  <small class="difficulty difficulty-hard">Hard</small>
+                </th>
+                <td class="confidence-unknown withheld">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      <span class="delta delta-withheld">Withheld</span>
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: The retrieved evidence covers project construction/deployment timelines (e.g., Landers Center MCP construction Feb 2025–Oct 2026, Mesa County 18-month delivery) and product documentation dates, but none disclose an explicit sales-cycle duration (time from lead/proposal to signed contract) for Schneider Electric&#39;s enterprise offerings. This is adjacent evidence about deployment length, not sales cycle length, so an honest unknown is required.</div></details>
+    <div class="cell-meta">
+      <span>10 evidence records</span>
+      <a href="https://perspectives.se.com/case-study/landers-center-energy-transformation-with-schneider-electric" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown withheld">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      <span class="delta delta-withheld">Withheld</span>
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: The evidence contains no disclosed sales-cycle duration or dated sales milestones for Vertiv. References to &#39;3-4 months&#39; relate to deployment/build timelines for colocation infrastructure projects, not time-to-close for a sale, so they do not satisfy the proof rule or support a reliable inference about sales cycle length.</div></details>
+    <div class="cell-meta">
+      <span>10 evidence records</span>
+      <a href="https://www.vertiv.com/globalassets/images/infographics/vertiv-timeline-infographic-en-gl-2025-1.pdf" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown withheld">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      <span class="delta delta-withheld">Withheld</span>
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: verification_failed: EMS’s official page supports that its customized busbar projects involve a multi-stage process from contact and offer through engineering, manufacturing, assembly, and commissioning. However, it provides no sales-cycle duration or dated sale/deployment milestones, and the operational stages do not substantiate the specific claim of a multi-month sales cycle. The exact proposed value is therefore unsupported.</div></details>
+    <div class="cell-meta">
+      <span>10 evidence records</span>
+      <a href="https://ems-power.com/en/engineering" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>R&amp;D capacity</span>
+                  <small class="difficulty difficulty-hard">Hard</small>
+                </th>
+                <td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: verification_failed: The Economic Times interview explicitly states that India is one of Schneider Electric&#39;s four global hubs and has more than 6,000 R&amp;D and software engineers contributing directly to product design and engineering solutions. However, this record is source_class &quot;other,&quot; which is not among the permitted source classes for this parameter; the allowed official-company records do not substantiate this exact India-specific headcount claim.</div></details>
+    <div class="cell-meta">
+      <span>6 evidence records</span>
+      <a href="https://www.se.com/ww/en/about-us/investor-relations/regulatory-information/annual-reports" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified strengthened">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      <span class="delta delta-strengthened">Strengthened</span>
+    </div>
+    <p class="cell-value">Vertiv reported R&amp;D spend of $441.7 million for fiscal year 2025 (per SEC filing), and its engineering, research and development (ER&amp;D) spend grew 8% year-over-year in 2023, supported by…</p>
+    <details><summary>Read full cell</summary><div class="full-value">Vertiv reported R&amp;D spend of $441.7 million for fiscal year 2025 (per SEC filing), and its engineering, research and development (ER&amp;D) spend grew 8% year-over-year in 2023, supported by dedicated R&amp;D facilities within its Ohio operations.
+
+Rationale: The SEC filing explicitly reports $441.7 million of R&amp;D expense for fiscal year 2025. Vertiv’s 2023 annual report explicitly states ER&amp;D spend increased 8% year-over-year, and the official company release explicitly identifies research and development facilities within its Ohio footprint. All relevant evidence is from allowed official sources and within the freshness window.</div></details>
+    <div class="cell-meta">
+      <span>5 evidence records</span>
+      <a href="https://www.sec.gov/Archives/edgar/data/1674101/000167410126000008/" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: Evidence describes general engineering/development services (simulation, testing fields, prototyping) but discloses no R&amp;D spend figure, named R&amp;D center, R&amp;D headcount, or patent data as required by the proof rule.</div></details>
+    <div class="cell-meta">
+      <span>6 evidence records</span>
+      <a href="https://ems-power.com/" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Busbar tap-off offering</span>
+                  <small class="difficulty difficulty-hard">Hard</small>
+                </th>
+                <td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">yes_productized</p>
+    <details><summary>Read full cell</summary><div class="full-value">yes_productized
+
+Rationale: Official Schneider Electric product page explicitly identifies KSB63SM48 as a Canalis tap-off unit and states compatibility with Canalis KS and KT busbar trunking systems. This directly establishes a productized offering of both the busbar trunking system and its tap-off unit, satisfying the proof rule.</div></details>
+    <div class="cell-meta">
+      <span>4 evidence records</span>
+      <a href="https://www.se.com/uk/en/product/KSB63SM48/tap-off-unit-63a-8-modules" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      
+    </div>
+    <p class="cell-value">yes_productized</p>
+    <details><summary>Read full cell</summary><div class="full-value">yes_productized
+
+Rationale: Official Vertiv product page explicitly identifies PowerBar Track as a busway system for data-center IT racks and states that it has hot-swappable tap-off boxes and tap-off units, directly satisfying both required product elements.</div></details>
+    <div class="cell-meta">
+      <span>4 evidence records</span>
+      <a href="https://www.vertiv.com/en-us/products-catalog/critical-power/busway-and-busduct/vertiv-powerbar-track" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified strengthened">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      <span class="delta delta-strengthened">Strengthened</span>
+    </div>
+    <p class="cell-value">yes_productized</p>
+    <details><summary>Read full cell</summary><div class="full-value">yes_productized
+
+Rationale: EMS’s official Vision®Electric product page explicitly offers the Vision®Rail busbar system and pluggable tap-off boxes for that system for data-center power distribution, satisfying both required product elements.</div></details>
+    <div class="cell-meta">
+      <span>4 evidence records</span>
+      <a href="https://ems-power.com/en/busbar-systems" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Server OEM / integrator relationships</span>
+                  <small class="difficulty difficulty-very-hard">Very hard</small>
+                </th>
+                <td class="confidence-unknown withheld">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      <span class="delta delta-withheld">Withheld</span>
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: verification_failed: Official Schneider evidence explicitly establishes Dell as a commercial reseller/OEM relationship for APC/Schneider racks and PDUs. The HPE record concerns replacement UPS SKUs, not rack PDUs, and the Lenovo records describe micro-data-center solutions without explicitly establishing a rack-PDU commercial, resale, bundle, integration, or deployment relationship. Therefore the three-item proposed list is not exactly supported.</div></details>
+    <div class="cell-meta">
+      <span>12 evidence records</span>
+      <a href="https://www.se.com/us/en/work/solutions/data-centers-and-networks/micro" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-verified strengthened">
+    <div class="cell-top">
+      <span class="confidence verified">verified</span>
+      <span class="delta delta-strengthened">Strengthened</span>
+    </div>
+    <p class="cell-value">Lenovo; Ingram Micro; TechData; CDW</p>
+    <details><summary>Read full cell</summary><div class="full-value">Lenovo; Ingram Micro; TechData; CDW
+
+Rationale: Official Vertiv evidence explicitly identifies Lenovo as a partner in a Redfish proof-of-concept containing a Vertiv MPH2 rack PDU, and explicitly offers Vertiv Geist rack PDUs for purchase from Ingram Micro, TechData, and CDW.</div></details>
+    <div class="cell-meta">
+      <span>12 evidence records</span>
+      <a href="https://www.vertiv.com/en-us/campaigns/na-campaigns/own-your-edge-vertiv-rack-pdu" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: Evidence covers EMS busbar/data-center products generically but names no server OEM or IT integrator with a commercial, integration, resale, or bundle relationship.</div></details>
+    <div class="cell-meta">
+      <span>7 evidence records</span>
+      <a href="https://ems-power.com/en/busbars-for-data-centers" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr><tr>
+                <th class="parameter-cell">
+                  <span>Hyperscaler reference wins</span>
+                  <small class="difficulty difficulty-very-hard">Very hard</small>
+                </th>
+                <td class="confidence-unknown withheld">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      <span class="delta delta-withheld">Withheld</span>
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: No evidence explicitly ties an allowed hyperscaler or major colocation customer (e.g., Equinix, Digital Realty, Oracle) to deployment of rack PDUs specifically; matches found relate to liquid cooling, UPS/switchgear, or general power monitoring, which the policy excludes as adjacent product categories.</div></details>
+    <div class="cell-meta">
+      <span>14 evidence records</span>
+      <a href="https://download.schneider-electric.com/files?p_Doc_Ref=EcoDataCenter_writtenstory-EN&amp;p_enDocType=EDMS" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: No evidence names an allowed hyperscaler or major colocation customer (AWS, Azure, Google, Meta, Oracle, Equinix, Digital Realty, NTT) explicitly connected to rack PDU deployment. Evidence covers Greenergy/A-Kaabel (not a listed major colocation player) and Oklo (nuclear power partner, not a hyperscaler/colo customer), which the policy excludes as adjacent partnership evidence.</div></details>
+    <div class="cell-meta">
+      <span>8 evidence records</span>
+      <a href="https://www.vertiv.com/en-us/solutions/colocation-data-centers" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td><td class="confidence-unknown">
+    <div class="cell-top">
+      <span class="confidence unknown">unknown</span>
+      
+    </div>
+    <p class="cell-value empty">No claim — public evidence did not meet the required standard.</p>
+    <details><summary>Read full cell</summary><div class="full-value">No claim — public evidence did not meet the required standard.
+
+Rationale: No evidence names any hyperscaler (AWS, Azure, Google, Meta, Oracle) or major colocation provider (Equinix, Digital Realty, NTT) as a customer using EMS busbar products; evidence only describes general data center applications and an unrelated aluminum/graphite manufacturer case study.</div></details>
+    <div class="cell-meta">
+      <span>8 evidence records</span>
+      <a href="https://ems-power.com/en/after-sales-services-busbar-systems" target="_blank" rel="noreferrer">Open source ↗</a>
+    </div>
+  </td>
+              </tr>
+        </tbody>
+      </table>
+    </div>
+    </section>
+
+    <section class="section" id="changes">
+      <div class="section-heading">
+        <div><div class="section-number">03 · Interpretation</div><h2>What materially changed</h2></div>
+        <p class="section-note">Unknown is not treated as failure when the public evidence cannot support an exact claim. The objective is decision-grade reliability, not maximum cell fill.</p>
+      </div>
+      <div class="change-grid">
+        <article class="change-card"><h3>Strengthened to verified</h3><p>5 cells gained direct support.</p><ul><li><strong>EMS</strong> · Busbar tap-off offering</li><li><strong>Schneider Electric</strong> · Headcount</li><li><strong>Vertiv Holdings</strong> · Latest material event</li><li><strong>Vertiv Holdings</strong> · R&amp;D capacity</li><li><strong>Vertiv Holdings</strong> · Server OEM / integrator relationships</li></ul></article>
+        <article class="change-card"><h3>Unsupported claims withheld</h3><p>6 inferred claims became auditable unknowns.</p><ul><li><strong>EMS</strong> · Sales-cycle length</li><li><strong>Schneider Electric</strong> · Hyperscaler reference wins</li><li><strong>Schneider Electric</strong> · Sales-cycle length</li><li><strong>Schneider Electric</strong> · Server OEM / integrator relationships</li><li><strong>Vertiv Holdings</strong> · Headcount</li><li><strong>Vertiv Holdings</strong> · Sales-cycle length</li></ul></article>
+        <article class="change-card"><h3>Values refined</h3><p>6 cells kept their confidence level while the answer became more precise.</p><ul><li><strong>EMS</strong> · Core offering</li><li><strong>EMS</strong> · Pricing disclosure</li><li><strong>Schneider Electric</strong> · Core offering</li><li><strong>Schneider Electric</strong> · Pricing disclosure</li><li><strong>Vertiv Holdings</strong> · Core offering</li><li><strong>Vertiv Holdings</strong> · Pricing disclosure</li></ul></article>
+      </div>
+      <div class="caveat"><strong>Validation status:</strong> this artifact shows confidence, evidence coverage, and cell-level differences. Blind human adjudication is still required before claiming final correctness or promoting these results into the canonical VentureX table.</div>
+    </section>
+
+    <footer class="footer">
+      <span>VentureX · Competitive intelligence with an auditable evidence trail</span>
+      <span><a href="comparison.html">Open technical evidence appendix</a></span>
+    </footer>
+  </main>
+</body>
+</html>

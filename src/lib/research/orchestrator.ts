@@ -18,6 +18,7 @@ import {
 import type {
   CandidateIdentity,
   ContentProvider,
+  DeepResearchProvider,
   OfficialDataProvider,
   ProviderCallRecord,
   ResearchCellOutcome,
@@ -28,7 +29,6 @@ import type {
 import {
   canonicalizeResearchUrl,
   domainForUrl,
-  inferSourceClass,
   providerCostEstimate,
   researchContentHash,
   sanitizeResearchText,
@@ -256,6 +256,299 @@ export async function researchOneCell(args: {
   };
 }
 
+/**
+ * Escalate one already-unknown cell after the ordinary provider pass.
+ * Perplexity only discovers sources: those URLs are fetched independently,
+ * then the existing extractor and verifier make the final decision.
+ */
+export async function researchOneCellWithDeepRepair(args: {
+  insforge: InsForgeClient;
+  ventureId: string;
+  candidate: CandidateIdentity;
+  parameter: Parameter;
+  policy: ResearchPolicy;
+  existing: ResearchCellOutcome;
+  deepProvider: DeepResearchProvider;
+  primaryContent: ContentProvider;
+  fallbackContent?: ContentProvider;
+  budget: ResearchBudgetTracker;
+  cellReservationUsd: number;
+  asOf: string;
+  productHint?: string;
+}): Promise<ResearchCellOutcome> {
+  if (args.existing.finalConfidence !== "unknown") {
+    throw new Error(
+      `Perplexity post-pass only accepts unknown cells; ${args.candidate.name}/${args.parameter.id} is ${args.existing.finalConfidence}.`,
+    );
+  }
+  const started = Date.now();
+  const retrievedAt = new Date().toISOString();
+  const attempts: ProviderCallRecord[] = [];
+  let incrementalCostUsd = 0;
+  const existingEvidence = args.existing.evidence.map(resetEvidenceDecision);
+  const deepRelease = args.budget.reserve(args.cellReservationUsd);
+  const deepStarted = Date.now();
+  let discovered;
+  try {
+    discovered = await withTransientDeepResearchRetry(() =>
+      args.deepProvider.research({
+        candidate: args.candidate,
+        parameter: args.parameter,
+        proofRule: args.policy.proofRule,
+        asOf: args.asOf,
+        maxCostUsd: args.cellReservationUsd,
+        priorReason: args.existing.reason,
+        productHint: args.productHint,
+        timeoutMs: 300_000,
+      }),
+    );
+    args.budget.settle(
+      args.cellReservationUsd,
+      discovered.costUsd,
+      deepRelease,
+    );
+    incrementalCostUsd += discovered.costUsd;
+    attempts.push({
+      provider: args.deepProvider.name,
+      operation: "deep_research_discovery",
+      requestMetadata: {
+        model: "sonar-deep-research",
+        reasoning_effort:
+          process.env.CELL_RESEARCH_PERPLEXITY_REASONING_EFFORT ?? "low",
+        max_tokens: Number.parseInt(
+          process.env.CELL_RESEARCH_PERPLEXITY_MAX_TOKENS ?? "2500",
+          10,
+        ),
+        proof_rule: args.policy.proofRule,
+        first_pass_reason: args.existing.reason,
+      },
+      responseMetadata: {
+        provider_request_id: discovered.providerRequestId ?? null,
+        synthesis: discovered.reason,
+        source_urls: discovered.evidence.map((item) => item.canonicalUrl),
+      },
+      resultCount: discovered.evidence.length,
+      costUsd: discovered.costUsd,
+      latencyMs: discovered.latencyMs,
+    });
+  } catch (error) {
+    deepRelease();
+    if (error instanceof ResearchBudgetError) throw error;
+    attempts.push({
+      provider: args.deepProvider.name,
+      operation: "deep_research_discovery",
+      requestMetadata: {
+        model: "sonar-deep-research",
+        proof_rule: args.policy.proofRule,
+        first_pass_reason: args.existing.reason,
+      },
+      responseMetadata: {},
+      resultCount: 0,
+      costUsd: 0,
+      latencyMs: Date.now() - deepStarted,
+      error: safeError(error),
+    });
+    return deepFailureOutcome({
+      existing: args.existing,
+      evidence: existingEvidence,
+      attempts,
+      reason: `perplexity_escalation_failed: ${safeError(error)}`,
+      incrementalCostUsd,
+      incrementalLatencyMs: Date.now() - started,
+    });
+  }
+
+  const existingUrls = new Set(
+    existingEvidence.map((item) => item.canonicalUrl),
+  );
+  const discoveredHits = mergeAndRankSearchHits({
+    hits: discovered.evidence
+      .filter((item) => !existingUrls.has(item.canonicalUrl))
+      .map((item, index) => ({
+        provider: "perplexity" as const,
+        providerRequestId: item.providerRequestId,
+        url: item.url,
+        title: item.title,
+        snippet: item.excerpt,
+        publishedAt: item.publishedAt,
+        rank: item.resultRank ?? index + 1,
+        score: null,
+        searchQuery: item.searchQuery,
+      })),
+    candidate: args.candidate,
+    policy: args.policy,
+    asOf: args.asOf,
+  });
+  const newEvidence: ResearchEvidence[] = [];
+  for (const hit of discoveredHits.slice(0, args.policy.maximumFetchedPages)) {
+    const fetched = await fetchWithFallback({
+      hit,
+      primary: args.primaryContent,
+      fallback: args.fallbackContent,
+      attempts,
+      budget: args.budget,
+      retrievedAt,
+    });
+    incrementalCostUsd += fetched.costUsd;
+    if (fetched.evidence) newEvidence.push(fetched.evidence);
+  }
+  const evidence = dedupeEvidence([...existingEvidence, ...newEvidence]);
+  if (newEvidence.length === 0) {
+    return deepFailureOutcome({
+      existing: args.existing,
+      evidence,
+      attempts,
+      reason: "perplexity_escalation_no_new_fetchable_sources",
+      incrementalCostUsd,
+      incrementalLatencyMs: Date.now() - started,
+    });
+  }
+
+  const extractReservation = args.budget.reserve(0.35);
+  let extracted;
+  try {
+    extracted = await extractWithModelFailover({
+      insforge: args.insforge,
+      ventureId: args.ventureId,
+      candidate: args.candidate,
+      parameter: args.parameter,
+      policy: args.policy,
+      evidence,
+      asOf: args.asOf,
+    });
+    args.budget.settle(0.35, extracted.costUsd, extractReservation);
+    incrementalCostUsd += extracted.costUsd;
+    attempts.push({
+      provider: "openrouter",
+      operation: "post_pass_extract",
+      requestMetadata: {
+        model: extracted.model,
+        evidence_count: evidence.length,
+        new_evidence_count: newEvidence.length,
+      },
+      responseMetadata: {
+        proposed_confidence: extracted.proposed.proposed_confidence,
+        llm_call_id: extracted.llmCallId,
+      },
+      resultCount: 1,
+      costUsd: extracted.costUsd,
+      latencyMs: extracted.latencyMs,
+    });
+  } catch (error) {
+    extractReservation();
+    if (error instanceof ResearchBudgetError) throw error;
+    attempts.push({
+      provider: "openrouter",
+      operation: "post_pass_extract",
+      requestMetadata: { evidence_count: evidence.length },
+      responseMetadata: {},
+      resultCount: 0,
+      costUsd: 0,
+      latencyMs: Date.now() - started,
+      error: safeError(error),
+    });
+    return deepFailureOutcome({
+      existing: args.existing,
+      evidence,
+      attempts,
+      reason: `perplexity_post_pass_extraction_failed: ${safeError(error)}`,
+      incrementalCostUsd,
+      incrementalLatencyMs: Date.now() - started,
+    });
+  }
+  if (extracted.proposed.parameter_key !== args.parameter.id) {
+    return deepFailureOutcome({
+      existing: args.existing,
+      evidence,
+      attempts,
+      reason: `perplexity_post_pass_extraction_returned_wrong_parameter: ${extracted.proposed.parameter_key}`,
+      incrementalCostUsd,
+      incrementalLatencyMs: Date.now() - started,
+    });
+  }
+
+  const verifyReservation = args.budget.reserve(0.35);
+  let verified;
+  try {
+    verified = await withTransientOpenRouterRetry(() =>
+      verifyCellEvidence({
+        insforge: args.insforge,
+        ventureId: args.ventureId,
+        candidate: args.candidate,
+        parameter: args.parameter,
+        policy: args.policy,
+        proposed: extracted.proposed,
+        evidence,
+        asOf: args.asOf,
+      }),
+    );
+    args.budget.settle(0.35, verified.costUsd, verifyReservation);
+    incrementalCostUsd += verified.costUsd;
+    attempts.push({
+      provider: "openrouter",
+      operation: "post_pass_verify",
+      requestMetadata: {
+        model:
+          process.env.CELL_RESEARCH_VERIFY_MODEL ??
+          process.env.STAGE_1_CRITIC_MODEL ??
+          "openai/gpt-5.5",
+        evidence_count: evidence.length,
+        new_evidence_count: newEvidence.length,
+      },
+      responseMetadata: {
+        supports_exact_value: verified.verification.supports_exact_value,
+        llm_call_id: verified.llmCallId,
+      },
+      resultCount: 1,
+      costUsd: verified.costUsd,
+      latencyMs: verified.latencyMs,
+    });
+  } catch (error) {
+    verifyReservation();
+    if (error instanceof ResearchBudgetError) throw error;
+    attempts.push({
+      provider: "openrouter",
+      operation: "post_pass_verify",
+      requestMetadata: { evidence_count: evidence.length },
+      responseMetadata: {},
+      resultCount: 0,
+      costUsd: 0,
+      latencyMs: Date.now() - started,
+      error: safeError(error),
+    });
+    return deepFailureOutcome({
+      existing: args.existing,
+      evidence,
+      attempts,
+      reason: `perplexity_post_pass_verification_failed: ${safeError(error)}`,
+      incrementalCostUsd,
+      incrementalLatencyMs: Date.now() - started,
+    });
+  }
+
+  const final = computeFinalConfidence({
+    proposed: extracted.proposed,
+    verification: verified.verification,
+    policy: args.policy,
+    evidence,
+    asOf: args.asOf,
+  });
+  return {
+    candidateId: args.existing.candidateId,
+    parameterKey: args.existing.parameterKey,
+    tier: args.existing.tier,
+    value: final.value,
+    proposedConfidence: extracted.proposed.proposed_confidence,
+    finalConfidence: final.confidence,
+    reason: final.reason,
+    verification: verified.verification,
+    evidence: final.evidence,
+    attempts,
+    costUsd: args.existing.costUsd + incrementalCostUsd,
+    latencyMs: args.existing.latencyMs + (Date.now() - started),
+  };
+}
+
 async function extractWithModelFailover(
   args: Parameters<typeof extractCellFromEvidence>[0],
 ): ReturnType<typeof extractCellFromEvidence> {
@@ -356,9 +649,11 @@ async function acquireWebEvidence(args: {
   maximumFetchedPages: number;
 }): Promise<{ evidence: ResearchEvidence[]; costUsd: number }> {
   let costUsd = 0;
-  const searchJobs = args.queries.flatMap((query) =>
-    args.searchProviders.map((provider) => ({ query, provider })),
-  ).slice(0, args.maximumSearches);
+  const searchJobs = args.queries
+    .flatMap((query) =>
+      args.searchProviders.map((provider) => ({ query, provider })),
+    )
+    .slice(0, args.maximumSearches);
   const settled = await Promise.all(
     searchJobs.map(async ({ query, provider }) => {
       const estimate = providerCostEstimate(provider.name);
@@ -509,7 +804,7 @@ async function fetchWithFallback(args: {
         canonicalUrl,
         title: sanitizeResearchText(args.hit.title, 500),
         sourceDomain: domainForUrl(canonicalUrl),
-        sourceClass: inferSourceClass(canonicalUrl, []),
+        sourceClass: args.hit.sourceClass,
         excerpt: sanitizeResearchText(args.hit.snippet, 6_000),
         fullContent: args.hit.snippet,
         publishedAt: args.hit.publishedAt ?? null,
@@ -540,11 +835,76 @@ function buildRepairQuery(args: {
     args.parameter.name,
     args.policy.proofRule,
     `Evidence gap: ${args.reason}`,
-  ].join(" ").slice(0, 1_500);
+  ]
+    .join(" ")
+    .slice(0, 1_500);
 }
 
 function safeError(error: unknown): string {
   if (error instanceof ResearchBudgetError) return error.message;
-  if (error instanceof ResearchProviderError) return error.message.slice(0, 500);
+  if (error instanceof ResearchProviderError)
+    return error.message.slice(0, 500);
   return (error instanceof Error ? error.message : String(error)).slice(0, 500);
+}
+
+async function withTransientDeepResearchRetry<T>(
+  operation: () => Promise<T>,
+): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      const transient =
+        error instanceof ResearchProviderError &&
+        (error.status === undefined ||
+          error.status === 408 ||
+          error.status === 429 ||
+          error.status >= 500);
+      if (!transient || attempt === 2) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 1_500 * attempt));
+    }
+  }
+  throw lastError;
+}
+
+function resetEvidenceDecision(item: ResearchEvidence): ResearchEvidence {
+  return {
+    ...item,
+    disposition: "rejected",
+    supportedValuePaths: [],
+    verifierReason: null,
+  };
+}
+
+function dedupeEvidence(items: ResearchEvidence[]): ResearchEvidence[] {
+  const byUrl = new Map<string, ResearchEvidence>();
+  for (const item of items) {
+    const existing = byUrl.get(item.canonicalUrl);
+    if (!existing || (!existing.fullContent && item.fullContent)) {
+      byUrl.set(item.canonicalUrl, item);
+    }
+  }
+  return [...byUrl.values()];
+}
+
+function deepFailureOutcome(args: {
+  existing: ResearchCellOutcome;
+  evidence: ResearchEvidence[];
+  attempts: ProviderCallRecord[];
+  reason: string;
+  incrementalCostUsd: number;
+  incrementalLatencyMs: number;
+}): ResearchCellOutcome {
+  return {
+    ...args.existing,
+    value: null,
+    finalConfidence: "unknown",
+    reason: args.reason,
+    evidence: args.evidence.map(resetEvidenceDecision),
+    attempts: args.attempts,
+    costUsd: args.existing.costUsd + args.incrementalCostUsd,
+    latencyMs: args.existing.latencyMs + args.incrementalLatencyMs,
+  };
 }

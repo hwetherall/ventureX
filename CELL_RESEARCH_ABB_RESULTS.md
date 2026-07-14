@@ -1,9 +1,9 @@
 # Cell Research V2 — ABB 3×10 Result
 
-Date: 2026-07-12  
-Branch: `cell-improve`  
-Venture: `cf724783-065c-44c8-93a4-be29cb154ff9`  
-Final V2 run: `0db6f7a6-43c5-46f2-967e-248a15dbfb14`  
+Date: 2026-07-13
+Branch: `cell-improve`
+Venture: `cf724783-065c-44c8-93a4-be29cb154ff9`
+Final clean V2 run: `72a9b395-7c7c-4cb2-b9ce-c2d5a91141c0`
 Decision: **successful 0→1 architecture test; do not promote yet**
 
 ## What ran
@@ -18,52 +18,48 @@ V1 remained immutable. V2 wrote only to the experiment tables created by
 were not changed.
 
 Live providers used successfully were Exa Search, Exa Contents, Brave Search,
-and GLEIF. SEC, Companies House, and Bright Data were wired and failed soft
-because of configuration issues documented in
-`CELL_RESEARCH_SERVICE_SETUP.md`.
+Bright Data Web Unlocker, GLEIF, and SEC EDGAR. Companies House remains wired
+but is deliberately deferred; none of the three frozen candidates is a UK
+business, so the clean run made no Companies House calls.
 
 ## Final result
 
-| Metric | V1 | V2 |
-|---|---:|---:|
-| Verified | 8 | 10 |
-| Inferred | 13 | 1 |
-| Unknown | 9 | 19 |
+| Metric                     |                          V1 |    V2 |
+| -------------------------- | --------------------------: | ----: |
+| Verified                   |                           8 |    12 |
+| Inferred                   |                          13 |     3 |
+| Unknown                    |                           9 |    15 |
 | Cells with stored evidence | not comparable in V1 schema | 30/30 |
-| Operational cell errors | — | 0 |
+| Operational cell errors    |                           — |     0 |
 
 Confidence transitions:
 
-| Transition | Cells |
-|---|---:|
-| inferred → verified | 2 |
-| verified → verified | 7 |
-| unknown → verified | 1 |
-| inferred → inferred | 1 |
-| inferred → unknown | 10 |
-| verified → unknown | 1 |
-| unknown → unknown | 8 |
+| Transition          | Cells |
+| ------------------- | ----: |
+| inferred → verified |     3 |
+| verified → verified |     8 |
+| unknown → verified  |     1 |
+| inferred → inferred |     3 |
+| inferred → unknown  |     7 |
+| unknown → unknown   |     8 |
 
-V2 retained 165 evidence records: 133 official-company, 6 official-filing, 4
-official-registry, 4 news, and 18 other records. Ten cells ended with accepted
-direct evidence and one with accepted inferred evidence. The remaining 19
-retained rejected evidence and an explicit reason for staying unknown.
+V2 retained 164 evidence records: 142 official-company, 10 official-filing, 4
+official-registry, 1 news, and 7 other records. Twelve cells ended verified,
+three inferred, and fifteen retained rejected evidence plus an explicit reason
+for staying unknown.
 
 ## Cost and latency
 
-- Final cumulative V2 run cost, including targeted reliability and policy
-  replays: **$5.8841**.
-- The first complete pass cost **$4.7393**. The additional spend exposed and
-  fixed transport retry, model failover, finalization retry, corporate-domain
-  alias, and fact-effective-date issues.
-- The hard cap remained $10; Perplexity spend was $0.
-- The serial reliability run took approximately **17,134 seconds (4h45m)**.
-  This misses the 15-minute soft target by a wide margin and is a hard blocker
-  for a 50-parameter experiment in the current execution shape.
+- The clean run cost **$5.1681**, exceeding the $5 soft target by $0.1681 while
+  remaining below the configured $8 hard cap. Perplexity spend was $0.
+- End-to-end latency was **977 seconds (16m17s)**, 17.5× faster than the prior
+  17,134-second reliability run and 77 seconds over the 15-minute soft target.
+- Provider calls were GLEIF 3, SEC EDGAR 12, Brave 73, Exa 231, OpenRouter 92,
+  and Bright Data 8. Companies House and Perplexity were both 0.
 
-The cost is acceptable for a PoC; the latency is not. A fresh run using the
-hardened code should avoid replay spend, but no lower end-to-end latency is
-claimed until measured.
+Cost and latency are now close to the PoC soft targets rather than scale
+blockers by themselves. The remaining gate is measured human correctness and
+citation entailment, followed by targeted optimization of false unknowns.
 
 ## What the PoC proved
 
@@ -88,16 +84,16 @@ claimed until measured.
   30-cell gold fixture is still an adjudication skeleton, so the required
   29/30 correctness and 95% entailment metrics cannot yet be claimed.
 - Comparative success is not yet established. V2 increased verified cells but
-  also moved unknown coverage from 30% to 63%. Some of that is desirable
+  also moved unknown coverage from 30% to 50%. Some of that is desirable
   calibration; some may be recoverable with better official sources and query
   policy.
-- The intended provider mix was not fully exercised. Bright Data, SEC, and
-  Companies House need configuration repair and another smoke test.
+- The intended active provider mix was exercised. Companies House remains a
+  deferred UK-only adapter and is not a blocker for this experiment.
 - The InsForge direct-link key should be rotated because the official CLI
   echoed it in private tool output during migration verification. It was not
   committed to Git or included in the comparison artifacts.
-- The architecture does not yet meet scale latency. It made repeated searches
-  and fetches for evidence that could be shared across a candidate.
+- The clean run narrowly missed the 15-minute soft target and still repeated
+  searches and fetches that could be shared across a candidate.
 - Famous-company performance says nothing yet about obscure or local-language
   companies.
 
@@ -108,25 +104,76 @@ obscure-company experiment yet.
 
 Complete these next:
 
-1. Fix the Bright Data zone, SEC user-agent contact, and Companies House key;
-   rerun only the seven-call smoke suite.
-2. Blind-review all 30 V1/V2 pairs and fill
+1. Blind-review all 30 V1/V2 pairs and fill
    `test-cases/abb-rack-pdu/cell-quality-gold.json`.
-3. Separate desirable unknowns from false unknowns and tune only the latter.
-4. Add candidate-level content caching/evidence reuse, safe bounded parallelism,
+2. Separate desirable unknowns from false unknowns and tune only the latter.
+3. Add candidate-level content caching/evidence reuse, safe bounded parallelism,
    and a measured latency target before expanding parameter count.
-5. Re-run one clean 3×10 from scratch. Promotion is considered only if the
-   human gates pass, semantic false positives remain zero, and latency improves
-   substantially.
+4. Promote only if the human gates pass and semantic false positives remain
+   zero; otherwise replay only the policies or cells that fail adjudication.
 
 ## Artifacts
 
-- `outputs/cell-improve-0db6f7a6/comparison.html` — inspectable side-by-side
+- `outputs/cell-improve-72a9b395/visual-comparison.html` — CEO-shareable
+  before/after matrices, executive summary, and print-to-PDF layout.
+- `outputs/cell-improve-72a9b395/comparison.html` — inspectable side-by-side
   evidence view.
-- `outputs/cell-improve-0db6f7a6/comparison.csv` — compact paired result.
-- `outputs/cell-improve-0db6f7a6/comparison.json` — complete machine-readable
+- `outputs/cell-improve-72a9b395/comparison.csv` — compact paired result.
+- `outputs/cell-improve-72a9b395/comparison.json` — complete machine-readable
   result and evidence.
 - `test-cases/abb-rack-pdu/cell-quality-v1-snapshot.json` — immutable V1
   baseline.
 - `test-cases/abb-rack-pdu/cell-quality-gold.json` — human-adjudication fixture
   to complete next.
+
+## Targeted Perplexity post-pass — 2026-07-13
+
+Perplexity was subsequently activated as an explicit post-pass for seven
+approved unknown cells. It did not participate in the ordinary 30-cell pass,
+and its prose synthesis was never accepted as evidence or as a cell value.
+VentureX independently fetched Perplexity-discovered URLs, combined them with
+the first-pass evidence, and ran the existing extractor and verifier.
+
+The original clean run remains immutable. The final audit chain is:
+
+- First pass: `72a9b395-7c7c-4cb2-b9ce-c2d5a91141c0`
+- Seven-cell post-pass: `f7de3e3c-cb64-4ec9-a952-c897e5cae760`
+- One-cell operational retry and final result:
+  `60092d5e-c537-4c96-85ba-cf71d1723efc`
+
+| Metric             | First pass | Final post-pass |
+| ------------------ | ---------: | --------------: |
+| Verified           |         12 |              13 |
+| Inferred           |          3 |               3 |
+| Unknown            |         15 |              14 |
+| Target cells fixed |          — |             1/7 |
+| Total run cost     |    $5.1681 |         $8.5404 |
+| Incremental cost   |          — |         $3.3723 |
+
+Vertiv's server-OEM/integrator cell improved from unknown to verified. Official
+Vertiv evidence supports Lenovo, Ingram Micro, TechData, and CDW in relevant
+rack-PDU proof, resale, or purchase relationships.
+
+The other six cells remained unknown. Five are useful negative results: the
+new evidence still lacked an exact sales-cycle duration, a dated total
+headcount, or rack-PDU-specific hyperscaler proof. Schneider's OEM cell is a
+known conservative false unknown: Dell is directly supported, but the
+extractor also proposed HPE and Lenovo; the verifier rejected those two list
+positions, so the all-or-nothing value rule withheld the whole list rather than
+silently pruning it.
+
+One Schneider request failed before billing with a transient `fetch failed`
+error. It was retried as a one-cell cloned run after adding one bounded retry
+for transient network, 408, 429, and 5xx failures. The retry completed normally.
+There were eight Perplexity audit records in the final run chain: seven valid
+research completions plus the zero-cost failed attempt.
+
+Canonical `cells` remain unchanged. The post-pass artifacts are:
+
+- `outputs/cell-improve-60092d5e/perplexity-delta.html` — focused seven-cell
+  first-pass-to-Perplexity executive comparison.
+- `outputs/cell-improve-60092d5e/visual-comparison.html` — updated full 3×10
+  V1-to-final comparison.
+- `outputs/cell-improve-60092d5e/comparison.html` — final evidence inspector.
+- `outputs/cell-improve-60092d5e/perplexity-delta.json` and `.csv` — focused
+  machine-readable results.

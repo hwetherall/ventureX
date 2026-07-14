@@ -32,9 +32,7 @@ export const EvidenceDispositionSchema = z.enum([
   "contradictory",
   "rejected",
 ]);
-export type EvidenceDisposition = z.infer<
-  typeof EvidenceDispositionSchema
->;
+export type EvidenceDisposition = z.infer<typeof EvidenceDispositionSchema>;
 
 export const ResearchConfidenceSchema = z.enum([
   "verified",
@@ -151,6 +149,8 @@ export interface DeepResearchRequest {
   proofRule: string;
   asOf: string;
   maxCostUsd: number;
+  priorReason?: string | null;
+  productHint?: string;
   timeoutMs?: number;
 }
 
@@ -252,9 +252,7 @@ export const VerificationOutcomeSchema = z.object({
     .max(10),
   reason: z.string().min(1).max(2000),
 });
-export type VerificationOutcome = z.infer<
-  typeof VerificationOutcomeSchema
->;
+export type VerificationOutcome = z.infer<typeof VerificationOutcomeSchema>;
 
 export interface ResearchCellOutcome {
   candidateId: string;

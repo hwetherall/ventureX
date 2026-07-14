@@ -220,18 +220,18 @@ Adapters must normalize results into shared types. Provider-specific response sh
 
 These ten policies are the actual 0→1 deliverable.
 
-| Parameter | Primary route | Secondary route | Proof required | Inference rule |
-|---|---|---|---|---|
-| `legal_name` | GLEIF, SEC, national registry | Official company legal/IR page | Exact registered entity name tied to the candidate identity | Forbidden |
-| `headcount` | Latest filing/annual report or official company disclosure | Exa + Brave discovery of dated authoritative disclosure | Employee count and explicit as-of/fiscal date | Allowed only as a labelled third-party estimate; never “verified” |
-| `latest_material_event` | Official press/IR and SEC recent filings | Brave news + Exa with strict 12-month window | Dated event within the rolling window and a reason it is material | Forbidden for the event/date; materiality explanation may be inferred |
-| `core_offering` | Official product page/catalog/datasheet | Authoritative distributor or analyst documentation | Source explicitly describes the candidate’s relevant product/service | Forbidden for product existence; summary wording may be synthesized |
-| `pricing_disclosure` | Official pricing/configurator/catalog, then authorized distributors | Exa + Brave site/domain searches | A published price/range, or a documented bounded search supporting “not publicly disclosed” | “Opaque” is inferred unless the company explicitly says quote/contact sales |
-| `sales_cycle_length` | Official procurement, implementation, partner, or case-study material | Credible analyst/customer material | Explicit duration or dated milestones for the relevant sale/deployment | Expected; cannot be `verified` without explicit duration evidence |
-| `rd_capacity` | Annual report/filing, official R&D locations, patents or R&D disclosure | Exa + Brave targeted searches | Actual R&D spend, named centers, R&D headcount, or relevant patent evidence | Manufacturing expansion alone is rejected |
-| `busbar_tap_off_offering` | Official product catalog/datasheet | Authorized distributor documentation | Explicit busbar plus tap-off/tap box/tap unit product evidence | Forbidden for `yes_productized` |
-| `server_oem_integrator_relationships` | Candidate and partner press/partner pages | Exa + Brave exact-pair searches | Named OEM/integrator and explicit commercial, integration, resale, bundle, or relevant deployment relationship | Forbidden for relationship existence |
-| `hyperscaler_reference_wins` | Candidate/customer case study or press release | Exa + Brave named-customer searches | Named allowed customer and explicit use/deployment of the relevant product category | Forbidden; adjacent cooling, campus, or general partnership evidence is rejected |
+| Parameter                             | Primary route                                                           | Secondary route                                         | Proof required                                                                                                 | Inference rule                                                                   |
+| ------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `legal_name`                          | GLEIF, SEC, national registry                                           | Official company legal/IR page                          | Exact registered entity name tied to the candidate identity                                                    | Forbidden                                                                        |
+| `headcount`                           | Latest filing/annual report or official company disclosure              | Exa + Brave discovery of dated authoritative disclosure | Employee count and explicit as-of/fiscal date                                                                  | Allowed only as a labelled third-party estimate; never “verified”                |
+| `latest_material_event`               | Official press/IR and SEC recent filings                                | Brave news + Exa with strict 12-month window            | Dated event within the rolling window and a reason it is material                                              | Forbidden for the event/date; materiality explanation may be inferred            |
+| `core_offering`                       | Official product page/catalog/datasheet                                 | Authoritative distributor or analyst documentation      | Source explicitly describes the candidate’s relevant product/service                                           | Forbidden for product existence; summary wording may be synthesized              |
+| `pricing_disclosure`                  | Official pricing/configurator/catalog, then authorized distributors     | Exa + Brave site/domain searches                        | A published price/range, or a documented bounded search supporting “not publicly disclosed”                    | “Opaque” is inferred unless the company explicitly says quote/contact sales      |
+| `sales_cycle_length`                  | Official procurement, implementation, partner, or case-study material   | Credible analyst/customer material                      | Explicit duration or dated milestones for the relevant sale/deployment                                         | Expected; cannot be `verified` without explicit duration evidence                |
+| `rd_capacity`                         | Annual report/filing, official R&D locations, patents or R&D disclosure | Exa + Brave targeted searches                           | Actual R&D spend, named centers, R&D headcount, or relevant patent evidence                                    | Manufacturing expansion alone is rejected                                        |
+| `busbar_tap_off_offering`             | Official product catalog/datasheet                                      | Authorized distributor documentation                    | Explicit busbar plus tap-off/tap box/tap unit product evidence                                                 | Forbidden for `yes_productized`                                                  |
+| `server_oem_integrator_relationships` | Candidate and partner press/partner pages                               | Exa + Brave exact-pair searches                         | Named OEM/integrator and explicit commercial, integration, resale, bundle, or relevant deployment relationship | Forbidden for relationship existence                                             |
+| `hyperscaler_reference_wins`          | Candidate/customer case study or press release                          | Exa + Brave named-customer searches                     | Named allowed customer and explicit use/deployment of the relevant product category                            | Forbidden; adjacent cooling, campus, or general partnership evidence is rejected |
 
 Aliases must be first-class. Search using the legal entity, trading name, relevant product brand, acquired brands, and abbreviations, while the identity validator prevents cross-company contamination.
 
@@ -377,7 +377,7 @@ Hard gates:
 - Every dynamic date passes its policy or is unknown.
 - Every unknown records the completed bounded attempt plan.
 - No provider secret or authorization header appears in logs or persisted payloads.
-- Hard run cost cap of $10 is enforced.
+- Hard run cost cap of $8 is enforced.
 - Perplexity call count is zero.
 
 Comparative success:
@@ -552,18 +552,18 @@ The verifier must reject:
 
 ## Parallel-workstream handoffs
 
-| Engineering task | Can start without credentials? | Service dependency |
-|---|---|---|
-| Schemas, migrations, provider contracts, mocks | Yes | None |
-| Policies and validators | Yes | None |
-| Recorded fixture tests | Yes | Public documentation/sample payloads |
-| Exa live smoke test | No | Exa ready |
-| Brave live smoke test | No | Brave key and storage terms |
-| Bright Data live smoke test | No | API key and Web Unlocker zone |
-| Companies House live smoke test | No | API key |
-| SEC/GLEIF smoke tests | Yes | Contact string for SEC |
-| Live ABB V2 run | No | All enabled providers ready and capped |
-| Perplexity test | Deferred | Explicit later authorization |
+| Engineering task                               | Can start without credentials? | Service dependency                     |
+| ---------------------------------------------- | ------------------------------ | -------------------------------------- |
+| Schemas, migrations, provider contracts, mocks | Yes                            | None                                   |
+| Policies and validators                        | Yes                            | None                                   |
+| Recorded fixture tests                         | Yes                            | Public documentation/sample payloads   |
+| Exa live smoke test                            | No                             | Exa ready                              |
+| Brave live smoke test                          | No                             | Brave key and storage terms            |
+| Bright Data live smoke test                    | No                             | API key and Web Unlocker zone          |
+| Companies House live smoke test                | No                             | API key                                |
+| SEC/GLEIF smoke tests                          | Yes                            | Contact string for SEC                 |
+| Live ABB V2 run                                | No                             | All enabled providers ready and capped |
+| Perplexity post-pass                           | Implemented                    | Explicit allowlist and separate budget |
 
 ## After 3×10 succeeds
 
@@ -596,20 +596,48 @@ This engineering milestone is complete when:
 - No V2 result has overwritten canonical cells without explicit approval.
 - We have a clear go/no-go decision for the 50-parameter and obscure-company experiments.
 
-## Implementation result — 2026-07-12
+## Implementation result — 2026-07-13
 
 The V2 architecture, migration, ten parameter policies, provider adapters,
 independent verification, bounded retries, model failover, error-only resume,
 targeted cell replay, budget enforcement, immutable baseline, and comparison
 harness are implemented. Migration `0008_cell_research_runs.sql` is live.
 
-The final isolated ABB run is
-`0db6f7a6-43c5-46f2-967e-248a15dbfb14`. It contains exactly 30 results,
-30 cells with evidence, and zero operational cell errors. Canonical `cells`
-were not promoted or modified.
+The final clean isolated ABB run is
+`72a9b395-7c7c-4cb2-b9ce-c2d5a91141c0`. It contains exactly 30 results,
+30 cells with evidence, and zero operational cell errors. It cost $5.1681 and
+completed in 977 seconds (16m17s), with Bright Data and SEC exercised live.
+Canonical `cells` were not promoted or modified. Companies House was
+deliberately not called because no frozen candidate is UK-based.
 
 See `CELL_RESEARCH_ABB_RESULTS.md` and
-`outputs/cell-improve-0db6f7a6/` for the outcome and side-by-side artifacts.
+`outputs/cell-improve-72a9b395/` for the outcome and side-by-side artifacts.
 The current decision is **do not promote and do not expand to 50 parameters
-yet**. First complete human adjudication and address coverage, latency, shared
-evidence reuse, and the remaining provider configuration failures.
+yet**. First complete human adjudication, separate desirable unknowns from
+false unknowns, and tune only the failed quality gates. Companies House is
+deferred until a UK case rather than treated as a blocker.
+
+## Perplexity escalation implementation — 2026-07-13
+
+The big-gun fallback is now implemented as a separate post-pass rather than a
+route inside ordinary research. It requires all of the following:
+
+- A completed V2 source run.
+- An explicit `candidate_id:parameter_key` allowlist.
+- A target whose source result is still `unknown`.
+- `CELL_RESEARCH_PERPLEXITY_ENABLED=true` for that command only.
+- An independent incremental soft/hard budget and a maximum cell count.
+
+Each post-pass clones the complete source result and provider-call audit into a
+new isolated run. This preserves the ordinary first pass, avoids repeating
+Exa/Brave across 30 cells, and makes incremental quality and cost attributable.
+Perplexity uses `sonar-deep-research` only to discover source URLs. Exa Contents
+and Bright Data fetch those URLs, and the existing model-family-separated
+extractor and verifier decide the value. Canonical cells are never promoted
+automatically.
+
+The ABB post-pass escalated seven cells and improved one, at $3.3723 all-in
+incremental cost including fetching and verification. The final audit-linked
+run is `60092d5e-c537-4c96-85ba-cf71d1723efc`; full results and the remaining
+conservative list-pruning issue are documented in
+`CELL_RESEARCH_ABB_RESULTS.md`.

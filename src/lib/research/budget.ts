@@ -71,7 +71,25 @@ export class ResearchBudgetTracker {
 export function researchBudgetFromEnvironment(): ResearchBudgetTracker {
   return new ResearchBudgetTracker(
     parsePositive(process.env.CELL_RESEARCH_V2_SOFT_CAP_USD, 5),
-    parsePositive(process.env.CELL_RESEARCH_V2_HARD_CAP_USD, 10),
+    parsePositive(process.env.CELL_RESEARCH_V2_HARD_CAP_USD, 8),
+  );
+}
+
+/**
+ * Perplexity is an explicitly authorized post-pass, so it has an incremental
+ * budget independent from the ordinary 3x10 acquisition budget.
+ */
+export function perplexityBudgetFromEnvironment(): ResearchBudgetTracker {
+  return new ResearchBudgetTracker(
+    parsePositive(process.env.CELL_RESEARCH_PERPLEXITY_SOFT_CAP_USD, 4),
+    parsePositive(process.env.CELL_RESEARCH_PERPLEXITY_HARD_CAP_USD, 6),
+  );
+}
+
+export function perplexityCellReservationFromEnvironment(): number {
+  return parsePositive(
+    process.env.CELL_RESEARCH_PERPLEXITY_CELL_RESERVATION_USD,
+    1.25,
   );
 }
 

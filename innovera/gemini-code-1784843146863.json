@@ -1,0 +1,632 @@
+{
+  "mckinsey_core": {
+    "who_does_the_thinking": {
+      "value": "human_expert",
+      "prose": "McKinsey core strategy practice relies entirely on human consultants (partners, engagement managers, and associates) to synthesize data, apply frameworks, and generate recommendations. Software is utilized solely as a supportive input for quantitative modeling or data staging, not as a decision-making agent."
+    },
+    "auditable_provenance": {
+      "value": "asserted",
+      "prose": "Deliverables are typically highly synthesized, polished PowerPoint presentations ('decks'). Key findings and recommendations are asserted on the authority of McKinsey's expertise, client interviews, and peer reviews. Granular, claim-level tracing back to raw source files is absent in standard final deliverables."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "engagement",
+        "band": "500k+"
+      },
+      "prose": "Engagements are transaction-based, priced per bespoke strategy study. A standard 6-to-14-week corporate strategy or growth opportunity study for an enterprise client is highly premium, typically costing between $800,000 and $1.5 million, putting it firmly in the $500K+ band."
+    },
+    "grounded_in": {
+      "value": "both",
+      "prose": "Analysis is heavily grounded in the client's internal proprietary operational data (VDRs, historical financials, expert interviews) combined with McKinsey's licensed external databases, industry benchmarks, and proprietary global market intelligence."
+    },
+    "time_to_first_usable_output": {
+      "value": "weeks",
+      "prose": "A typical core strategy study spans 6 to 14 weeks. Initial usable outputs (such as interim diagnostic findings or market-sizing assessments) are delivered at the first major steerco milestone, typically within 3 to 4 weeks from kickoff."
+    },
+    "procurement_path": {
+      "value": "full_enterprise_procurement",
+      "prose": "Contracting with McKinsey core requires executive board or C-suite sign-off, extensive corporate vendor onboarding, standard master service agreement (MSA) reviews, and security compliance checks, taking weeks."
+    },
+    "local_language_delivery": {
+      "value": "board_grade_multi_apac",
+      "prose": "Backed by extensive global office infrastructure and native-speaking senior partners stationed in key APAC hubs (Tokyo, Seoul, Shanghai, Singapore, etc.), McKinsey core delivers board-grade strategy presentations natively in local languages with localized regulatory context."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "flat_linear",
+      "prose": "The traditional consulting business model scales flat-linearly. To evaluate a new growth initiative or adjacent market, the client must hire a new consulting team and pay another full engagement fee, with no software leverage."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "purpose_built",
+      "prose": "Every core strategy engagement is a bespoke study specifically designed, staffed, and tailored to evaluate the unique growth initiative, market-entry hypothesis, or corporate development objective of the client."
+    },
+    "direction_of_travel": {
+      "value": "static",
+      "prose": "While McKinsey core increasingly leverages internal generative AI tools (like Lilli) to accelerate desk research, the primary corporate strategy delivery model remains highly mature, relationship-driven, human-centered, and structurally static."
+    }
+  },
+  "mckinsey_leap": {
+    "who_does_the_thinking": {
+      "value": "human_expert",
+      "prose": "Leap utilizes human experts—product designers, agile developers, and business builders—to design and stand up new digital corporate ventures. Human strategy partners direct the build sprint milestones."
+    },
+    "auditable_provenance": {
+      "value": "asserted",
+      "prose": "Project deliverables are working software MVPs and launched business units, with operational roadmaps asserted by Leap's engineering and venture-building leadership. Claims are not structured on traceable evidence graphs."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "engagement",
+        "band": "500k+"
+      },
+      "prose": "Leap engagements are structured around multi-month or multi-quarter sprint builds. Standard business-building projects last 12 to 18 months and cost multiple millions of dollars, placing them firmly in the premium $500K+ band."
+    },
+    "grounded_in": {
+      "value": "both",
+      "prose": "Ventures are grounded in the corporate client's unique technological capabilities, IP, and data infrastructure (client corpus) combined with external market intelligence and competitive user testing data."
+    },
+    "time_to_first_usable_output": {
+      "value": "months",
+      "prose": "While agile designs begin in weeks, the first usable corporate venture MVP, functional product, or operational spinoff typically requires 3 to 6 months of intense sprint build-out before market testing."
+    },
+    "procurement_path": {
+      "value": "full_enterprise_procurement",
+      "prose": "Leap projects represent massive strategic capital commitments, demanding full corporate procurement cycles, extensive technical risk evaluations, MSA agreements, and board-level or CEO-level budget authorization."
+    },
+    "local_language_delivery": {
+      "value": "board_grade_multi_apac",
+      "prose": "Leveraging McKinsey's global talent network, Leap deploys bilingual product managers, agile engineers, and designers to build and launch ventures natively in regional APAC markets like Japan, Korea, and Southeast Asia."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "flat_linear",
+      "prose": "Venture building is highly human-capital intensive. Stated code and framework reuse exist, but launching a second distinct corporate venture requires mobilizing another dedicated engineering and design squad, scaling costs flat-linearly."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "purpose_built",
+      "prose": "Sprints are purpose-built to conceptualize, design, and build one specific growth venture or digital product, tailored uniquely to the parent corporation's strategic expansion goals."
+    },
+    "direction_of_travel": {
+      "value": "moving_toward",
+      "prose": "Leap is actively expanding and integrating its dedicated gen-AI venture-building platform, enabling corporations to accelerate product design cycles and incorporate advanced technology stack architectures into new ventures."
+    }
+  },
+  "bcg_x": {
+    "who_does_the_thinking": {
+      "value": "human_expert",
+      "prose": "BCG X deploys human designers, deep-tech architects, and software engineers to design, build, and scale corporate AI-native products and ventures. Human expert managers direct the design and technical sprints."
+    },
+    "auditable_provenance": {
+      "value": "asserted",
+      "prose": "Project deliverables consist of digital products, code bases, and venture scaling frameworks. Architectural and operational decisions are asserted based on BCG X's technical expertise, rather than claim-level source-document tracing."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "engagement",
+        "band": "500k+"
+      },
+      "prose": "Engagements are structured as agile digital building blocks or venture scaling programs. Custom enterprise AI product developments easily exceed $500K, often running into millions over multi-quarter schedules."
+    },
+    "grounded_in": {
+      "value": "both",
+      "prose": "BCG X is deeply grounded in the client's internal operational data and enterprise IT/API infrastructure, combined with external datasets required for custom model training, benchmarking, and market validation."
+    },
+    "time_to_first_usable_output": {
+      "value": "months",
+      "prose": "Developing, testing, and launching a functional, enterprise-grade, AI-native product or scaling a new corporate venture typically takes 3 to 6 months of active software development."
+    },
+    "procurement_path": {
+      "value": "full_enterprise_procurement",
+      "prose": "Engaging BCG X requires rigorous enterprise-level procurement, complete with comprehensive cyber security, data privacy, cloud compliance checks, and senior executive (CIO/CDO/CEO) budget approval."
+    },
+    "local_language_delivery": {
+      "value": "board_grade_multi_apac",
+      "prose": "Under BCG's global umbrella, BCG X deploys bilingual software engineers, product designers, and strategy consultants across APAC regional offices (including Tokyo and Sydney) to deliver fully localized builds."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "flat_linear",
+      "prose": "Although some software components or templates are reusable, the cost of designing and building a second distinct corporate venture scales flat-linearly with each incremental initiative due to the high volume of human engineer hours required."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "purpose_built",
+      "prose": "BCG X works on a custom basis to build specific digital solutions or AI ventures, tailormade to the client's strategic growth or transformation objective."
+    },
+    "direction_of_travel": {
+      "value": "moving_toward",
+      "prose": "BCG X is BCG's primary growth vehicle, expanding rapidly and building AI-native transformation solutions that integrate the latest agentic architectures directly into corporate operations."
+    }
+  },
+  "ey_parthenon": {
+    "who_does_the_thinking": {
+      "value": "human_expert",
+      "prose": "EY-Parthenon relies entirely on human strategic advisors, transactions experts, and diligence consultants to conduct due diligence, analyze markets, and synthesize recommendations for corporate and PE clients."
+    },
+    "auditable_provenance": {
+      "value": "asserted",
+      "prose": "Deliverables are commercial due diligence (CDD) and strategic growth opportunity decks. Findings and conclusions are asserted by the senior consulting team, backed by standard 'EY-Parthenon analysis,' without automated claim-level tracing."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "engagement",
+        "band": "100–500k"
+      },
+      "prose": "Typical transaction-based commercial due diligence or growth-opportunity diagnostic engagements range from $150,000 to $400,000, placing them in the $100K–$500K band."
+    },
+    "grounded_in": {
+      "value": "both",
+      "prose": "Studies are heavily grounded in the target company's data room/client files combined with EY's external databases, industry survey primary research, and licensed expert interviews."
+    },
+    "time_to_first_usable_output": {
+      "value": "weeks",
+      "prose": "Transaction cycles require rapid delivery; standard EY-Parthenon due diligence or growth diagnostics are completed within 3 to 6 weeks, with initial synthesized draft reports delivered within 2 weeks of launch."
+    },
+    "procurement_path": {
+      "value": "standard_procurement",
+      "prose": "While transaction-related services are fast-tracked compared to traditional consultancies, engagements still require corporate MSA approvals, standard vendor compliance onboarding, and division-head budget sign-off."
+    },
+    "local_language_delivery": {
+      "value": "board_grade_multi_apac",
+      "prose": "Supported by EY's vast global transaction and advisory network, EY-Parthenon provides board-ready strategic and transactions advisory natively in local languages (Japanese, Korean, Mandarin, etc.) across APAC."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "flat_linear",
+      "prose": "Due diligence is highly labor-intensive and lacks software scale. Evaluating a new target or adjacent growth opportunity requires deploying a new team of human analysts, carrying a flat-linear marginal cost."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "purpose_built",
+      "prose": "Strategic market entries and due diligence assessments are bespoke projects specifically designed to evaluate a single target asset or a specific geographic growth initiative."
+    },
+    "direction_of_travel": {
+      "value": "static",
+      "prose": "EY-Parthenon's commercial due diligence and transactions advisory model is highly mature, standardized, and structurally static, serving as a reliable industry workhorse."
+    }
+  },
+  "nri": {
+    "who_does_the_thinking": {
+      "value": "human_expert",
+      "prose": "NRI (Nomura Research Institute) leverages its elite Japanese think-tank staff and strategic management consultants to conduct research, formulate innovation hypotheses, and design business architectures for corporate clients."
+    },
+    "auditable_provenance": {
+      "value": "asserted",
+      "prose": "Reports and strategic recommendations are asserted on the institutional authority of NRI's research capabilities and deep historical relationships with APAC industrials, backed by manual analysis."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "engagement",
+        "band": "500k+"
+      },
+      "prose": "Sells high-value strategy and 'Navigation x Solution' consulting packages that are often bundled with long-term IT implementation contracts. Standard strategic assessments for major corporate accounts run into $500K+."
+    },
+    "grounded_in": {
+      "value": "both",
+      "prose": "Grounded heavily in the client's internal legacy corporate data combined with NRI's extensive proprietary Japanese macroeconomic, industrial, and regulatory research databases."
+    },
+    "time_to_first_usable_output": {
+      "value": "months",
+      "prose": "NRI's research-led consulting engagements are traditionally extensive and thorough, typically requiring several months to design, execute, and deliver a comprehensive strategy or innovation road map."
+    },
+    "procurement_path": {
+      "value": "full_enterprise_procurement",
+      "prose": "Enjoys deeply entrenched, multi-decade relationships with Japanese and APAC industrial conglomerates, but still requires full enterprise procurement workflows and C-suite authorizations for high-value contracts."
+    },
+    "local_language_delivery": {
+      "value": "board_grade_multi_apac",
+      "prose": "The gold standard for Japanese board-grade delivery, providing peerless native-language strategic presentation materials and bilingual regional advisory in Tokyo, Seoul, Beijing, and Taipei."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "flat_linear",
+      "prose": "NRI's model is heavily dependent on bespoke human research and custom software/systems integration. Expanding or assessing a new growth sector requires engaging new consulting resources, scaling linearly."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "purpose_built",
+      "prose": "NRI's Innovation Strategy consulting practice works on a bespoke basis to formulate specific, tailored business hypotheses and strategic road maps for corporate innovation programs."
+    },
+    "direction_of_travel": {
+      "value": "consolidating",
+      "prose": "NRI is actively consolidating its dominance in Japan and APAC by systematically pairing its elite macroeconomic research and management consulting with custom, long-term enterprise IT delivery systems."
+    }
+  },
+  "sopheon_wellspring": {
+    "who_does_the_thinking": {
+      "value": "buyer_themselves",
+      "prose": "Wellspring Accolade is an enterprise software platform; the client's own product, R&D, and innovation portfolio managers input data, map projects, and perform the strategic thinking and gate evaluations."
+    },
+    "auditable_provenance": {
+      "value": "source_cited",
+      "prose": "Operates as an InnovationOps system of record, logging stage-gate milestones and tracking project histories back to specific user actions and uploaded documentation, though it does not generate claims itself."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "subscription",
+        "band": "100–500k"
+      },
+      "prose": "Sold as an enterprise SaaS platform. Deployment for R&D-heavy organizations running formal NPD programs typically ranges from $100,000 to $500,000 annually, depending on user seats and modules."
+    },
+    "grounded_in": {
+      "value": "both",
+      "prose": "Grounded in the client's internal pipeline (NPD portfolio, stage-gate records) and, via Wellspring's core technology, external academic, patent, and startup scouting databases (licensed external data)."
+    },
+    "time_to_first_usable_output": {
+      "value": "months",
+      "prose": "Implementing and configuring an enterprise stage-gate system, aligning R&D workflows, and onboarding portfolio management teams requires substantial time, taking months to achieve a functional operational funnel."
+    },
+    "procurement_path": {
+      "value": "full_enterprise_procurement",
+      "prose": "SaaS deployments require comprehensive corporate IT security assessments, data integration checks, single sign-on (SSO) configuration, and full enterprise procurement approval cycles."
+    },
+    "local_language_delivery": {
+      "value": "english_plus_translation",
+      "prose": "The software UI supports multiple languages and regional translations, but Sopheon/Wellspring does not provide active, board-grade, bilingual strategy consulting or advisory teams natively in regional languages."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "near_zero",
+      "prose": "Once the software license is active, entering another idea, tracking an additional R&D project, or scoring a new product concept inside the platform carries near-zero marginal software cost."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "adjacent_configurable",
+      "prose": "Sopheon is a general-purpose innovation portfolio and stage-gate software suite. It is highly configurable for growth portfolios but is not purpose-built as an automated strategic decision-analysis tool."
+    },
+    "direction_of_travel": {
+      "value": "consolidating",
+      "prose": "Following Wellspring's acquisition of Sopheon in early 2024, the entity is actively consolidating its products into a unified innovation-management and IP governance platform."
+    }
+  },
+  "workboard_spm": {
+    "who_does_the_thinking": {
+      "value": "buyer_themselves",
+      "prose": "WorkBoard is an enterprise system of record for strategy and execution (SPM). The customer's own teams define the OKRs, set priorities, track metrics, and run strategic planning check-ins."
+    },
+    "auditable_provenance": {
+      "value": "source_cited",
+      "prose": "Tracks corporate goals, key results, and organizational alignment back to specific owners, operational integration points, or attached source files within the platform."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "subscription",
+        "band": "100–500k"
+      },
+      "prose": "SaaS pricing is seat-based with custom enterprise contracts. Enterprise deployments typically demand minimum annual spends ranging from $100,000 to $500,000, aligning with Vendr and G2 benchmarks."
+    },
+    "grounded_in": {
+      "value": "internal_only",
+      "prose": "Grounded entirely in the client's own internal corporate strategy, organizational OKRs, business unit metrics, and execution data. It does not ingest or reason over external market data."
+    },
+    "time_to_first_usable_output": {
+      "value": "months",
+      "prose": "Onboarding an enterprise to an OKR system, configuring cascading goals, and integrating with underlying databases typically requires several months to establish a synchronized plan-vs-actual rhythm."
+    },
+    "procurement_path": {
+      "value": "full_enterprise_procurement",
+      "prose": "Requires rigorous corporate SaaS procurement, including SSO integration, extensive data privacy compliance checks, IT security approvals, and enterprise software budget sign-off."
+    },
+    "local_language_delivery": {
+      "value": "english_plus_translation",
+      "prose": "The software interface supports multi-language translations for global teams, but WorkBoard does not provide in-house bilingual strategic consultants to deliver board-grade local language advisory."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "near_zero",
+      "prose": "Once licensed, adding another strategic priority, cascading a new set of OKRs, or tracking an additional initiative carries near-zero marginal software cost."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "adjacent_configurable",
+      "prose": "Built for OKR management, tracking, and cascading execution alignment. It is easily configured to manage growth strategy metrics, but is not a purpose-built tool for evaluating or validating growth initiatives."
+    },
+    "direction_of_travel": {
+      "value": "moving_toward",
+      "prose": "In 2025–2026, WorkBoard transitioned to an AI-agent-first architecture, launching its 'Chief of Staff' AI agents to draft OKRs, generate meeting pre-reads, and automatically track execution risks."
+    }
+  },
+  "hebbia": {
+    "who_does_the_thinking": {
+      "value": "software_only",
+      "prose": "Hebbia's Matrix uses agentic workflows to automatically execute iterative document analysis and synthesis. Users prompt the system to construct answers, but the software does the reading and reasoning."
+    },
+    "auditable_provenance": {
+      "value": "claim_level_traceable",
+      "prose": "Hebbia's flagship feature is an interactive analysis grid where every cell's claim can be clicked to highlight the exact sentence, paragraph, and page inside the raw source PDFs, providing perfect lineage."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "seat",
+        "band": "10–100k"
+      },
+      "prose": "Sold via seat-based annual subscriptions, with Professional seats at ~$10K/year and Lite seats at ~$3K/year. Initial deployments in high-stakes teams typically range between $30,000 and $80,000."
+    },
+    "grounded_in": {
+      "value": "client_corpus",
+      "prose": "Reasons strictly over the specific corpus of documents uploaded by the user (such as virtual data rooms, filings, and transcripts). It does not natively bring external market intelligence to fill information gaps."
+    },
+    "time_to_first_usable_output": {
+      "value": "minutes_hours",
+      "prose": "Hebbia Matrix can process thousands of document pages and generate comprehensive, synthesized tables and strategic answers within minutes to hours of document ingestion."
+    },
+    "procurement_path": {
+      "value": "standard_procurement",
+      "prose": "Often purchased at the business-unit or specialized team level under standard SaaS procurement. Large-scale enterprise expansions undergo complete IT security and data governance reviews."
+    },
+    "local_language_delivery": {
+      "value": "english_only",
+      "prose": "Hebbia is optimized for English language document processing and corporate UI, lacking localized bilingual strategic advisory or human validation teams stationed in regional APAC offices."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "near_zero",
+      "prose": "Running another complex query, processing an additional set of documents, or building a new agentic template inside Hebbia incurs near-zero marginal software and compute cost."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "general_purpose",
+      "prose": "Hebbia is a general-purpose, horizontal document-reasoning platform. It is highly versatile across legal, M&A, and finance, but does not embed specific business strategy frameworks natively."
+    },
+    "direction_of_travel": {
+      "value": "moving_toward",
+      "prose": "Expanding rapidly, raising a $130M Series B in 2024, and actively integrating premium financial data streams (ICE, S&P Capital IQ, Preqin) and supporting multi-model AI architectures in late 2025/2026."
+    }
+  },
+  "alphasense_tegus": {
+    "who_does_the_thinking": {
+      "value": "buyer_themselves",
+      "prose": "AlphaSense operates as a market intelligence and research engine. Users search, synthesize, and run analysis themselves, although its Generative Search and Workflow Agents automate initial synthesis."
+    },
+    "auditable_provenance": {
+      "value": "source_cited",
+      "prose": "AI-generated search results, financial primers, and SWOT summaries cite their sources with direct hyperlinks to the underlying broker reports, SEC filings, or expert transcript paragraphs."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "seat",
+        "band": "10–100k"
+      },
+      "prose": "Seat-based annual subscription, typically costing $10,000 to $20,000 per user seat. A standard team license for strategic planning or market research sits within the $10K–$100K range."
+    },
+    "grounded_in": {
+      "value": "licensed_external",
+      "prose": "Grounded in AlphaSense's massive library of licensed external content, including 200K+ expert transcripts (via Tegus), broker research, SEC filings, and global regulatory databases. Client upload is secondary."
+    },
+    "time_to_first_usable_output": {
+      "value": "minutes_hours",
+      "prose": "Users can query the global index and generate detailed market intelligence summaries, competitor profiles, or SWOT reports in minutes using built-in generative tools."
+    },
+    "procurement_path": {
+      "value": "existing_subscription",
+      "prose": "Often already deployed in corporate finance, investor relations, or strategy units, allowing teams to utilize it immediately. New purchases follow standard corporate software procurement."
+    },
+    "local_language_delivery": {
+      "value": "english_only",
+      "prose": "Content (especially broker research and Tegus transcripts) is heavily English-centric. The platform lacks native, localized strategic translation and board-grade regional language delivery services."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "near_zero",
+      "prose": "Once the seat subscription is paid, running another competitive search, reading additional expert transcripts, or auto-generating another SWOT analysis costs nothing extra."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "adjacent_configurable",
+      "prose": "While designed as a market research tool, its 2026 launch of specialized 'Workflow Agents' automates SWOT analyses and competitive landscapes, making it adjacent and highly configurable for growth strategy."
+    },
+    "direction_of_travel": {
+      "value": "consolidating",
+      "prose": "AlphaSense is actively consolidating its market-intelligence monopoly post-Tegus acquisition ($930M in 2024) and rolling out agentic search layers to move further up the analysis value chain."
+    }
+  },
+  "palantir_aip": {
+    "who_does_the_thinking": {
+      "value": "hybrid_human_validated",
+      "prose": "Palantir AIP combines automated model orchestration across an enterprise ontology with Forward Deployed Engineers (FDEs) who build, validate, and customize the decision workflows alongside client teams."
+    },
+    "auditable_provenance": {
+      "value": "claim_level_traceable",
+      "prose": "Built on Foundry's data lineage pipelines and Object Ontology, tracking every model output and business decision directly back to the raw internal database, ERP, or sensor input sources."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "subscription",
+        "band": "500k+"
+      },
+      "prose": "Enterprise contracts are custom and usage-based, typically starting in the high six-figures to multi-million dollar annual subscription range. Bootcamps serve as the standard low-friction landing vehicle."
+    },
+    "grounded_in": {
+      "value": "both",
+      "prose": "Grounded in the client's internal operational databases (ERP, CRM, operational logs) combined with external data streams, APIs, and market intelligence integrated into the ontology."
+    },
+    "time_to_first_usable_output": {
+      "value": "days",
+      "prose": "Palantir's 5-day AIP Bootcamps are designed to model the client's operational domain into an ontology and deliver a working, live, LLM-grounded decision workflow on client data by day three."
+    },
+    "procurement_path": {
+      "value": "full_enterprise_procurement",
+      "prose": "Because AIP requires deep integration into core enterprise data networks and represents a massive strategic financial investment, engagements require executive committee or CIO/CEO procurement sign-off."
+    },
+    "local_language_delivery": {
+      "value": "board_grade_multi_apac",
+      "prose": "Palantir deploys regional FDE teams from offices across Asia-Pacific (including Japan and Australia) to configure workflows and deliver operational systems natively in regional languages."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "sublinear",
+      "prose": "While integrating a new operational domain requires additional FDE engineering hours, the process is highly leveraged by the existing Foundry ontology infrastructure, making marginal costs sublinear."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "general_purpose",
+      "prose": "AIP is a horizontal enterprise operating system for decisions and operations, applied across supply chain, defense, and manufacturing, rather than purpose-built for corporate growth-strategy."
+    },
+    "direction_of_travel": {
+      "value": "moving_toward",
+      "prose": "Experiencing massive commercial momentum with its AIP flywheel, running thousands of bootcamps, and actively expanding its developer footprint globally in 2026."
+    }
+  },
+  "frontier_assistants": {
+    "who_does_the_thinking": {
+      "value": "software_only",
+      "prose": "Frontier assistants (such as ChatGPT, Claude, and Gemini Deep Research) use agentic LLM planning and parallel web retrieval to synthesize information and write reports without human experts."
+    },
+    "auditable_provenance": {
+      "value": "source_cited",
+      "prose": "Automatically compiles and lists hyperlinks and citations to web pages, though links can suffer from decay and citations lack the structured database lineage of specialized enterprise software."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "seat",
+        "band": "<10k"
+      },
+      "prose": "Priced as standard SaaS seat licenses, typically around $20 per user/month, representing an annual spend well below the $10,000 threshold for corporate strategy teams."
+    },
+    "grounded_in": {
+      "value": "ad_hoc_input",
+      "prose": "Grounded on whatever files the user manually uploads to the chat window on an ad-hoc basis, combined with public web search index results. It lacks persistent, enterprise-wide corpus grounding."
+    },
+    "time_to_first_usable_output": {
+      "value": "minutes_hours",
+      "prose": "Deep Research agents plan, execute dozens of web searches in parallel, and generate fully detailed, structured, cited report drafts within minutes of receiving a prompt."
+    },
+    "procurement_path": {
+      "value": "below_po_threshold",
+      "prose": "Individual team members can purchase Pro subscriptions via standard corporate credit cards under discretionary spend limits, entirely bypassing formal IT procurement and security reviews."
+    },
+    "local_language_delivery": {
+      "value": "english_plus_translation",
+      "prose": "Highly fluent in processing inputs and translating strategic outputs into dozens of global languages, but lacks native board-grade bilingual strategy consultants to validate local market nuances."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "near_zero",
+      "prose": "Evaluating another market, growth hypothesis, or competitor costs only pennies in API tokens or standard monthly subscription cycles, representing near-zero marginal cost."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "general_purpose",
+      "prose": "These are horizontal, general-purpose strategic assistants. They can draft competitive analyses or SWOT reports, but lack encoded strategic planning frameworks or corporate governance templates."
+    },
+    "direction_of_travel": {
+      "value": "moving_toward",
+      "prose": "High rate of continuous development. Supplier-substitute LLM leaders are rapidly improving multi-agent reasoning, deep web search planning, and tool integration in 2026."
+    }
+  },
+  "internal_team": {
+    "who_does_the_thinking": {
+      "value": "buyer_themselves",
+      "prose": "The client's own corporate strategy, planning, or business-development team executes the strategic analyses, synthesizes findings, and makes the recommendations."
+    },
+    "auditable_provenance": {
+      "value": "asserted",
+      "prose": "Internal strategy documents and slides assert recommendations based on manual calculations, expert calls, and desk research. Claims lack automated, traceable evidence lineage."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "none",
+        "band": "n/a"
+      },
+      "prose": "No external transaction takes place; the strategic labor is an in-house corporate overhead expense represented by salaried employee headcount."
+    },
+    "grounded_in": {
+      "value": "internal_only",
+      "prose": "Primarily grounded in the company's internal operational contexts and historical files, supplemented by basic external search and whatever ad-hoc market reports the company has purchased."
+    },
+    "time_to_first_usable_output": {
+      "value": "weeks",
+      "prose": "Conducting a strategic market assessment or vetting a growth opportunity typically takes a small in-house team 2 to 6 weeks of focused manual research, analysis, and slide compilation."
+    },
+    "procurement_path": {
+      "value": "no_purchase",
+      "prose": "Bypasses vendor procurement entirely, as the planning team is already on the company's payroll."
+    },
+    "local_language_delivery": {
+      "value": "board_grade_single",
+      "prose": "Typically delivers board-ready materials natively in the single language of corporate headquarters (e.g., Japanese in Tokyo, or English in New York). Lacks global, multi-lingual strategic offices."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "flat_linear",
+      "prose": "Evaluating an additional growth initiative requires manual labor, diverting scarce analyst hours from other strategic priorities, representing a flat-linear opportunity and labor cost."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "purpose_built",
+      "prose": "The internal team's strategic outputs are fully customized, tailored, and purpose-built for their own corporation's specific growth initiatives and corporate development agenda."
+    },
+    "direction_of_travel": {
+      "value": "static",
+      "prose": "While internal corporate strategy teams are slowly incorporating consumer AI chatbots to assist with writing and drafting, their overall strategic planning methods remain highly static."
+    }
+  },
+  "do_nothing_defer": {
+    "who_does_the_thinking": {
+      "value": "buyer_themselves",
+      "prose": "Deferring means no active, structured strategic analysis occurs. Any tracking or monitoring of the growth initiative is left entirely to the buyer's ad-hoc individual attention."
+    },
+    "auditable_provenance": {
+      "value": "none",
+      "prose": "Because the strategic decision is deferred or ignored, no formal analysis, documentation, or evidence trail is created."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "none",
+        "band": "n/a"
+      },
+      "prose": "Postponing the decision involves zero external strategic service fees or software purchases."
+    },
+    "grounded_in": {
+      "value": "internal_only",
+      "prose": "Grounded in the client's default, unanalyzed internal status quo, with no active external data integration."
+    },
+    "time_to_first_usable_output": {
+      "value": "year_plus",
+      "prose": "Deferring the strategic evaluation means no usable strategic outputs or business case findings are produced, delaying the opportunity indefinitely (over a year or more)."
+    },
+    "procurement_path": {
+      "value": "no_purchase",
+      "prose": "Bypasses procurement entirely, as no software is licensed and no consulting firm is engaged."
+    },
+    "local_language_delivery": {
+      "value": "english_only",
+      "prose": "Postponing strategic analysis requires zero delivery, resulting in a default English placeholder status with no localized local language support."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "near_zero",
+      "prose": "Continuing to defer strategic decisions or maintain the status quo costs nothing financially."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "not_applicable",
+      "prose": "Not applicable, as there is no active strategic analysis being tailored or delivered for any growth initiative."
+    },
+    "direction_of_travel": {
+      "value": "static",
+      "prose": "The default corporate path of least resistance—inaction—remains completely stable and static."
+    }
+  },
+  "ai_augmented_boutique": {
+    "who_does_the_thinking": {
+      "value": "hybrid_human_validated",
+      "prose": "Solo or boutique strategic consultants do the primary strategic thinking, using advanced agentic tools to execute research and automatically generate and validate outputs."
+    },
+    "auditable_provenance": {
+      "value": "source_cited",
+      "prose": "Consultants cite their data sources (broker reports, expert calls, and client data) in their final strategic decks to validate their recommendations to corporate clients."
+    },
+    "commercial_model": {
+      "value": {
+        "unit": "engagement",
+        "band": "10–100k"
+      },
+      "prose": "Projects are transaction-based, typically charging between $25,000 and $50,000 per strategic assessment, placing them squarely in the $10K–$100K range."
+    },
+    "grounded_in": {
+      "value": "both",
+      "prose": "Grounded in the client's internal operational context combined with external market intelligence and expert transcripts accessed via their personal strategic software subscriptions."
+    },
+    "time_to_first_usable_output": {
+      "value": "weeks",
+      "prose": "Accelerated by agentic research software, an independent consultant can deliver a high-quality, comprehensive strategic assessment within 2 to 4 weeks of kickoff."
+    },
+    "procurement_path": {
+      "value": "below_po_threshold",
+      "prose": "Because engagement fees typically fall under $50,000, projects can often be approved directly by division heads under standard PO limits, completely bypassing full procurement."
+    },
+    "local_language_delivery": {
+      "value": "board_grade_single",
+      "prose": "Typically delivers exceptionally high-quality board-grade strategic materials in a single language (the consultant's native language, e.g., English), lacking regional multilingual support."
+    },
+    "marginal_cost_of_next_assessment": {
+      "value": "flat_linear",
+      "prose": "Each new strategy assessment requires dedicated manual hours of analysis and partner validation, scaling the consultant's costs flat-linearly with each project."
+    },
+    "growth_initiative_purpose_built": {
+      "value": "purpose_built",
+      "prose": "Deliverables are highly customized, tailored, and purpose-built to address the corporate client's specific business hypothesis or market entry strategy."
+    },
+    "direction_of_travel": {
+      "value": "moving_toward",
+      "prose": "Highly dynamic segment. Independent consultants are rapidly adopting custom agent-building platforms to underprice and outpace traditional mid-tier consulting firms in 2026."
+    }
+  }
+}

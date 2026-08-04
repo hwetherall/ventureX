@@ -1,0 +1,389 @@
+{
+  "run": {
+    "subject": "Innovera",
+    "stage": "part1_competitor_discovery",
+    "status": "FINAL / converged",
+    "generated_at": "2026-07-23",
+    "rounds_completed": 3,
+    "round_compression_note": "Operator declared this the third and final iteration. This round therefore executes THREE stages: (a) Round 3 decomposition-and-stress; (b) the Round 4 reveal-and-diff against the quarantined deck positioning in section 4 (load-bearing, does not require operator input); (c) the Round 5 convergence and prune to the 10-14 row target. Final set = 14 rows.",
+    "product_scope_locked": "single_initiative_25k. Enterprise-license / portfolio is a near-term (2027) story with a DIFFERENT competitive set and buying cycle; excluded here, flagged for a possible second Part-2 table.",
+    "convergence_note": "Converged to 14 rows (top of the 10-14 budget, expanded from the safe 11 by operator directives: venture-builders kept in scope as TWO rows, Palantir kept as both reference point and live collision, Sopheon retained). Decomposition applied to McKinsey (core vs Leap) and Palantir (AIP/commercial vs Gotham/defense). Category claim survives with qualification. The single most load-bearing output is the deck diff (see blind_vs_deck_diff): the deck's own JUDGEMENT x AGILITY 2x2 omits Palantir, the exact playbook Innovera emulates."
+  },
+
+  "operator_decisions_round3": [
+    { "q": "decision vs execution boundary", "decision": "Hold the decision layer; treat the strategy-execution/SPM cohort as ONE contrast row. May expand downstream later, not now.", "effect": "WorkBoard/SPM = single row. Empty-box claim holds at the AI-native growth-DECISION layer." },
+    { "q": "Palantir", "decision": "Keep as BOTH reference point AND live collision. Split into constituent parts: defense/Gotham gets the attention but is NOT the competing unit; the AIP + commercial FDE pitch IS. Operator affirms 'growth version of that model'.", "effect": "Decompose Palantir -> palantir_aip (included) + palantir_gotham_defense (cut, non-competing)." },
+    { "q": "internal team assistant-equipped?", "decision": "It depends. Most internal teams are nascent or do not exist; those that do use old-school tools. Most now use general AI chatbots (ChatGPT/Claude) but NOT purpose-built innovation tools.", "effect": "Recalibrate: the 'internal team + assistant' threat is real but rudimentary (general chatbots, not sophisticated deep-research-vs-corpus). Merge internal_team_plus_assistant INTO internal_team as a maturity spectrum; strengthens do-nothing/defer and the 'we lack the capability' argument for Innovera. My Round 1 headline holds in spirit but the 'sophisticated assistant-armed team' version was overstated." },
+    { "q": "venture-builders in scope?", "decision": "IN scope (operator overrides model lean). Mach49 correctly removed; Leap, BCG X etc. kept as interesting.", "effect": "Venture-builder archetype retained as TWO differentiated rows: mckinsey_leap (consulting/strategy-led build) + bcg_x (tech/AI-led build)." }
+  ],
+
+  "candidates": [
+    {
+      "id": "mckinsey_core",
+      "name": "McKinsey core strategy practice",
+      "parent_company": "McKinsey & Company",
+      "unit_scope": "Classic corporate/growth-strategy advisory: bespoke studies delivering recommendations",
+      "decomposed": true,
+      "decomposition_rationale": "Split from Leap: core is advisory (~35% of global strategy-consulting revenue, mature ~2% CAGR, 25-30% margins, recommendations); Leap builds ventures. Different delivery, price, buyer, output. Represents the whole MBB-study archetype (BCG core + Bain cut as near-duplicates).",
+      "type": "direct",
+      "archetype": "strategy_house",
+      "rationale": "The incumbent mental model. Every Innovera client has bought a study like this before, and the operator confirms all clients have worked with big consultancies. Sets the price/time/prestige ceiling.",
+      "teaches": "The upper bound: ~$800K-1.5M, 6-14 weeks, human judgement, maximum prestige. The thing Innovera claims to compress ~30x on cost and ~5x on time.",
+      "evidence": [
+        { "claim": "McKinsey core strategy consulting held roughly 35% of global strategy-consulting revenue in 2024 in a mature ~2% CAGR market at 25-30% EBITDA margins.", "url": "https://matrixbcg.com/products/mckinsey-bcg-matrix", "title": "McKinsey & Company BCG Matrix Analysis", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [ { "source": "team_recollection", "note": "Operator: all clients have worked with large consultancies before; Innovera positions as 'leveling up' vs that baseline." } ],
+      "confidence": "verified",
+      "surfaced_in_round": 1,
+      "surfaced_by": "model_prior",
+      "status": "included"
+    },
+    {
+      "id": "mckinsey_leap",
+      "name": "Leap by McKinsey (McKinsey Business Building)",
+      "parent_company": "McKinsey & Company",
+      "unit_scope": "Business-building practice: designs/launches/scales new ventures for corporates via sprint-based delivery",
+      "decomposed": true,
+      "decomposition_rationale": "Split from core (see mckinsey_core). 700+ builds since 2018, 12-18 month engagements, ships products not slide decks, own gen-AI venture platform. Nothing like the advisory core on delivery/price/buyer/speed.",
+      "type": "category",
+      "archetype": "venture_builder",
+      "rationale": "Same growth budget line, different job: Leap BUILDS the venture; Innovera helps DECIDE whether/how to pursue it. Consulting/strategy-led venture building (grounded in McKinsey frameworks). Kept in scope per operator.",
+      "teaches": "What the NEXT decision costs (the ceiling on how much de-risking the current decision is worth), delivered consulting-led. Paired with bcg_x to span consulting-led vs tech/AI-led venture building.",
+      "evidence": [
+        { "claim": "Leap (rebranded McKinsey Business Building) is a sprint-based venture-building practice with 700+ builds since 2018, 20+ unicorns, typical 12-18 month engagements that ship real products rather than recommendations, now with a dedicated gen-AI venture-building platform.", "url": "https://www.hackingthecaseinterview.com/pages/mckinsey-leap", "title": "McKinsey Leap: What It Is, Roles, and How to Get In", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [],
+      "confidence": "verified",
+      "surfaced_in_round": 1,
+      "surfaced_by": "deck",
+      "status": "included"
+    },
+    {
+      "id": "bcg_x",
+      "name": "BCG X",
+      "parent_company": "Boston Consulting Group",
+      "unit_scope": "BCG's tech-build-and-design + AI venture arm (ex-Digital Ventures + GAMMA); builds AI-native products and ventures for corporates",
+      "decomposed": true,
+      "decomposition_rationale": "Split from BCG core (which is cut as a near-duplicate of mckinsey_core). BCG X is the discriminating build unit.",
+      "type": "category",
+      "archetype": "venture_builder",
+      "rationale": "Big-house venture builder, but tech/AI-product-build-led rather than consulting-led. The decision after Innovera's. Kept per operator directive that venture-builders stay in scope.",
+      "teaches": "The tech/AI-led flavour of venture building (vs Leap's consulting-led), giving the archetype a legible spread. NOTE: closest pair in the table with mckinsey_leap; first merge candidate if the row count ever needs trimming.",
+      "evidence": [
+        { "claim": "BCG X is positioned as the digital/AI arm of BCG, building AI-native transformation and supporting venture scaling.", "url": "https://fuelyourdigital.com/post/top-ai-consulting-firms-with-ai-native-solutions-in-2026/", "title": "Top AI Consulting Firms with AI Native Solutions in 2026", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [ { "source": "team_recollection", "note": "Operator: 'the other ones, like Leap, BCG X, etc., I think they're interesting... I want them in scope.'" } ],
+      "confidence": "inferred",
+      "surfaced_in_round": 1,
+      "surfaced_by": "model_prior",
+      "status": "included"
+    },
+    {
+      "id": "ey_parthenon",
+      "name": "EY-Parthenon",
+      "parent_company": "Ernst & Young",
+      "unit_scope": "Strategy + transactions arm; commercial due diligence and growth-opportunity assessment",
+      "decomposed": false,
+      "decomposition_rationale": "EY-Parthenon is already the discriminating strategy/transaction unit inside EY. Represents the Big-4 diligence archetype (Monitor Deloitte cut as near-duplicate).",
+      "type": "direct",
+      "archetype": "big4_midtier",
+      "rationale": "Commercial due diligence is the closest consulting analogue to Innovera's core job: validate whether a growth opportunity is real, as a repeatable product rather than a bespoke study.",
+      "teaches": "Commercial diligence as a productized offering at the ~$200-500K mid-tier band Innovera undercuts; the closest human analogue to 'validate the opportunity'.",
+      "evidence": [],
+      "internal_evidence": [],
+      "confidence": "inferred",
+      "surfaced_in_round": 1,
+      "surfaced_by": "model_prior",
+      "status": "included",
+      "notes": "Citation gap — not searched directly. Firm up a source before the demo if it stays in front of James."
+    },
+    {
+      "id": "nri",
+      "name": "Nomura Research Institute (NRI)",
+      "parent_company": "Nomura Research Institute, Ltd.",
+      "unit_scope": "Management-consulting + systems-integration 'think tank'; includes an Innovation Strategy / new-business practice for Japanese and APAC corporates",
+      "decomposed": false,
+      "decomposition_rationale": "The consulting practice is the competing unit; IT-solutions segments are bundled via the 'Navigation x Solution' model but are not the growth-decision competitor.",
+      "type": "direct",
+      "archetype": "apac_regional_advisory",
+      "rationale": "The real displaced incumbent for a large share of Innovera's ACTUAL (APAC) wins. A Japanese/Korean industrial already has a decades-long NRI relationship; NRI's Innovation Strategy practice does the 'shape a new-business hypothesis' job via research-led consulting + long-term IT contracts. Invisible on any Western 2x2. Retained as the SINGLE APAC row (operator: APAC is cyclical not strategic, prestige is NA/EU) — ADL/Roland Berger/MRI cut.",
+      "teaches": "The incumbent varies by geography — the most under-modelled variable. The deck's frame is US/EU-shaped; the client list (currently) isn't. 'Your real incumbent in these deals is NRI, not McKinsey' is the most surprising thing to tell James.",
+      "evidence": [
+        { "claim": "NRI is a Tokyo-based consulting + systems-integration firm (~$3.8B+ revenue) running a 'Navigation x Solution' / 'Con-solution' model pairing research-led consulting with bespoke IT delivery and long-term contracts, with deep C-suite and regulator relationships across Japan and APAC.", "url": "https://portersfiveforce.com/blogs/how-it-works/nri", "title": "How Does Nomura Research Institute Company Work?", "retrieved_at": "2026-07-23" },
+        { "claim": "NRI runs an explicit Innovation Strategy consulting practice helping (mostly Japanese) corporates create business hypotheses and formulate innovation strategy.", "url": "https://www.nri.com/en/service/theme/business_management/innovation.html", "title": "Business Innovation | Business Management | NRI", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [ { "source": "team_recollection", "note": "Operator: heavy APAC concentration is cyclical, not strategic; prestige targets are NA/EU. Central-Asia clients (Kazakhstan, Azerbaijan) too." } ],
+      "confidence": "verified",
+      "surfaced_in_round": 1,
+      "surfaced_by": "model_prior",
+      "status": "included"
+    },
+    {
+      "id": "sopheon_wellspring",
+      "name": "Sopheon (now Wellspring)",
+      "parent_company": "Wellspring (Resurgens Technology Partners)",
+      "unit_scope": "Innovation-management software: manages the innovation FUNNEL — tech scouting, NPD, IP, portfolio governance, discovery-to-commercialization",
+      "decomposed": false,
+      "decomposition_rationale": "Atomic product line (merge of Round 1's separate Sopheon + Wellspring, now one entity).",
+      "type": "category",
+      "archetype": "innovation_mgmt_software",
+      "rationale": "Retained by explicit operator directive ('focusing on it soon'). Claims to be the system of record for the innovation pipeline — adjacent to Innovera's moat claim — but its job is managing a FUNNEL OF IDEAS, not analysing a single growth DECISION to decision-grade.",
+      "teaches": "Empty-box test, axis 1 (funnel): holds and governs the pipeline of initiatives; does not produce the judgement on any one of them. Occupies an adjacent box, not Innovera's.",
+      "evidence": [
+        { "claim": "Sopheon was acquired by Wellspring in Feb 2024 (~$146M) and the brands merged ('Sopheon is now Wellspring'), spanning the innovation lifecycle from discovery/invention through NPD, IP management and portfolio governance.", "url": "https://www.wellspring.com/news/wellspring-acquires-sopheon", "title": "Wellspring Acquires Sopheon", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [ { "source": "team_recollection", "note": "Operator explicitly wants Sopheon on the list despite single-initiative product scope." } ],
+      "confidence": "verified",
+      "surfaced_in_round": 1,
+      "surfaced_by": "model_prior",
+      "status": "included"
+    },
+    {
+      "id": "workboard_spm",
+      "name": "WorkBoard(AI) / strategy-execution (SPM) cohort",
+      "parent_company": "WorkBoard, Inc. (representing Cascade, Quantive, Planview, Shibumi, ClearPoint, i-nexus)",
+      "unit_scope": "Enterprise 'system of record for strategy and execution' — OKRs, portfolio/initiative funding + tracking, AI 'Chief of Staff' agents, plan-vs-actual",
+      "decomposed": false,
+      "decomposition_rationale": "Represented as ONE contrast row per operator decision (hold the decision layer, don't expand into execution now). Planview and the wider SPM/SEMS field fold in here.",
+      "type": "category",
+      "archetype": "strategy_execution_spm",
+      "rationale": "The most literal challenge to the empty-box claim: WorkBoard markets itself verbatim as 'the enterprise system of record for strategy and execution', now with AI agents. Same label as Innovera's moat claim.",
+      "teaches": "Empty-box test, axis 2 (execution): owns the DECIDED strategy — tracking, OKRs, portfolio funding, plan-vs-actual. The defensible Innovera boundary is 'we are the upstream DECISION layer, they are the downstream EXECUTION layer.' This is the row that keeps the category claim honest; the claim survives only because Innovera is (for now) staying on the decision side of that line.",
+      "evidence": [
+        { "claim": "WorkBoard(AI) positions itself as 'the enterprise system of record for strategy and execution' and in 2025-26 moved to an AI-agent-first architecture (a 'Chief of Staff' agent that drafts OKRs, generates review pre-reads, and surfaces portfolio risk).", "url": "https://www.workboard.com/resources/blog/best-strategic-planning-software", "title": "5 Best Enterprise Strategic Planning Software in 2026", "retrieved_at": "2026-07-23" },
+        { "claim": "The strategy-execution-management software category includes Cascade, Quantive, OnStrategy, ClearPoint, Rhythm Systems, Shibumi and i-nexus, positioned around executing/tracking strategic initiatives.", "url": "https://www.g2.com/categories/strategic-planning-and-execution", "title": "Best Strategic Planning and Execution Software — G2", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [ { "source": "team_recollection", "note": "Operator Q1: hold the decision layer; treat this cohort as one contrast row; may expand downstream in future." } ],
+      "confidence": "verified",
+      "surfaced_in_round": 2,
+      "surfaced_by": "research",
+      "status": "included"
+    },
+    {
+      "id": "hebbia",
+      "name": "Hebbia (Matrix)",
+      "parent_company": "Hebbia AI",
+      "unit_scope": "Document-grounded agentic analysis platform (Matrix): agent-swarm / iterative source decomposition over large document sets with full citation trails; finance / legal / government / consulting verticals",
+      "decomposed": false,
+      "decomposition_rationale": "Atomic. Represents the vertical-AI-analysis archetype (Rogo cut as a near-duplicate).",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Architecturally the closest software analogue to Innovera's reasoning-graph-plus-provenance model. Same job shape (corpus -> structured, cited analysis feeding a high-stakes decision) via a similar mechanism; differs mainly by VERTICAL (finance/diligence vs corporate growth) and by Innovera's added encoded-framework + human-validation layer. One GTM decision from colliding.",
+      "teaches": "The vertical boundary — and the sharpest demonstrable Innovera differentiator: a Hebbia review notes it under-surfaces risk when fed a bullish sell-side doc, because it reasons only over supplied documents; Innovera's external-intelligence + framework layer claims to surface the risks the documents omit.",
+      "evidence": [
+        { "claim": "Hebbia's Matrix uses an agent-swarm / iterative-source-decomposition architecture to answer complex multi-document questions with full citation trails, targeting finance, law and government; ~$700M valuation on ~$160M+ raised; deployed at firms including KKR, Centerview and MetLife.", "url": "https://sacra.com/c/hebbia/", "title": "Hebbia revenue, valuation & funding | Sacra", "retrieved_at": "2026-07-23" },
+        { "claim": "A user review notes that fed a sell-side offering memo and asked for risks, Hebbia surfaces few because the document omits them — it reasons over supplied content rather than bringing external evidence.", "url": "https://www.g2.com/products/hebbia-ai-2026-02-24/reviews", "title": "Hebbia AI Reviews 2026 | G2", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [],
+      "confidence": "verified",
+      "surfaced_in_round": 1,
+      "surfaced_by": "model_prior",
+      "status": "included"
+    },
+    {
+      "id": "alphasense_tegus",
+      "name": "AlphaSense (incl. Tegus)",
+      "parent_company": "AlphaSense",
+      "unit_scope": "Market-intelligence + AI search platform with the largest expert-transcript library (Tegus) and AI-led expert calls; adding 'Workflow Agents' that auto-build competitive landscapes and SWOT analyses",
+      "decomposed": false,
+      "decomposition_rationale": "AlphaSense and Tegus are one entity post-2024 acquisition. Represents the unbundled market-intelligence + expert-supply archetype (GLG and Gartner fold in here).",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Owns the external-market-intelligence half of Innovera's Knowledge Base, and — via seat access at $10-20K/user (inside the single-initiative band) plus its new agentic Workflow Agents — a plausible 'just buy a seat and run the analysis yourself' substitute. The unbundled price of Innovera's inputs.",
+      "teaches": "The unbundled inputs layer, drifting toward analysis: a content+search+expert platform now generating the competitive-landscape/SWOT artifacts Innovera also produces. If it keeps moving up the stack it becomes a same_problem row rather than an input.",
+      "evidence": [
+        { "claim": "AlphaSense completed its ~$930M acquisition of Tegus in July 2024 (combined entity ~$4B), pairing AI market-intelligence search with 200,000+ expert transcripts and AI-led expert calls, seat-based at roughly $10-20K/user/year.", "url": "https://www.prnewswire.com/news-releases/alphasense-completes-acquisition-of-tegus-302190934.html", "title": "AlphaSense Completes Acquisition Of Tegus", "retrieved_at": "2026-07-23" },
+        { "claim": "In Jan 2026 AlphaSense launched next-gen Generative Search evolving into a research agent, plus Workflow Agents that automate whole analysis arcs including company primers, competitive landscapes and SWOT analyses.", "url": "https://intuitionlabs.ai/articles/alphasense-platform-review", "title": "AlphaSense: How the AI Market Intelligence Platform Works | IntuitionLabs", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [],
+      "confidence": "verified",
+      "surfaced_in_round": 1,
+      "surfaced_by": "model_prior",
+      "status": "included"
+    },
+    {
+      "id": "palantir_aip",
+      "name": "Palantir (AIP + commercial Forward Deployed Engineers)",
+      "parent_company": "Palantir Technologies",
+      "unit_scope": "Commercial AIP + Ontology + Foundry, delivered via forward-deployed engineers and the 5-day AIP Bootcamp. EXCLUDES the Gotham/government-defense business (cut as non-competing).",
+      "decomposed": true,
+      "decomposition_rationale": "Decomposed per operator: the defense/Gotham work gets the attention but is a different job (government/intelligence mission software) and does not compete with Innovera; the AIP + commercial FDE pitch is the competing unit. Splitting changes the answer — Gotham/defense would give a completely different (non-competing) reading.",
+      "type": "category",
+      "archetype": "enterprise_decision_platform",
+      "rationale": "The tightest structural mirror of Innovera's ENTIRE model. The deck explicitly emulates Palantir (FDA=FDE, RQA=Ontology). The AIP Bootcamp is the same motion — land with a working LLM-grounded decision app on the client's own data, fast — just horizontal/operational and enterprise-scale, sold into the same industrials. Operator keeps it as BOTH a reference point ('growth version of that model') and a live collision.",
+      "teaches": "The playbook Innovera emulates, run by its author, in the same accounts. Same mechanism/GTM, different job (general enterprise operations vs growth-strategy) and scale ($M+ vs $25K). The comparison an investor makes unprompted — and, per the diff, the one occupant the deck's own 2x2 omits.",
+      "evidence": [
+        { "claim": "Palantir's AIP Bootcamp is a ~5-day sprint where forward-deployed engineers model the client's domain into an ontology and ship a working LLM-grounded decision workflow on the client's own data by ~day three; 1,300+ run at ~75% conversion, compressing a ~year-long sales cycle to about a week.", "url": "https://longyield.substack.com/p/palantir-the-aip-flywheel-hits-escape", "title": "Palantir: The AIP Flywheel Hits Escape Velocity — LongYield", "retrieved_at": "2026-07-23" },
+        { "claim": "Analysts describe Palantir's product as 'an operating system for decisions and operations, packaged as products but delivered with people', and note Anthropic and OpenAI are copying the forward-deployed-engineering GTM model Palantir pioneered.", "url": "https://www.everestgrp.com/palantir-inside-the-category-of-one-forward-deployed-software-engineers-blog/", "title": "Palantir: Inside the category of one — Everest Group", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [ { "source": "team_recollection", "note": "Operator Q2: keep as both reference point and live collision; split off defense/Gotham as non-competing; 'growth version of that model' is right." } ],
+      "confidence": "verified",
+      "surfaced_in_round": 1,
+      "surfaced_by": "model_prior",
+      "status": "included"
+    },
+    {
+      "id": "frontier_assistants",
+      "name": "Frontier deep-research assistants (ChatGPT / Gemini / Claude / Perplexity)",
+      "parent_company": "OpenAI / Google / Anthropic / Perplexity",
+      "unit_scope": "General-purpose agentic 'deep research': multi-agent planning, web + connected-corpus retrieval, cited long-form reports; ~$20/user/month, improving monthly",
+      "decomposed": false,
+      "decomposition_rationale": "One compound row — the four resolve near-identically on the dimensions that matter; the deck's own 2x2 lumps them together bottom-right.",
+      "type": "supplier_substitute",
+      "rationale": "The substitution risk AND the dual relationship: Claude, OpenAI and Gemini sit INSIDE Innovera's own stack as LLM suppliers while sitting in Innovera's own 2x2 as competitors. Filing them under 'direct' would be wrong and look careless to an investor; supplier_substitute exists for exactly this. Per operator, internal teams increasingly use these chatbots (though not sophisticatedly).",
+      "teaches": "The dual supplier/competitor relationship, handled honestly, and the fastest-improving competitor. The honest answer to 'why doesn't a frontier assistant eat this in 18 months' lives here — and it is stronger to surface it in Innovera's own demo than to hide it.",
+      "evidence": [
+        { "claim": "ChatGPT Deep Research, Gemini Deep Research, Claude Research and Perplexity all run multi-agent 'deep research' that plans, searches in parallel and returns cited reports; Gemini's is explicitly pitched for competitive analysis, market research and due-diligence workflows at ~$20/month.", "url": "https://futurefactors.ai/ai-deep-research-tools-comparison-2026/", "title": "Best Gemini Alternatives for Deep Research in 2026", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [ { "source": "team_recollection", "note": "Deck lists Claude, OpenAI, Gemini as multi-provider LLM suppliers in Innovera's stack. Operator Q3: most internal teams now use general chatbots (ChatGPT/Claude) but not purpose-built tools." } ],
+      "confidence": "verified",
+      "surfaced_in_round": 1,
+      "surfaced_by": "model_prior",
+      "status": "included"
+    },
+    {
+      "id": "internal_team",
+      "name": "Client internal strategy / corporate-planning team",
+      "parent_company": "n/a (the buyer)",
+      "unit_scope": "The corporate strategy / new-business / CVC / planning unit inside the client — spanning nonexistent, nascent, old-school-tooled, and (increasingly) general-chatbot-augmented",
+      "decomposed": false,
+      "decomposition_rationale": "Merges Round 2's internal_team + internal_team_plus_assistant. Per operator, chatbot use is a maturity characteristic of the same team, not a distinct competitor.",
+      "type": "non_consumption",
+      "rationale": "Per operator, one of the two main things Innovera competes against — AND both competitor and channel: the buyer, the collaborator the FDA works alongside, and the DIY substitute. Critically, most internal teams are nascent or do not exist and use old-school tools; a growing share use general chatbots (ChatGPT/Claude) but no purpose-built innovation tools. In a new category this is usually the most frequent loss.",
+      "teaches": "The demand-side mirror of the supplier/competitor problem: the same entity is customer, partner and substitute. Also the column the deck most needs to refresh — but the truer story is that the internal team is often ABSENT, which is a stronger argument for Innovera than the deck's 'capable-but-slow team' framing.",
+      "evidence": [],
+      "internal_evidence": [ { "source": "team_recollection", "note": "Operator Q4(R1)+Q3(R3): internal team is BOTH competitor and channel; most are nascent/nonexistent, old-school-tooled, some using general chatbots but no purpose-built tools." } ],
+      "confidence": "verified",
+      "surfaced_in_round": 1,
+      "surfaced_by": "operator",
+      "status": "included"
+    },
+    {
+      "id": "do_nothing_defer",
+      "name": "Do nothing / defer the decision",
+      "parent_company": "n/a",
+      "unit_scope": "Status quo — the initiative doesn't get formally evaluated, or the decision is postponed",
+      "decomposed": false,
+      "decomposition_rationale": "n/a.",
+      "type": "non_consumption",
+      "rationale": "In a new category the most frequent loss is to no decision at all. Reinforced by operator Q3: if the internal team is nascent or nonexistent, 'do nothing' is the path of least resistance. The $25K/immediate-kickoff pricing reads as engineered to beat 'defer' by staying under the procurement threshold.",
+      "teaches": "The true baseline. If most losses are to 'nothing', the table is non-consumption-weighted and the consultancy rows are theatre.",
+      "evidence": [],
+      "internal_evidence": [ { "source": "team_recollection", "note": "Operator Q3: most internal teams nascent or nonexistent — strengthens 'do nothing' as the real baseline." } ],
+      "confidence": "verified",
+      "surfaced_in_round": 1,
+      "surfaced_by": "model_prior",
+      "status": "included"
+    },
+    {
+      "id": "ai_augmented_boutique",
+      "name": "AI-augmented boutique / independent strategy consultant",
+      "parent_company": "n/a (fragmented cohort)",
+      "unit_scope": "Solo or small-firm strategy consultants using agent tooling to deliver growth/market analysis at ~$25-40K per engagement",
+      "decomposed": false,
+      "decomposition_rationale": "A fragmented cohort, not a single vendor.",
+      "type": "same_problem_different_mechanism",
+      "rationale": "Sits squarely in Innovera's single-initiative price band ($25-50K) and PO-free buying window. 'I have a guy / a small firm who'll do this for ~$30K with AI' is a live alternative the big-consultancy framing misses entirely.",
+      "teaches": "The floor of the market — the cheap-and-fast human+AI hybrid at Innovera's exact price point. Spans the tradeoff frontier at the opposite corner from McKinsey core.",
+      "evidence": [
+        { "claim": "Commentary on the 2026 AI-strategy-consulting market describes wide-and-growing demand for AI-augmented advisory that big firms can't service in the long tail, with independent consultants closing ~$30K engagements aided by agent-building platforms.", "url": "https://pickaxe.co/post/ai-strategy-consulting-playbook", "title": "AI Strategy Consulting: The 2026 Playbook", "retrieved_at": "2026-07-23" }
+      ],
+      "internal_evidence": [],
+      "confidence": "inferred",
+      "surfaced_in_round": 2,
+      "surfaced_by": "research",
+      "status": "included",
+      "notes": "Unsearchable at the individual-vendor level — cite as a cohort, evidence thin/inferred. Kept because it is the only row occupying the cheap-human+AI corner at Innovera's exact price."
+    }
+  ],
+
+  "cut_list": [
+    { "name": "CB Insights", "reason": "not relevant — input/data source, not an alternative", "cut_in_round": 1 },
+    { "name": "PitchBook", "reason": "not relevant — input/data source, not an alternative", "cut_in_round": 1 },
+    { "name": "Crunchbase", "reason": "not relevant — input/data source, not an alternative", "cut_in_round": 1 },
+    { "name": "Mach49", "reason": "defunct — parent Next 15 began an orderly wind-down Aug 2025 after dismissing founder Linda Yates over alleged misconduct; discontinued operation closing by end FY26. Verified (Next 15 RNS, CB Insights).", "cut_in_round": 2 },
+    { "name": "BCG core strategy practice", "reason": "near-duplicate of mckinsey_core — resolves identically on discriminating dimensions; MBB-study archetype represented by McKinsey core", "cut_in_round": 3 },
+    { "name": "Bain & Company (core)", "reason": "near-duplicate of mckinsey_core", "cut_in_round": 3 },
+    { "name": "Monitor Deloitte", "reason": "near-duplicate of ey_parthenon — Big-4 diligence/strategy represented by EY-Parthenon", "cut_in_round": 3 },
+    { "name": "Arthur D. Little", "reason": "APAC demoted per operator (cyclical not strategic); NRI carries the geography teaching alone", "cut_in_round": 3 },
+    { "name": "Roland Berger", "reason": "near-duplicate of MBB-core / APAC demoted", "cut_in_round": 3 },
+    { "name": "Mitsubishi Research Institute (MRI)", "reason": "cut for the NA/EU-weighted table, BUT flagged: MRI (plausible competitor) vs Mitsubishi Corporation (Innovera client, converted contract) is a genuine client/competitor collision worth keeping as a footnote", "cut_in_round": 3 },
+    { "name": "Itonics", "reason": "near-duplicate of sopheon_wellspring — innovation-funnel cohort represented by Sopheon/Wellspring", "cut_in_round": 3 },
+    { "name": "Planview", "reason": "folded into workboard_spm — strategic-portfolio/execution cohort represented by the WorkBoard row", "cut_in_round": 3 },
+    { "name": "Rogo", "reason": "near-duplicate of hebbia — vertical-AI-analysis represented by Hebbia", "cut_in_round": 3 },
+    { "name": "GLG (Gerson Lehrman Group)", "reason": "folded into alphasense_tegus — unbundled intel+expert-supply represented by the AlphaSense row (GLG is the pure human-expert leg of the same substitute)", "cut_in_round": 3 },
+    { "name": "Gartner", "reason": "folded into alphasense_tegus — 'already-on-contract analyst' is the same unbundled-intelligence substitute", "cut_in_round": 3 },
+    { "name": "Rainmaking", "reason": "venture-builder archetype represented by the operator's named exemplars (Leap + BCG X); Rainmaking was the independent-studio alternative, not needed", "cut_in_round": 3 },
+    { "name": "High Alpha", "reason": "venture-builder archetype already represented by Leap + BCG X", "cut_in_round": 3 },
+    { "name": "Internal team + assistant (as a separate row)", "reason": "merged into internal_team per operator Q3 — general-chatbot use is a maturity characteristic of the internal-team row, not a distinct competitor", "cut_in_round": 3 },
+    { "name": "Palantir Gotham / government & defense", "reason": "DECOMPOSITION cut (operator Q2) — government/intelligence/defense mission software is a different job and does not compete with Innovera; the competing unit is Palantir's commercial AIP + FDE motion (kept as palantir_aip)", "cut_in_round": 3 }
+  ],
+
+  "dimension_seeds": [
+    { "dimension": "who_does_the_thinking", "why_it_discriminates": "Separates consultancies (human experts), DIY (client), pure software (machine), hybrids.", "observed_spread": "human experts / client / software / human+software hybrid", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "unit_of_sale", "why_it_discriminates": "Innovera sells per-initiative; rivals sell seats, reports, retainers, or whole ventures — changes buying window and buyer.", "observed_spread": "initiative / seat / report / retainer / venture / bootcamp", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "marginal_cost_of_next_assessment", "why_it_discriminates": "Software marginal cost falls toward zero; consulting stays flat. Core to the compounding claim.", "observed_spread": "falls to ~0 / flat", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "time_to_first_usable_output", "why_it_discriminates": "Hours (assistants) vs weeks (Innovera / Palantir bootcamp) vs months (consulting) vs 12-18 months (venture build).", "observed_spread": "hours / days-weeks / weeks / months", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "auditable_provenance", "why_it_discriminates": "Innovera, Hebbia and Palantir expose traceable evidence graphs; assistants and slide-deck consulting largely don't.", "observed_spread": "traceable evidence graph / citations / opaque", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "compounds_across_engagements", "why_it_discriminates": "Does institutional memory accrue (system-of-record claim) or is each engagement one-off?", "observed_spread": "compounds / one-off", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "regional_delivery_footprint", "why_it_discriminates": "The incumbent varies by geography (NRI in Japan; MBB globally; SPM/assistants everywhere).", "observed_spread": "global / US-EU / APAC-native", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "price_band_vs_procurement_threshold", "why_it_discriminates": "Under-PO ~$25-50K (Innovera single-initiative, boutiques, expert calls, assistant seats) vs enterprise $250K+/$M+ (Sopheon/Palantir/MBB). Determines the real consideration set.", "observed_spread": "under-PO ~$25-50K / enterprise $250K+ / $M+ study", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "buyer", "why_it_discriminates": "Corp strategy vs innovation unit vs CVC vs function head vs C-suite — different budgets and triggers.", "observed_spread": "corp strategy / innovation-CVC / function head / C-suite", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "depth_vs_speed_position", "why_it_discriminates": "Spans the tradeoff frontier — deep-slow (MBB) to fast-shallow (assistants) to the hybrid middle (Innovera, boutiques).", "observed_spread": "deep-slow / hybrid / fast-shallow", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "grounded_in", "why_it_discriminates": "Client corpus (Innovera SOT layer, Hebbia) vs external market content (AlphaSense, Gartner) vs whatever is pasted (assistants). Determines what risks get surfaced.", "observed_spread": "client corpus / external market content / ad-hoc paste", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "human_validation_layer", "why_it_discriminates": "Innovera's XTL / expert-in-the-loop vs unvalidated software output.", "observed_spread": "human-validated / unvalidated", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "unit_that_actually_competes", "why_it_discriminates": "Forces decomposition — Leap vs McKinsey-core, AIP-commercial vs Gotham-defense, Gemini-Deep-Research vs Alphabet.", "observed_spread": "whole firm / practice / product / feature", "searchable": true, "surfaced_in_round": 1 },
+    { "dimension": "decision_vs_execution_locus", "why_it_discriminates": "THE empty-box boundary. Innovera = upstream DECISION; WorkBoard/SPM cohort = downstream EXECUTION/tracking; venture builders = BUILD. Where a rival plugs into decide->build->execute is the sharpest single separator.", "observed_spread": "decide / build / execute-track", "searchable": true, "surfaced_in_round": 2 },
+    { "dimension": "ai_posture", "why_it_discriminates": "AI-native (Innovera, Palantir-AIP, Hebbia, frontier assistants) vs AI-augmenting-humans (Leap's gen-AI platform, AI boutiques, chatbot-using internal teams) vs AI-free legacy.", "observed_spread": "ai-native / ai-augmented / ai-free", "searchable": true, "surfaced_in_round": 2 },
+    { "dimension": "horizontal_vs_vertical", "why_it_discriminates": "Palantir horizontal-operational; Hebbia finance-vertical; Innovera growth-strategy-vertical. Often the only difference between Innovera and its closest software analogues.", "observed_spread": "horizontal-operational / vertical-finance / vertical-growth", "searchable": true, "surfaced_in_round": 2 },
+    { "dimension": "vendor_viability", "why_it_discriminates": "Some 'competitors' are consolidating or dying (Mach49 wound down; Sopheon absorbed into Wellspring; Tegus into AlphaSense). A defunct rival is not a row, and venture-studio fragility is itself a signal.", "observed_spread": "durable / consolidating / winding-down", "searchable": true, "surfaced_in_round": 2 },
+    { "dimension": "surfaces_omitted_risk", "why_it_discriminates": "Does the tool bring external evidence to surface risks the supplied documents omit (Innovera's claim) or reason only over what it's given (Hebbia's noted limitation)? A crisp, demonstrable differentiator.", "observed_spread": "brings external evidence / reasons only over supplied docs", "searchable": true, "surfaced_in_round": 2 },
+    { "dimension": "internal_team_maturity", "why_it_discriminates": "Per operator, the buyer's own capability ranges from nonexistent -> nascent -> old-school-tooled -> chatbot-augmented -> well-developed. Determines whether the deal is won against a capable team, a rudimentary one, or no team at all (do-nothing).", "observed_spread": "nonexistent / nascent / old-school / chatbot-augmented / well-developed", "searchable": false, "surfaced_in_round": 3 }
+  ],
+
+  "category_claim_test": {
+    "claim": "Business Strategy is an empty enterprise-software box worth $65B+, occupied only by Innovera",
+    "verdict": "survives_with_qualification",
+    "occupants_found": [
+      "Strategy-execution / SPM cohort (WorkBoard(AI) — literally 'system of record for strategy and execution' — plus Cascade, Quantive, Shibumi, Planview, ClearPoint, i-nexus): occupy strategy EXECUTION/tracking, not the growth DECISION",
+      "Innovation-management software (Sopheon/Wellspring, Itonics): occupy the innovation FUNNEL, not single-decision analysis",
+      "AlphaSense/Tegus Workflow Agents: now auto-generate competitive landscapes and SWOT analyses — the inputs/analysis layer creeping upward",
+      "Palantir commercial AIP: 'an operating system for decisions and operations', but horizontal/operational and enterprise-scale, not growth-strategy-specific",
+      "QuantumBlack (McKinsey): 'AI-native decision systems', but embedded in operational functions"
+    ],
+    "direct_clone_found": false,
+    "reasoning": "No direct clone exists — a broad search for an AI-native, FDA-led, growth-strategy DECISION platform with encoded frameworks + human validation returned only (a) AI-implementation consulting (a different job), (b) strategy-EXECUTION software, (c) vertical AI in finance/legal, (d) the Palantir playbook Innovera emulates. So the specific box is genuinely sparse TODAY. QUALIFICATIONS: (1) The box looks empty partly because it is defined tightly (AI-native AND forward-deployed-advisor AND growth-specific AND productized-decision); a box narrow enough to be uniquely occupied is also narrow enough that the $65B tag — which is the growth-CONSULTING market, not the size of this specific software box — likely overstates the near-term software TAM. (2) The claim depends on the DECISION/EXECUTION boundary holding, which is a strategic choice Innovera is actively making: the operator will hold the decision line for now but may relax it later — and the WorkBoard cohort's near-identical 'system of record for strategy' label sits right on that line. (3) At least four adjacent occupants are encroaching toward the center. HONEST VERDICT FOR JAMES: Innovera is first in a narrowly-defined box under multi-directional encroachment — a stronger and more credible story than 'the box is empty and always will be', and the best available proof the machine is not simply echoing the team's priors."
+  },
+
+  "blind_vs_deck_diff": {
+    "contamination_caveat": "Round 1's quarantine failed — section 4 (the deck's positioning claims) was read before the independent frame was built. Contamination biases a model TOWARD agreement, so the DISAGREEMENTS below are trustworthy and the AGREEMENTS carry little weight. Recommended remediation for a clean re-run: have a second model build a frame from the section-4-redacted file and diff THAT.",
+    "agreements_discounted": [
+      "Consultancies (deck's top-left) and the internal team are the main competitors — agrees with the operator and my frame, but contaminated (and independently confirmed by the operator, so usable).",
+      "Frontier assistants (deck's bottom-right) are the substitution risk — agrees, contaminated."
+    ],
+    "omissions_in_deck": [
+      "THE headline finding: the deck's JUDGEMENT x AGILITY 2x2 (top-left consultancies, bottom-right consumer assistants, top-right Innovera alone) has NO position for PALANTIR — the exact playbook Innovera emulates. Palantir's commercial AIP is AI-native AND delivered with human expertise, which places it in or beside Innovera's sole-occupancy top-right quadrant. The 2x2 quietly omits the one competitor that most resembles Innovera.",
+      "The 2x2 also has no home for the strategy-execution/SPM cohort (a different axis: decide vs execute), for NRI / APAC incumbents (regional, high-judgement), or — revealingly — the deck lists Hebbia in its OWN section-4.3 under 'vertical AI eating business operations', filing away the closest architectural analogue as 'operations' to keep the growth box empty.",
+      "The four-column comparison table's Internal-Team column uses PRE-ASSISTANT numbers (3-4 months / $75-150K / 15-20 hrs/wk) and, per the operator, mis-frames reality: most internal teams are nascent or nonexistent, not capable-but-slow — a point that would strengthen Innovera's case if made accurately."
+    ],
+    "boundary_disputes": [
+      "The deck asserts the Business Strategy box is simply empty; the SPM cohort occupies an overlapping 'system of record for strategy' box with a near-identical label. The empty-box claim survives only because Innovera is (for now) holding the decision-vs-execution line — a boundary the deck does not draw explicitly.",
+      "The $65B tag is the growth-CONSULTING category, presented as if it were the size of the empty software box. Worth separating for James."
+    ],
+    "who_else_in_top_right": "Asked by section 4's own diff prompt ('does your frame put anyone in the top-right besides Innovera?'). Answer: PALANTIR (commercial AIP) is already there or adjacent — AI-native platform delivered with forward-deployed human expertise — just horizontal rather than growth-specific. Hebbia is high-agility but lighter on the human-expertise-delivery layer, so it sits more mid-judgement. The deck's claim of SOLE occupancy of the top-right is the single boundary most worth stress-testing, and Palantir is the reason."
+  },
+
+  "questions_for_pedram": [
+    "Is $25K or $50K the canonical single-initiative price? The deck is internally inconsistent; unresolved by the operator and needed before Part 2 fills cells.",
+    "Roadmap timing for expanding downstream from the DECISION layer into strategy EXECUTION/tracking. The operator will hold the decision line for now but flagged 'maybe in future'; the timing determines whether the WorkBoard/SPM row stays a contrast or becomes a head-to-head cohort — and how safe the empty-box claim is 18 months out.",
+    "Does the 2027 enterprise-license story warrant its OWN row axis in Part 2 (Sopheon/Planview/Palantir move up, consultancies shrink), rather than stretching this single-initiative table to cover it?"
+  ],
+
+  "unresolved": [
+    "No deal-level competitive data exists (operator + head of growth Zamir both confirmed none). Per the open-slot rule this would outrank all searching; recorded as absent. Ten loss data points would reshape the row set more than any research did.",
+    "$25K vs $50K price inconsistency across deck slides (Pedram question).",
+    "Name discrepancy: deck says 'Stalwart Ventures' (James's fund); operator wrote 'Stillwood Ventures'. Likely a typo; confirm before the demo since the table is shown to James.",
+    "mckinsey_leap and bcg_x are the closest pair in the final set (both big-house venture builders), kept as two rows per operator directive; if row count ever needs trimming, merge these first.",
+    "ey_parthenon and ai_augmented_boutique carry the thinnest evidence (inferred / cohort-level); firm up or footnote before the demo.",
+    "Deck housekeeping: the Project Knowledge Graph slide carries a '(c) 2025 Cota Capital — Strictly confidential — Not for further distribution' footer, and the New-Enterprise-Category market sizes are cited to 2023 statistics.",
+    "The Round 4 reveal-and-diff was run under contamination (section 4 read in Round 1). Findings lead with disagreements accordingly; a clean second-model diff is the recommended remediation."
+  ]
+}

@@ -1,0 +1,976 @@
+{
+    "run": {
+      "subject": "Innovera",
+      "stage": "part2_parameter_axis",
+      "generated_at": "2026-07-23",
+      "iterations_run": 1,
+      "iteration_note": "Single-pass build under operator time constraint. No ask->answer loop; open judgement calls are listed in review_queue rather than deferred to a round.",
+      "row_axis_source": "innovera_competitive_set_final.json (14 rows, FINAL/converged)",
+      "product_scope": "single_initiative_25k",
+      "counts": {
+        "tier_1": 15,
+        "tier_2": 21,
+        "tier_3": 15,
+        "total": 51,
+        "rows": 14,
+        "cells": 714,
+        "cells_projected_not_applicable": 89,
+        "cells_to_research": 625
+      },
+      "architecture_note": "Conforms to the settled three-tier schema (15/21/15 = 51) and to parameter_generation_runs.full_parameter_schema. Tier 2 maps 4/2/3/3/3/3/3 across the seven Innovera dimensions."
+    },
+    "amendment_proposed": {
+      "title": "Tier 1 becomes unit-identity, not company-identity",
+      "problem": "Tier 1 as built for the ABB rack-PDU run assumes every row is a company with a legal name, founding year, HQ, headcount and revenue. Five of these fourteen rows are not legal entities (three cohorts, plus internal_team and do_nothing_defer) and five more are practices or segments inside firms that do not disclose separately. A company-shaped Tier 1 would render roughly a fifth of the top-left of the table as unknown, which reads as pipeline failure rather than category truth \u2014 in front of an investor who has used the product.",
+      "fix": "Replace legal_name/founded/revenue-style fields with competing_unit + parent_entity + entity_type + operating_model, and route unanswerable cells to an explicit reason enum instead of unknown.",
+      "backward_compatible": "Yes. For the ABB case: competing_unit='APC rack PDU line', parent_entity='Schneider Electric', entity_type='listed_company', operating_model='hardware_product'. This is an improvement to the universal tier, not a per-brief override \u2014 so it does not breach the versioned-parameter-sets decision."
+    },
+    "reason_enum_extension": {
+      "rationale": "Closes the open S2 question on unknowable-fact handling (owner: Daniel). The engine must distinguish missing-because-unknown from missing-because-impossible, and the viewer must render them differently.",
+      "values": {
+        "no_evidence_found": "Entity exists, fact should be public, search failed. Renders as unknown dot.",
+        "extraction_error": "Pipeline fault. Renders as unknown dot.",
+        "not_disclosed": "Entity exists, fact is deliberately private (partnership revenue, practice headcount). Renders as 'Not disclosed' in muted text, NOT as a failure.",
+        "not_applicable_by_construction": "The row is not an entity, so the fact cannot exist. Renders as an em-dash. Must NOT show a confidence dot.",
+        "cohort_row_no_single_value": "The row is a cohort; the value varies across members. Renders as 'Varies across cohort' with the range where useful."
+      },
+      "ui_change_required": "claude-table.md \u00a74.5 currently shows a confidence indicator on every non-header cell. Empty cells were already flagged as incorrectly showing dots. These two reasons must render without one, or the do_nothing_defer row reads as a broken column."
+    },
+    "parameters": [
+      {
+        "parameter_key": "competing_unit",
+        "parameter_label": "Competing Unit",
+        "tier": 1,
+        "description": "The unit that actually competes, at the granularity chosen in Part 1 \u2014 not the parent corporation. E.g. 'McKinsey core corporate/growth-strategy advisory', not 'McKinsey & Company'.",
+        "value_shape": "string",
+        "na_for": [],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "parent_entity",
+        "parameter_label": "Parent Entity",
+        "tier": 1,
+        "description": "Legal entity the competing unit sits inside. Null by construction for demand-side and status-quo rows.",
+        "value_shape": "string",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "med",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "entity_type",
+        "parameter_label": "Entity Type",
+        "tier": 1,
+        "description": "What kind of thing this row is. Makes the heterogeneity of the row set legible rather than looking like missing data.",
+        "value_shape": "string",
+        "enum": [
+          "listed_company",
+          "private_company",
+          "pe_owned",
+          "partnership_practice",
+          "business_segment",
+          "product_cohort",
+          "buyer_function",
+          "status_quo"
+        ],
+        "na_for": [],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "operating_model",
+        "parameter_label": "Operating Model",
+        "tier": 1,
+        "description": "What kind of offering this is, independent of what kind of organisation provides it.",
+        "value_shape": "string",
+        "enum": [
+          "software_product",
+          "advisory_engagement",
+          "hybrid_software_plus_expert",
+          "venture_build",
+          "content_and_expert_access",
+          "internal_capability",
+          "none"
+        ],
+        "na_for": [],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "primary_offering_name",
+        "parameter_label": "Primary Offering",
+        "tier": 1,
+        "description": "The named thing a buyer actually purchases (Accolade, Matrix, AIP + Bootcamp, 'a commercial due diligence'). Null where nothing is purchased.",
+        "value_shape": "string",
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "year_unit_established",
+        "parameter_label": "Unit Established",
+        "tier": 1,
+        "description": "Year the competing unit was founded or formed as a distinct practice/product line.",
+        "value_shape": "number",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team",
+          "workboard_spm",
+          "ai_augmented_boutique",
+          "frontier_assistants"
+        ],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "year_offering_launched",
+        "parameter_label": "Offering Launched",
+        "tier": 1,
+        "description": "Year the current named offering became commercially available. Separates twenty-year-old software from two-year-old software \u2014 high variance across this set.",
+        "value_shape": "number",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "headquarters",
+        "parameter_label": "Headquarters",
+        "tier": 1,
+        "description": "Primary operating base of the competing unit.",
+        "value_shape": "string",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team",
+          "frontier_assistants",
+          "ai_augmented_boutique"
+        ],
+        "variance": "med",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "ownership_status",
+        "parameter_label": "Ownership",
+        "tier": 1,
+        "description": "Who owns it. Directly relevant to vendor_viability and to how much runway a rival has.",
+        "value_shape": "string",
+        "enum": [
+          "public",
+          "vc_backed",
+          "pe_owned",
+          "partnership",
+          "subsidiary",
+          "n_a"
+        ],
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "disclosed_financials",
+        "parameter_label": "Disclosed Financials",
+        "tier": 1,
+        "description": "Publicly reported revenue / ARR / total funding for the competing unit, with as-of date. Expect not_disclosed for partnership practices \u2014 that absence is itself a fact.",
+        "value_shape": "object",
+        "summary_keys": [
+          "metric",
+          "value",
+          "as_of"
+        ],
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "employees_or_practitioners",
+        "parameter_label": "Headcount",
+        "tier": 1,
+        "description": "Practitioners in the competing unit. For practices, use published practice size; for cohorts, mark cohort_row.",
+        "value_shape": "number",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team",
+          "workboard_spm",
+          "ai_augmented_boutique",
+          "frontier_assistants"
+        ],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "stated_positioning",
+        "parameter_label": "Stated Positioning",
+        "tier": 1,
+        "description": "How the unit describes itself, in its own words, short quoted fragment plus source. The self-description is the fact; do not paraphrase into analysis.",
+        "value_shape": "string",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "viability_status",
+        "parameter_label": "Viability",
+        "tier": 1,
+        "description": "Durable / consolidating / winding-down / defunct. Added after the Part 1 finding that Mach49 was wound down in Aug 2025 while aggregator profiles still showed it live. No competitor tool carries this column.",
+        "value_shape": "string",
+        "enum": [
+          "durable",
+          "consolidating",
+          "winding_down",
+          "defunct",
+          "n_a"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "med",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "named_clients_disclosed",
+        "parameter_label": "Named Clients",
+        "tier": 1,
+        "description": "Publicly named clients, cited. Separates 'claims to serve corporate strategy teams' from 'names one'.",
+        "value_shape": "array",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "public_source_of_truth",
+        "parameter_label": "Source of Truth",
+        "tier": 1,
+        "description": "Canonical URL the research pipeline anchors to. Also the entity-anchor string for Exa queries \u2014 see the M15 entity-anchoring failure mode.",
+        "value_shape": "string",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "low",
+        "citation_required": false
+      },
+      {
+        "parameter_key": "who_does_the_thinking",
+        "parameter_label": "Who Does the Thinking",
+        "tier": 2,
+        "description": "Which agent produces the judgement, and the AI posture of that production. Merged from two dimension seeds (who_does_the_thinking + ai_posture) \u2014 near-duplicates across this row set, merged per the \u00a77 variance rule.",
+        "value_shape": "object",
+        "dimension": "product_solution",
+        "summary_keys": [
+          "thinker",
+          "ai_posture"
+        ],
+        "enum_thinker": [
+          "human_experts",
+          "client",
+          "software",
+          "human_plus_software"
+        ],
+        "enum_ai_posture": [
+          "ai_native",
+          "ai_augmented",
+          "ai_free"
+        ],
+        "na_for": [],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "decision_vs_execution_locus",
+        "parameter_label": "Decision vs Execution Locus",
+        "tier": 2,
+        "description": "Where the offering attaches to decide -> build -> execute. THE empty-box boundary: Innovera claims the upstream decision layer; the SPM cohort owns downstream execution; venture builders own build.",
+        "value_shape": "string",
+        "dimension": "product_solution",
+        "enum": [
+          "decide",
+          "build",
+          "execute_track",
+          "none"
+        ],
+        "na_for": [],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "output_artifact",
+        "parameter_label": "Output Artifact",
+        "tier": 2,
+        "description": "What the buyer physically receives: slide deck, written report, cited comparison table, live dashboard, financial model, a standing venture, or nothing.",
+        "value_shape": "array",
+        "dimension": "product_solution",
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "auditable_provenance",
+        "parameter_label": "Auditable Provenance",
+        "tier": 2,
+        "description": "Whether every conclusion traces to evidence. Innovera's reasoning-graph claim; also true of Hebbia and Palantir, which is why this column does not flatter.",
+        "value_shape": "string",
+        "dimension": "product_solution",
+        "enum": [
+          "traceable_evidence_graph",
+          "per_claim_citations",
+          "source_list_only",
+          "opaque"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "primary_buyer",
+        "parameter_label": "Primary Buyer",
+        "tier": 2,
+        "description": "Job title that signs. Determines whether two rows ever meet in the same room.",
+        "value_shape": "string",
+        "dimension": "customers",
+        "enum": [
+          "corp_strategy",
+          "innovation_or_cvc",
+          "business_unit_gm",
+          "c_suite",
+          "finance_or_pe_analyst",
+          "innovation_office_or_it"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "buying_trigger",
+        "parameter_label": "Buying Trigger",
+        "tier": 2,
+        "description": "The event that causes a purchase \u2014 board paper, capex committee, JV term sheet, annual planning, renewal. Innovera's trigger is a dated decision; a software renewal is not.",
+        "value_shape": "string",
+        "dimension": "customers",
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "unit_of_sale",
+        "parameter_label": "Unit of Sale",
+        "tier": 2,
+        "description": "Initiative / seat / report / retainer / venture / bootcamp. Innovera's per-initiative pricing is structurally unusual and most rows cannot occupy it.",
+        "value_shape": "string",
+        "dimension": "transaction",
+        "enum": [
+          "initiative",
+          "seat",
+          "report",
+          "retainer",
+          "engagement",
+          "venture",
+          "bootcamp",
+          "none"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "published_price_band",
+        "parameter_label": "Published Price Band",
+        "tier": 2,
+        "description": "Actual published or credibly reported numbers with currency and basis. Where quote-only, record that fact rather than an estimate.",
+        "value_shape": "object",
+        "dimension": "transaction",
+        "summary_keys": [
+          "low",
+          "high",
+          "basis"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "commitment_shape",
+        "parameter_label": "Commitment Shape",
+        "tier": 2,
+        "description": "One-off / annual / multi-year / usage-based, and minimum term. Determines whether a rival is displaceable per-decision or locked in for a year.",
+        "value_shape": "string",
+        "dimension": "transaction",
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "med",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "upstream_dependencies",
+        "parameter_label": "Upstream Dependencies",
+        "tier": 2,
+        "description": "Which LLMs, data providers or content licences the offering consumes. This is where the supplier_substitute relationship becomes visible as a fact rather than an argument.",
+        "value_shape": "array",
+        "dimension": "partners",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "channel_and_alliances",
+        "parameter_label": "Channel & Alliances",
+        "tier": 2,
+        "description": "Resellers, SI partnerships, Big-4 alliances, cloud marketplaces. How the offering reaches an APAC conglomerate that has never heard of it.",
+        "value_shape": "array",
+        "dimension": "partners",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "human_validation_layer",
+        "parameter_label": "Human Validation Layer",
+        "tier": 2,
+        "description": "Whether a named human expert validates output before the buyer sees it, and how that expert is sourced. Innovera's XTL claim; the column that separates it from unvalidated software.",
+        "value_shape": "string",
+        "dimension": "partners",
+        "enum": [
+          "expert_network_validated",
+          "staff_expert_validated",
+          "client_validated",
+          "unvalidated",
+          "n_a"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "delivery_mechanism",
+        "parameter_label": "Delivery Mechanism",
+        "tier": 2,
+        "description": "Self-serve product / embedded forward-deployed person / on-site team / DIY. The Access dimension was absent in the ABB run; it carries real weight here.",
+        "value_shape": "string",
+        "dimension": "access",
+        "enum": [
+          "self_serve_software",
+          "embedded_forward_deployed",
+          "onsite_team",
+          "remote_engagement",
+          "diy",
+          "none"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "time_to_first_usable_output",
+        "parameter_label": "Time to First Usable Output",
+        "tier": 2,
+        "description": "Hours (assistants) / days-weeks (Innovera, AIP bootcamp) / weeks-months (consulting) / 12-18 months (venture build). Record the vendor's stated figure and flag it as a claim.",
+        "value_shape": "object",
+        "dimension": "access",
+        "summary_keys": [
+          "value",
+          "unit",
+          "basis"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "procurement_path",
+        "parameter_label": "Procurement Path",
+        "tier": 2,
+        "description": "Whether the buy clears inside the decision window: under-PO threshold, full enterprise procurement, an existing subscription already in the building, or no purchase at all. Often decides the deal before capability does.",
+        "value_shape": "string",
+        "dimension": "access",
+        "enum": [
+          "under_po_threshold",
+          "enterprise_procurement",
+          "existing_subscription",
+          "no_purchase"
+        ],
+        "na_for": [],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "regional_delivery_footprint",
+        "parameter_label": "Regional Footprint",
+        "tier": 2,
+        "description": "Where the unit can actually deliver. Innovera's live book is Thailand, Japan, Korea, Indonesia and Central Asia (Kazakhstan, Azerbaijan) with NA/EU as prestige targets \u2014 a footprint most software rivals do not have and NRI does.",
+        "value_shape": "array",
+        "dimension": "geography_regulatory",
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "local_language_delivery",
+        "parameter_label": "Local-Language Delivery",
+        "tier": 2,
+        "description": "Can the unit staff an engagement in Japanese, Korean, Thai or Russian to a standard a client board will accept. A binary that quietly decides APAC and Central Asia deals.",
+        "value_shape": "array",
+        "dimension": "geography_regulatory",
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "governance_and_data_controls",
+        "parameter_label": "Governance & Data Controls",
+        "tier": 2,
+        "description": "SOC 2 / ISO / SOX support, data residency, on-prem or VPC options, model-training opt-out. Innovera's stated AI-control-layer differentiator, tested as a fact rather than a claim.",
+        "value_shape": "array",
+        "dimension": "geography_regulatory",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "marginal_cost_of_next_assessment",
+        "parameter_label": "Marginal Cost of Next Assessment",
+        "tier": 2,
+        "description": "Does assessment n+1 cost the same as assessment n? Software falls toward zero; consulting stays flat; Innovera claims sublinear while retaining a human advisor per engagement. The compounding claim, made testable.",
+        "value_shape": "string",
+        "dimension": "capital_asset",
+        "enum": [
+          "falls_to_near_zero",
+          "sublinear",
+          "flat_linear",
+          "rises"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "proprietary_asset",
+        "parameter_label": "Proprietary Asset",
+        "tier": 2,
+        "description": "What the vendor owns that a competitor cannot buy: a document corpus, an ontology, an expert panel, an encoded methodology, a brand, a model.",
+        "value_shape": "array",
+        "dimension": "capital_asset",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "client_side_compounding",
+        "parameter_label": "Client-Side Compounding",
+        "tier": 2,
+        "description": "Does institutional memory accrue to the client across engagements, or does it leave with the team. The system-of-record claim from the buyer's side.",
+        "value_shape": "string",
+        "dimension": "capital_asset",
+        "enum": [
+          "compounds_in_platform",
+          "compounds_in_client_docs",
+          "one_off"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "grounded_in",
+        "parameter_label": "Grounded In",
+        "tier": 3,
+        "description": "Client corpus (Innovera SOT layer, Hebbia) vs external market content (AlphaSense, Gartner) vs whatever gets pasted in (assistants). Determines which risks can surface at all.",
+        "value_shape": "string",
+        "enum": [
+          "client_corpus",
+          "external_market_content",
+          "both",
+          "ad_hoc_paste",
+          "none"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "surfaces_omitted_risk",
+        "parameter_label": "Surfaces Omitted Risk",
+        "tier": 3,
+        "description": "Does the offering bring external evidence to surface risks the supplied documents omit, or reason only over what it is given. Record documented behaviour or an explicit vendor claim, cited \u2014 not the analyst's opinion.",
+        "value_shape": "string",
+        "enum": [
+          "brings_external_evidence",
+          "reasons_only_over_supplied",
+          "unclear"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "forward_deployed_human_model",
+        "parameter_label": "Forward-Deployed Human",
+        "tier": 3,
+        "description": "Whether a person embeds with the client, and under what title. Palantir FDE, Innovera FDA, McKinsey EM, none. The GTM pattern Innovera says it emulates, checked across the set.",
+        "value_shape": "object",
+        "summary_keys": [
+          "embeds",
+          "title"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "frameworks_encoded",
+        "parameter_label": "Frameworks Encoded",
+        "tier": 3,
+        "description": "Named strategic frameworks built into the product versus freeform reasoning. Innovera's FBM claim; also the thing a frontier assistant does not have by default.",
+        "value_shape": "array",
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "scenario_pathway_modelling",
+        "parameter_label": "Scenario / Pathway Modelling",
+        "tier": 3,
+        "description": "Does it model multiple strategic paths and quantify tradeoffs, or evaluate a single plan. Innovera claims up to three pathways (MPS / MSPO).",
+        "value_shape": "string",
+        "enum": [
+          "multi_path_quantified",
+          "multi_path_qualitative",
+          "single_path",
+          "none"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "financial_business_case_output",
+        "parameter_label": "Financial Business Case",
+        "tier": 3,
+        "description": "Does the offering produce a cash-flow or unit-economics model, or stop at qualitative assessment. Innovera's FME claim.",
+        "value_shape": "string",
+        "enum": [
+          "full_model",
+          "summary_economics",
+          "none"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "determinism_and_reproducibility",
+        "parameter_label": "Determinism",
+        "tier": 3,
+        "description": "Same inputs, same answer twice? Vendor claims and any documented controls. Enterprise governance cares; this is the substance of the AI-control-layer argument.",
+        "value_shape": "string",
+        "enum": [
+          "deterministic_workflow",
+          "reproducible_with_caveats",
+          "non_deterministic",
+          "n_a"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "accuracy_and_hallucination_controls",
+        "parameter_label": "Accuracy Controls",
+        "tier": 3,
+        "description": "Documented mechanisms for preventing or catching fabricated output: citation enforcement, human review gates, published eval results, none.",
+        "value_shape": "array",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "growth_initiative_purpose_built",
+        "parameter_label": "Purpose-Built for Growth Decisions",
+        "tier": 3,
+        "description": "Is the offering built specifically for new-venture and market-entry decisions, or general-purpose and merely usable for them. The narrowness that makes the empty box look empty.",
+        "value_shape": "string",
+        "enum": [
+          "purpose_built",
+          "adaptable_general",
+          "general_purpose",
+          "n_a"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "horizontal_vs_vertical",
+        "parameter_label": "Horizontal vs Vertical",
+        "tier": 3,
+        "description": "Palantir horizontal-operational, Hebbia finance-vertical, Innovera growth-strategy-vertical. Frequently the only real difference between Innovera and its closest software analogues.",
+        "value_shape": "string",
+        "enum": [
+          "horizontal_operational",
+          "vertical_finance",
+          "vertical_growth_strategy",
+          "vertical_other",
+          "n_a"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "public_evidence_of_growth_decision_use_case",
+        "parameter_label": "Evidence of Growth-Decision Use",
+        "tier": 3,
+        "description": "A citable case study of THIS unit being used for a market-entry or new-venture decision specifically. The sharpest test of whether a row is a real competitor or a theoretical one. Expect several honest unknowns; that pattern is the finding.",
+        "value_shape": "object",
+        "summary_keys": [
+          "found",
+          "case"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "self_declared_competitors",
+        "parameter_label": "Self-Declared Competitors",
+        "tier": 3,
+        "description": "Who this unit names as its own competitors, from its site, comparison pages or filings. Whether anyone names Innovera is direct evidence for or against the empty-box claim.",
+        "value_shape": "array",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "pricing_transparency",
+        "parameter_label": "Pricing Transparency",
+        "tier": 3,
+        "description": "Published price, banded guidance, or quote-only. A real, searchable fact and a genuine Innovera differentiator against the whole consulting cohort.",
+        "value_shape": "string",
+        "enum": [
+          "published",
+          "banded_guidance",
+          "quote_only",
+          "n_a"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "overlap_with_innovera_named_accounts",
+        "parameter_label": "Overlap with Innovera Accounts",
+        "tier": 3,
+        "description": "Which of Innovera's named pilots and pipeline logos (LG, Mitsubishi, ABB, Kajima, MOL, Ecolab, Daikin, Samsung, Singtel, Zebra, Baker Hughes, ST Engineering, Honeywell, Hitachi, Hyundai...) are also public clients of this unit. Collision in the actual book, not the theoretical market.",
+        "value_shape": "array",
+        "na_for": [
+          "do_nothing_defer",
+          "internal_team"
+        ],
+        "variance": "high",
+        "citation_required": true
+      },
+      {
+        "parameter_key": "direction_of_travel",
+        "parameter_label": "Direction of Travel",
+        "tier": 3,
+        "description": "Product or GTM moves in the last ~18 months that carry this unit toward or away from Innovera's box \u2014 AlphaSense Workflow Agents, WorkBoard's AI chief of staff, Leap's gen-AI platform, Wellspring's absorption of Sopheon. The encroachment evidence that makes the survives-with-qualification verdict defensible.",
+        "value_shape": "object",
+        "summary_keys": [
+          "vector",
+          "evidence"
+        ],
+        "na_for": [
+          "do_nothing_defer"
+        ],
+        "variance": "high",
+        "citation_required": true
+      }
+    ],
+    "derived_views": {
+      "note": "Dimension seeds that are analysis rather than fact. They are NOT researched parameters \u2014 citation would be impossible \u2014 but the analysis engine can compute them from cited cells. Keeps the fact-only rule intact without losing the discriminator.",
+      "views": [
+        {
+          "view": "depth_vs_speed_position",
+          "computed_from": [
+            "time_to_first_usable_output",
+            "published_price_band"
+          ],
+          "seed_origin": 10,
+          "spread": "deep-slow / hybrid / fast-shallow"
+        },
+        {
+          "view": "price_band_vs_procurement_threshold",
+          "computed_from": [
+            "published_price_band",
+            "procurement_path"
+          ],
+          "seed_origin": 8,
+          "spread": "under-PO / enterprise / $M+ study"
+        }
+      ]
+    },
+    "operator_supplied": {
+      "note": "Dimension seed 19 (internal_team_maturity) is flagged searchable:false. Under the settled citation rule a claim is either cited or it is not in the table, so it cannot be a parameter. It becomes a row annotation on internal_team sourced to internal_evidence / team_recollection, matching the Part 1 schema.",
+      "fields": [
+        {
+          "row": "internal_team",
+          "field": "internal_team_maturity",
+          "value": "Spectrum: nonexistent -> nascent -> old-school-tooled -> general-chatbot-augmented -> well-developed. Operator's read: most are nascent or absent; those that exist use old-school tools; general chatbots increasingly, purpose-built tools rarely.",
+          "source": "team_recollection"
+        }
+      ]
+    },
+    "seed_coverage": {
+      "total_seeds": 19,
+      "mapped": 17,
+      "derived": 2,
+      "operator_supplied": 1,
+      "unmapped": 0,
+      "merges": [
+        {
+          "merged": [
+            "who_does_the_thinking",
+            "ai_posture"
+          ],
+          "into": "who_does_the_thinking",
+          "reason": "Near-duplicate across this row set \u2014 the two resolve together on 11 of 14 rows. Merged per the \u00a77 variance rule; ai_posture survives as a sub-field so no information is lost."
+        }
+      ],
+      "cuts": [
+        {
+          "cut": "target_customer_size",
+          "reason": "Dead column \u2014 near-zero variance. Thirteen of fourteen rows resolve to 'large enterprise'. Cut on the same variance test the row axis uses."
+        }
+      ]
+    },
+    "null_projection": {
+      "by_row": {
+        "mckinsey_core": 0,
+        "mckinsey_leap": 0,
+        "bcg_x": 0,
+        "ey_parthenon": 0,
+        "nri": 0,
+        "sopheon_wellspring": 0,
+        "workboard_spm": 9,
+        "hebbia": 0,
+        "alphasense_tegus": 0,
+        "palantir_aip": 0,
+        "frontier_assistants": 9,
+        "internal_team": 17,
+        "do_nothing_defer": 45,
+        "ai_augmented_boutique": 9
+      },
+      "commentary": "do_nothing_defer and internal_team carry the emptiness. That is not a defect \u2014 for do_nothing the emptiness IS the finding (the most frequent loss has no vendor, no price, no timeline and no artifact). Style it deliberately as a baseline row and it becomes the strongest single moment in the demo. Style it as unknown and it looks broken."
+    },
+    "review_queue": [
+      {
+        "item": "Cell volume",
+        "detail": "714 cells vs 255 in the ABB run \u2014 2.8x the research spend, and the <500ms render acceptance criterion was measured at 255. Recommend filling Tier 1+2 first (504 cells), gating on quality, then Tier 3.",
+        "owner": "Harry"
+      },
+      {
+        "item": "Entity-anchoring",
+        "detail": "public_source_of_truth exists partly to seed the entity anchor for every Exa query. Cohort and non-entity rows have no anchor, so the M15 failure mode (queries returning competitor pages) will recur on five of fourteen rows unless those rows are researched member-by-member and rolled up.",
+        "owner": "Felipe"
+      },
+      {
+        "item": "Thin rows",
+        "detail": "ey_parthenon and ai_augmented_boutique were already inferred at row level; they will also be the thinnest columns. Footnote or firm up before James sees it.",
+        "owner": "Harry"
+      },
+      {
+        "item": "$25K vs $50K",
+        "detail": "Still unresolved and now blocking. published_price_band cannot be filled for the Innovera reference column until Pedram settles it.",
+        "owner": "Pedram"
+      },
+      {
+        "item": "Stalwart vs Stillwood",
+        "detail": "Name mismatch on James's own fund. Confirm before the demo.",
+        "owner": "Harry"
+      }
+    ]
+  }
